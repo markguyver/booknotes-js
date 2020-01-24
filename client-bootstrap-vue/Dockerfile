@@ -1,8 +1,6 @@
 FROM node:12.14.1-alpine3.9
-
-EXPOSE 3000
+EXPOSE 3000/tcp
 WORKDIR /var/node
-
 RUN npm install -g @vue/cli serve
 
 #COPY application /var/node
