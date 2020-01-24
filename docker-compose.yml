@@ -1,0 +1,36 @@
+version: "3"
+services:
+  server:
+    build: ./server-express-node
+    environment:
+      APP_DB_HOST: database-relational
+      APP_DB_USER: root
+      APP_DB_PASSWORD:
+      APP_DB_SCHEMA: booknotes
+    image: booknotes-js-server
+    networks:
+      - booknotes-network
+    ports:
+      - "5000"
+  client:
+    build: client-bootstrap-vue
+    environment:
+      APP_API_URL: server
+    image: booknotes-js-client
+    networks:
+      - booknotes-network
+    ports:
+      - "80:3000"
+  database-relational:
+    build: ./database-relational-mariadb
+    image: booknotes-js-database-relational
+    networks:
+      - booknotes-network
+    ports:
+      - "3306"
+    volumes:
+      - database-relational-data:/var/lib/mysql
+networks:
+  booknotes-network:
+volumes:
+  database-relational-data:
