@@ -23,6 +23,8 @@ services:
       - "80:3000"
   database-relational:
     build: ./database-relational-mariadb
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
     image: booknotes-js-database-relational
     networks:
       - booknotes-network
