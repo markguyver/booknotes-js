@@ -1,9 +1,10 @@
 <template>
     <b-navbar type="dark" variant="secondary">
-        <b-navbar-brand>Booknotes</b-navbar-brand>
+        <b-navbar-brand to="/">Booknotes</b-navbar-brand>
         <b-navbar-nav class="ml-auto">
             <b-nav-item-dropdown text="Authors" right>
-                <b-dropdown-item href="#">Browse Authors</b-dropdown-item>
+                <b-dropdown-item to="/authors">Browse Authors</b-dropdown-item>
+                <b-dropdown-item>Create Author(s)</b-dropdown-item>
             </b-nav-item-dropdown>
             <b-nav-item-dropdown text="Books" right>
                 <b-dropdown-item href="#">Browse Books</b-dropdown-item>

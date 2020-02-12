@@ -1,8 +1,7 @@
 <template>
     <b-container class="booknotes-application">
         <Header />
-        <div>{{ $route }}</div>
-        <router-view />
+        <router-view class="my-2" />
         <Footer />
     </b-container>
 </template>
