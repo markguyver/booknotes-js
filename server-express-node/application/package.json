@@ -2,29 +2,35 @@
   "name": "booknotes-js-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "compile": "tsc",
+    "develop": "npm run compile && nodemon dist",
+    "start": "pm2 start dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mark Chavez <mark.chavez@startmail.com>",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "immutable": "^4.0.0-rc.12",
     "inversify": "^5.0.1",
-    "mysql": "^2.18.1",
+    "mysql2": "^2.1.0",
     "ramda": "^0.26.1",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.21.3",
     "umzug": "^2.2.0"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.29",
     "@types/express": "^4.17.2",
-    "@types/node": "^13.5.0",
-    "@types/ramda": "^0.26.40",
+    "@types/node": "^13.7.0",
+    "@types/ramda": "^0.26.41",
     "@types/sequelize": "^4.28.8",
-    "@typescript-eslint/eslint-plugin": "^2.17.0",
-    "@typescript-eslint/parser": "^2.17.0",
+    "@types/validator": "^12.0.1",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "@typescript-eslint/parser": "^2.19.0",
     "eslint": "^6.8.0",
     "typescript": "^3.7.5"
   }
