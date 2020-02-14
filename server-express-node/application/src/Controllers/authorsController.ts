@@ -1,59 +1,23 @@
-import {Sequelize, DataTypes, Model} from 'sequelize';
-import {Request, Response} from 'express';
+import {Request, Response, Router} from 'express';
+import {sequelize} from './databaseController';
 
-const sequelize = new Sequelize('mysql://root:@booknotes-database:3306/marknotes');
-
-class Authors extends Model {
-    public id!: number;
-    public first_name!: string | null;
-    public middle_name!: string | null;
-    public last_name!: string;
-    public parent_author_id!: number | null;
-}
-
-Authors.init({
-    id: {
-        primaryKey: true,
-        type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: false,
-        autoIncrement: true,
-    },
-    first_name: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-    },
-    middle_name: {
-        type: DataTypes.STRING(255),
-        allowNull: true,
-    },
-    last_name: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-    },
-    parent_author_id: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: true,
-    },
-},{
-    sequelize,
-    tableName: 'authors',
-    modelName: 'authors',
-});
-
-export const getAllAuthors = (request: Request, response: Response): Response => {
-    Authors.findAll({order:[ ['last_name', 'ASC'], ['first_name', 'ASC'], ['middle_name', 'ASC'] ]}).then(results => {
+const getAllAuthors = (request: Request, response: Response): Response => {
+    sequelize.models.Authors.findAll({
+        order: [['last_name', 'ASC'], ['first_name', 'ASC'], ['middle_name', 'ASC']],
+        paranoid: false,
+    }).then(results => {
         response.type('json');
         response.send({ Authors: results });
     });
     return response;
 };
 
-export const createNewAuthor = (request: Request, response: Response): Response => {
+const createNewAuthor = (request: Request, response: Response): Response => {
 
     // TODO Parse Request Body into Author Object
 
-    Authors.create(request.body).then(() => {
-        Authors.findOne({where: request.body}).then(result => {
+    sequelize.models.Authors.create(request.body).then(() => {
+        sequelize.models.Authors.findOne({where: request.body}).then(result => {
             response.type('json');
             response.status(201);
             response.send({ Authors: [result] });
@@ -61,3 +25,23 @@ export const createNewAuthor = (request: Request, response: Response): Response 
     });
     return response;
 };
+
+const getAuthorById = (request: Request, response: Response): Response => {
+    const authorId = request.params.authorId;
+    sequelize.models.Authors.findByPk(authorId).then(result => {
+        console.log('Get Author by ID results:', result);
+        response.type('json');
+        response.send({ Authors: [result] });
+    }).catch(error => {
+        console.error('Get Author by ID error:', error);
+        response.status(500).send();
+    });
+    return response;
+};
+
+export const authorsRoutes = Router();
+authorsRoutes.get('/', getAllAuthors);
+authorsRoutes.post('/', createNewAuthor);
+
+export const authorRoutes = Router();
+authorRoutes.get('/:authorId', getAuthorById);
