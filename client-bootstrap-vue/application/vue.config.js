@@ -1,5 +1,5 @@
 module.exports = {
     devServer: {
-        proxy: 'http://booknotes-server:5000'
+        proxy: 'http://booknotesjs_server_1:5000'
     }
 };

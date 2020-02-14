@@ -5,9 +5,10 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 // Application Imports
-import routes from './routes';
 import BookNotes from './BookNotes.vue';
-import 'bootstrap/dist/css/bootstrap.css';
+import routes from './routes';
+import BreadcrumbsMixin from './mixins/breadcrumbsGenerator';
+import './assets/theme.scss';
 
 // Configure Framework
 Vue.config.productionTip = false;
@@ -17,6 +18,7 @@ Vue.use(BootstrapVue);
 Vue.use(PortalVue);
 Vue.use(VueRouter);
 Vue.use(IconsPlugin);
+Vue.mixin(BreadcrumbsMixin);
 
 // Configure Application
 const router = new VueRouter({routes});
