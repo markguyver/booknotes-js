@@ -1,0 +1,44 @@
+// Booknotes-JS Custom Variables
+$slate-shadow: #132639;
+$slate-midtone: #264d73;
+$slate-highlight: #79a6d2;
+
+$lavender-shadow: #1a0033;
+$lavender-midtone: #400080;
+$lavender-highlight: #b38cd9;
+
+$eggplant-shadow: #330033;
+$eggplant-midtone: #800080;
+$eggplant-highlight: #e600e6;
+
+$olive-shadow: #1a3300;
+$olive-midtone: #264d00;
+$olive-highlight: #4d9900;
+
+$crimson-shadow: #4d0000;
+$crimson-midtone: #800000;
+$crimson-highlight: #cc0000;
+
+$squash-shadow: #331a00;
+$squash-midtone: #804000;
+$squash-highlight: #cc6600;
+
+$turquoise-shadow: #003333;
+$turquoise-midtone: #006666;
+$turquoise-highlight: #00cccc;
+
+$tobacco-shadow: #271a0c;
+$tobacco-midtone: #4d3319;
+$tobacco-highlight: #7e4d1b;
+
+// Booknotes-JS Variable Overrides
+$theme-colors: (
+  "primary": $slate-midtone,
+  "info": $lavender-highlight
+);
+
+// Bootstrap and its default variables
+@import '../../node_modules/bootstrap/scss/bootstrap';
+
+// BootstrapVue and its default variables
+@import '../../node_modules/bootstrap-vue/src/index.scss';
