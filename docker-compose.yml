@@ -27,7 +27,7 @@ services:
   database-relational:
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
-    image: mariadb:10.4.11
+    image: mariadb:10.4.12
     networks:
       - booknotes-network
     ports:
