@@ -3,6 +3,7 @@ import express from 'express';
 
 import {authorsRoutes, authorRoutes} from './Controllers/authorsController';
 import {booksRoutes, bookRoutes} from './Controllers/booksController';
+import {tagsRoutes, tagRoutes} from './Controllers/tagsController';
 
 const expressServerInstance = express();
 const port = process.env.APP_PORT || 5000;
@@ -24,6 +25,10 @@ expressServerInstance.use('/author', authorRoutes);
 // Books Resource Requests
 expressServerInstance.use('/books', booksRoutes);
 expressServerInstance.use('/book', bookRoutes);
+
+// Tags Resource Requests
+expressServerInstance.use('/tags', tagsRoutes);
+expressServerInstance.use('/tag', tagRoutes);
 
 // Start the Server
 expressServerInstance.listen(port, () => console.log(`Booknotes API Server started on port: ${port}`));

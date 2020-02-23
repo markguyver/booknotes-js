@@ -178,6 +178,36 @@ Notes.init({
     underscored: true,
 });
 
+class Tags extends Model {
+    public id!: number;
+    public tag!: string;
+}
+
+Tags.init({
+    id: {
+        primaryKey: true,
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+        autoIncrement: true,
+    },
+    tag: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+    },
+},{
+    sequelize,
+    tableName: 'tags',
+    modelName: 'Tags',
+    timestamps: true,
+    paranoid: true,
+    underscored: true,
+});
+
+// Authors <=> Authors
+Authors.belongsTo(Authors, { foreignKey: 'parent_author_id', as: 'ActualAuthor' });
+Authors.hasMany(Authors, { foreignKey: 'parent_author_id', as: 'Pseudonyms' });
+
+// Authors <=> Books <=> Contribution Types
 Authors.hasMany(BookAuthors);
 Books.hasMany(BookAuthors);
 ContributionTypes.hasMany(BookAuthors);
@@ -185,7 +215,16 @@ BookAuthors.belongsTo(Authors);
 BookAuthors.belongsTo(Books);
 BookAuthors.belongsTo(ContributionTypes);
 
+// Books <=> Notes
 Books.hasMany(Notes);
 Notes.belongsTo(Books);
+
+// Tags <=> Authors , Tags <=> Books , Tags <=> Notes
+Authors.belongsToMany(Tags, { through: 'author_tags', timestamps: false });
+Tags.belongsToMany(Authors, { through: 'author_tags', timestamps: false });
+Tags.belongsToMany(Books, { through: 'book_tags', timestamps: false });
+Books.belongsToMany(Tags, { through: 'book_tags', timestamps: false });
+Tags.belongsToMany(Notes, { through: 'note_tags', timestamps: false });
+Notes.belongsToMany(Tags, { through: 'note_tags', timestamps: false });
 
 sequelize.sync(); // TODO Switch to Migrations with Umzug
