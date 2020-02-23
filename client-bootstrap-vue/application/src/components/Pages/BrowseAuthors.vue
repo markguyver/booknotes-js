@@ -7,13 +7,18 @@
     </b-row>
     <b-row v-if="displayAuthors">
         <b-col class="pr-2">
-            <SidebarFacets class="mr-2" />
+            <SidebarFacets class="mr-2" :sidebarFacets="facetOptions" :sidebarFacetDataset="authors" v-on:resultsUpdated="updateAuthorsOnPage" />
         </b-col>
         <b-col cols="9" class="px-0 mr-3">
             <b-list-group>
-                <b-list-group-item v-for="author in authorsOnPage" v-bind:key="author.id" v-bind:to="{ path: 'author/' + author.id }">
+                <b-list-group-item v-bind:variant="author.deleted_at ? 'light' : ''" v-for="author in authorsOnPage" v-bind:key="author.id" v-bind:to="{ path: 'author/' + author.id }" class="d-flex justify-content-between align-items-center">
                     {{ displayAuthorNameLastFirst(author) }}
-                    <b-badge pill class="book-count-badge" variant="info">#</b-badge>
+                    <span>
+                        <b-badge pill class="artist-badge text-light ml-1" variant="tags" v-for="tag in author.Tags" v-bind:key="tag.id" v-bind:to="'/tag/' + tag.id">{{ tag.tag }}</b-badge>
+                        <b-badge pill class="artist-badge text-light ml-1" variant="info" v-if="author.bookCount">{{ author.bookCount + (author.bookCount > 1 ? ' books' : ' book') }}</b-badge>
+                        <b-badge pill class="artist-badge text-light ml-1" variant="pseudonym" v-if="author.parent_author_id">Pseudonym</b-badge>
+                        <b-badge pill class="artist-badge text-light ml-1" variant="danger" v-if="author.deleted_at">Deleted</b-badge>
+                    </span>
                 </b-list-group-item>
             </b-list-group>
         </b-col>
@@ -22,11 +27,11 @@
 
 <script>
 import axios from 'axios';
-import Loading from './Loading.vue';
-import SidebarFacets from './SidebarFacets.vue';
+import Loading from '../PageElements/Loading.vue';
+import SidebarFacets from '../PageElements/SidebarFacets.vue';
 
-const removePenNamesFilter = author => !author.parent_author_id;
-const removeSoftDeletedAuthors = author => !author.deletedAt;
+const removePenNamesFilter = author => (!author.parent_author_id);
+const removeSoftDeletedAuthors = author => !author.deleted_at;
 
 export default {
     name: "BrowseAuthors",
@@ -48,11 +53,25 @@ export default {
             text: 'Browse Authors',
             active: true,
         }],
+        facetOptions: [{
+            label: 'Show Deleted',
+            type: 'checkbox',
+            filter: author => !author.deleted_at,
+            checked: false,
+        },{
+            label: 'Show Pseudonyms',
+            type: 'checkbox',
+            filter: author => !author.parent_author_id,
+            checked: false,
+        }],
     };},
     methods: {
         displayAuthorNameLastFirst: author => author.last_name + (author.first_name ? ', ' + author.first_name + (author.middle_name ? ' ' + author.middle_name : '') : ''),
         defaultAuthorDisplay: function() {
             this.authorsOnPage = this.authors.filter(removePenNamesFilter).filter(removeSoftDeletedAuthors);
+        },
+        updateAuthorsOnPage: function(authorsToShow) {
+            this.authorsOnPage = authorsToShow;
         },
     },
     mounted: function() {
@@ -78,8 +97,12 @@ export default {
 </script>
 
 <style>
-#authors-browse .book-count-badge {
-    font-size: 0.6em;
+#authors-browse .list-group .list-group-item {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+}
+#authors-browse .list-group .list-group-item .artist-badge {
+    font-size: 0.6rem;
     vertical-align: middle;
 }
 </style>

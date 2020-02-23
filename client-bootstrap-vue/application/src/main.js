@@ -7,7 +7,8 @@ import VueRouter from 'vue-router';
 // Application Imports
 import BookNotes from './BookNotes.vue';
 import routes from './routes';
-import BreadcrumbsMixin from './mixins/breadcrumbsGenerator';
+import BreadcrumbsMixin from './components/Mixins/breadcrumbsGenerator';
+import DateTimeHelpers from './components/Mixins/dateTimeHelpers';
 import './assets/theme.scss';
 
 // Configure Framework
@@ -19,6 +20,7 @@ Vue.use(PortalVue);
 Vue.use(VueRouter);
 Vue.use(IconsPlugin);
 Vue.mixin(BreadcrumbsMixin);
+Vue.mixin(DateTimeHelpers);
 
 // Configure Application
 const router = new VueRouter({routes});

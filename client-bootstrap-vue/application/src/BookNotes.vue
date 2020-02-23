@@ -2,14 +2,14 @@
     <b-container class="booknotes-application">
         <Header v-bind:class="{ 'rounded-bottom': !breadcrumbs.length }" />
         <b-breadcrumb v-bind:items="breadcrumbs" v-if="breadcrumbs.length" class="mb-2"></b-breadcrumb>
-        <router-view class="my-2" v-on:errorOccurred="handleErrorMessage" v-on:breadcrumbsChange="setBreadcrumbs" />
+        <router-view class="my-2" v-on:errorOccurred="handleErrorMessage" v-on:breadcrumbsChange="setBreadcrumbs" :key="$route.fullPath" />
         <Footer />
     </b-container>
 </template>
 
 <script>
-import Header from './components/Header.vue';
-import Footer from './components/Footer.vue';
+import Header from './components/PageElements/Header.vue';
+import Footer from './components/PageElements/Footer.vue';
 export default {
     name: 'BookNotes',
     components: {

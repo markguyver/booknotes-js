@@ -5,19 +5,19 @@ $slate-highlight: #79a6d2;
 
 $lavender-shadow: #1a0033;
 $lavender-midtone: #400080;
-$lavender-highlight: #b38cd9;
+$lavender-highlight: #bea6d9;
 
 $eggplant-shadow: #330033;
-$eggplant-midtone: #800080;
+$eggplant-midtone: #8f568f;
 $eggplant-highlight: #e600e6;
 
 $olive-shadow: #1a3300;
 $olive-midtone: #264d00;
-$olive-highlight: #4d9900;
+$olive-highlight: #59862d;
 
 $crimson-shadow: #4d0000;
 $crimson-midtone: #800000;
-$crimson-highlight: #cc0000;
+$crimson-highlight: #c63939;
 
 $squash-shadow: #331a00;
 $squash-midtone: #804000;
@@ -34,7 +34,11 @@ $tobacco-highlight: #7e4d1b;
 // Booknotes-JS Variable Overrides
 $theme-colors: (
   "primary": $slate-midtone,
-  "info": $lavender-highlight
+  "secondary": $eggplant-midtone,
+  "info": $lavender-highlight,
+  "danger": $crimson-highlight,
+  "tags": $turquoise-highlight,
+  "pseudonym": $olive-highlight,
 );
 
 // Bootstrap and its default variables
