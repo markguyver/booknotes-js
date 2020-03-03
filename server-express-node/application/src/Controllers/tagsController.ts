@@ -1,6 +1,6 @@
 import {Request, Response, Router} from 'express';
 import {Sequelize} from 'sequelize';
-import {sequelize} from './databaseController';
+import {sequelize, validateIdParameter} from './databaseController';
 
 // Initialize Database Models
 const Authors = sequelize.models.Authors;
@@ -10,12 +10,15 @@ const Tags = sequelize.models.Tags;
 
 // Define Endpoint Handlers
 const getAllTags = (request: Request, response: Response): Response => {
+
+    // TODO Fix Author Count, Book Count, and Note Count From this Query
+
     Tags.findAll({
         attributes: [
             'id',
             'tag',
             'deleted_at',
-            [Sequelize.fn('COUNT', Sequelize.col('Authors.id')), 'authorCount'],
+            [Sequelize.fn('COUNT', Sequelize.col('Authors.author_tags.author_id')), 'authorCount'],
             [Sequelize.fn('COUNT', Sequelize.col('Books.id')), 'bookCount'],
             [Sequelize.fn('COUNT', Sequelize.col('Notes.id')), 'noteCount'],
         ],
@@ -75,10 +78,64 @@ const getTagById = (request: Request, response: Response): Response => {
     } // End of Validate ID Parameter
     return response;
 };
+const getTagsByBookId = (request: Request, response: Response): Response => {
+    const bookId = validateIdParameter(request.params.bookId, response);
+    if (bookId) { // Check Passed ID Parameter Validation
+        Tags.findAll({
+            attributes: ['id', 'tag'],
+            paranoid: false,
+            include: [{
+                model: Books,
+                paranoid: false,
+                required: true,
+                attributes: [],
+                where: { id: bookId },
+            }],
+        }).then(result => {
+            if (result) { // Check for Results
+                response.type('json');
+                response.send({ Tags: result });
+            } else { // Middle of Check for Results
+                response.status(404).send();
+            } // End of Check for Results
+        }).catch(error => {
+            response.status(500).send();
+        });
+    } // End of Check Passed ID Parameter Validation
+    return response;
+};
+const getTagsByAuthorId = (request: Request, response: Response): Response => {
+    const authorId = validateIdParameter(request.params.authorId, response);
+    if (authorId) { // Check Passed ID Parameter Validation
+        Tags.findAll({
+            attributes: ['id', 'tag'],
+            paranoid: false,
+            include: [{
+                model: Authors,
+                paranoid: false,
+                required: true,
+                attributes: [],
+                where: { id: authorId },
+            }],
+        }).then(result => {
+            if (result) { // Check for Results
+                response.type('json');
+                response.send({ Tags: result });
+            } else { // Middle of Check for Results
+                response.status(404).send();
+            } // End of Check for Results
+        }).catch(error => {
+            response.status(500).send();
+        });
+    } // End of Check Passed ID Parameter Validation
+    return response;
+};
 
 // Register Resource Routes
 export const tagsRoutes = Router();
 tagsRoutes.get('/', getAllTags);
+tagsRoutes.get('/author/:authorId', getTagsByAuthorId);
+tagsRoutes.get('/book/:bookId', getTagsByBookId);
 
 export const tagRoutes = Router();
 tagRoutes.get('/:tagId', getTagById);

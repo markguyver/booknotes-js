@@ -3,6 +3,8 @@ import express from 'express';
 
 import {authorsRoutes, authorRoutes} from './Controllers/authorsController';
 import {booksRoutes, bookRoutes} from './Controllers/booksController';
+import {dashboardRoutes} from './Controllers/dashboardController';
+import {notesRoutes} from './Controllers/notesController';
 import {tagsRoutes, tagRoutes} from './Controllers/tagsController';
 
 const expressServerInstance = express();
@@ -25,6 +27,12 @@ expressServerInstance.use('/author', authorRoutes);
 // Books Resource Requests
 expressServerInstance.use('/books', booksRoutes);
 expressServerInstance.use('/book', bookRoutes);
+
+// Dashboard Requests
+expressServerInstance.use('/dashboard', dashboardRoutes);
+
+// Notes Resource Requests
+expressServerInstance.use('/notes', notesRoutes);
 
 // Tags Resource Requests
 expressServerInstance.use('/tags', tagsRoutes);

@@ -19,13 +19,26 @@ const getAllBooks = (request: Request, response: Response): Response => {
             'deleted_at',
             [Sequelize.fn('COUNT', Sequelize.col('Notes.book_id')), 'noteCount'],
         ],
-        group: ['id', 'title', 'deleted_at'],
+        group: [
+            'id',
+            'title',
+            'deleted_at',
+            'Tags.id',
+            'Tags.tag',
+            'Tags.deleted_at',
+        ],
         order: [['title', 'ASC']],
         paranoid: false,
         include: [{
             model: Notes,
             required: false,
+            paranoid: false,
             attributes: [],
+        }, {
+            model: Tags,
+            required: false,
+            paranoid: false,
+            attributes: ['id', 'tag', 'deleted_at'],
         }],
     }).then(results => {
         response.type('json');
@@ -72,7 +85,7 @@ const getBookById = (request: Request, response: Response): Response => {
             response.status(500).send();
         });
     } else { // Middle of Validate ID Parameter
-        response.status(400).send();
+        response.status(400).send('Invalid Book ID');
     } // End of Validate ID Parameter
     return response;
 };

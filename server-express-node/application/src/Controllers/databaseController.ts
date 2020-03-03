@@ -1,13 +1,25 @@
+import {Response} from 'express';
 import {Sequelize, Model, DataTypes} from 'sequelize';
 
-const databaseProtocol = process.env.DB_PROTOCOL || 'mysql';
-const databaseHost = process.env.DB_HOSTNAME || '';
-const databasePort = process.env.DB_PORT || 3306;
-const databaseUsername = process.env.DB_USERNAME || 'root';
-const databasePassword = process.env.DB_PASSWORD || '';
-const databaseSchema = process.env.DB_SCHEMA || 'booknotes';
+const databaseProtocol  = process.env.DB_PROTOCOL || 'mysql';
+const databaseHost      = process.env.DB_HOSTNAME || '';
+const databasePort      = process.env.DB_PORT || 3306;
+const databaseUsername  = process.env.DB_USERNAME || 'root';
+const databasePassword  = process.env.DB_PASSWORD || '';
+const databaseSchema    = process.env.DB_SCHEMA || 'booknotes';
 
 export const sequelize = new Sequelize(databaseProtocol + '://' + databaseUsername + ':' + databasePassword + '@' + databaseHost + ':' + databasePort + '/' + databaseSchema);
+export const validateIdParameter = (idToValidate: string, response: Response): number | null => {
+    const filteredIdToValidate = parseInt(idToValidate);
+    if (!isNaN(filteredIdToValidate) && filteredIdToValidate > 0) { // Validate ID Parameter
+        return filteredIdToValidate;
+    } else { // Middle of Validate ID Parameter
+        response.status(400).send();
+        return null;
+    } // End of Validate ID Parameter
+};
+
+// TODO Write Curried Functions for Handling findAll() Results and Errors
 
 class Authors extends Model {
     public id!: number;
@@ -16,7 +28,6 @@ class Authors extends Model {
     public last_name!: string;
     public parent_author_id!: number | null;
 }
-
 Authors.init({
     id: {
         primaryKey: true,
@@ -68,7 +79,6 @@ class Books extends Model {
     public id!: number;
     public title!: string;
 }
-
 Books.init({
     id: {
         primaryKey: true,
@@ -93,7 +103,6 @@ class ContributionTypes extends Model {
     public id!: number;
     public name!: string;
 }
-
 ContributionTypes.init({
     id: {
         primaryKey: true,
@@ -119,7 +128,6 @@ class BookAuthors extends Model {
     public contribution_type_id!: number;
     public order!: number | null;
 }
-
 BookAuthors.init({
     book_id: {
         primaryKey: true,
@@ -153,7 +161,6 @@ class Notes extends Model {
     public note!: string;
     public book_id!: number;
 }
-
 Notes.init({
     id: {
         primaryKey: true,
@@ -182,7 +189,6 @@ class Tags extends Model {
     public id!: number;
     public tag!: string;
 }
-
 Tags.init({
     id: {
         primaryKey: true,
@@ -220,11 +226,11 @@ Books.hasMany(Notes);
 Notes.belongsTo(Books);
 
 // Tags <=> Authors , Tags <=> Books , Tags <=> Notes
-Authors.belongsToMany(Tags, { through: 'author_tags', timestamps: false });
-Tags.belongsToMany(Authors, { through: 'author_tags', timestamps: false });
-Tags.belongsToMany(Books, { through: 'book_tags', timestamps: false });
-Books.belongsToMany(Tags, { through: 'book_tags', timestamps: false });
-Tags.belongsToMany(Notes, { through: 'note_tags', timestamps: false });
-Notes.belongsToMany(Tags, { through: 'note_tags', timestamps: false });
+Tags        .belongsToMany(Authors, { through: 'author_tags', timestamps: false });
+Authors     .belongsToMany(Tags, { through: 'author_tags', timestamps: false });
+Tags        .belongsToMany(Books, { through: 'book_tags', timestamps: false });
+Books       .belongsToMany(Tags, { through: 'book_tags', timestamps: false });
+Tags        .belongsToMany(Notes, { through: 'note_tags', timestamps: false });
+Notes       .belongsToMany(Tags, { through: 'note_tags', timestamps: false });
 
 sequelize.sync(); // TODO Switch to Migrations with Umzug

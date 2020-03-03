@@ -21,7 +21,16 @@ const getAllAuthors = (request: Request, response: Response): Response => {
             'deleted_at',
             [Sequelize.fn('COUNT', Sequelize.col('BookAuthors.author_id')), 'bookCount'],
         ],
-        group: ['id', 'first_name', 'middle_name', 'last_name', 'deleted_at'],
+        group: [
+            'id',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'parent_author_id',
+            'deleted_at',
+            'Tags.id',
+            'Tags.tag',
+        ],
         order: [['last_name', 'ASC'], ['first_name', 'ASC'], ['middle_name', 'ASC']],
         paranoid: false,
         include: [{
@@ -80,6 +89,7 @@ const getAuthorById = (request: Request, response: Response): Response => {
             },{
                 model: Tags,
                 required: false,
+                paranoid: false,
             }],
         }).then(result => { // Middle of Perform Author Retrieval Query
             if (result) { // Check for Results
@@ -89,11 +99,10 @@ const getAuthorById = (request: Request, response: Response): Response => {
                 response.status(404).send();
             } // End of Check for Results
         }).catch(error => { // Middle of Perform Author Retrieval Query
-            // TODO Add Logging?
             response.status(500).send();
         }); // End of Perform Author Retrieval Query
     } else { // Middle of Validate ID Parameter
-        response.status(400).send();
+        response.status(400).send('Invalid Author ID');
     } // End of Validate ID Parameter
     return response;
 };
