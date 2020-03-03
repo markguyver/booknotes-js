@@ -4,6 +4,7 @@ import ViewAuthor from './components/Pages/ViewAuthor.vue';
 import BrowseBooks from './components/Pages/BrowseBooks.vue';
 import ViewBook from './components/Pages/ViewBook.vue';
 import BrowseTags from './components/Pages/BrowseTags.vue';
+import ViewTag from './components/Pages/ViewTag.vue';
 import Dashboard from './components/Pages/Dashboard.vue';
 
 const routes = [{
@@ -29,6 +30,10 @@ const routes = [{
 },{
     path: '/tags',
     component: BrowseTags,
+},{
+    path: '/tag/:tagId',
+    component: ViewTag,
+    props: true,
 }];
 
 export default routes;

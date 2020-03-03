@@ -1,5 +1,5 @@
 <template>
-    <b-navbar type="dark" rounded variant="primary" class="footer">
+    <b-navbar type="dark" rounded variant="primary" class="footer mb-2">
         <div id="footer-copyright" class="w-100 text-center"><a class="text-light" target="_new" href="https://github.com/markguyver">&copy; 2020 Mark Chavez</a></div>
     </b-navbar>
 </template>

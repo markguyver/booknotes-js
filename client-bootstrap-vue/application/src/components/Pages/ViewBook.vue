@@ -1,45 +1,71 @@
 <template><div id="book-view">
-    <Loading v-if="displayLoading" />
-    <b-card-group deck v-if="displayBook">
+    <b-row v-if="displayLoading | displayError">
+        <b-col cols="10" class="mx-auto">
+            <Loading v-if="displayLoading" />
+            <PageError  v-if="displayError" :errorMessage="errorMessage" />
+        </b-col>
+    </b-row>
+    <b-card-group deck v-if="displayPage">
         <b-card body-class="px-2 py-2">
             <b-card-title>{{ book.title }}</b-card-title>
-
             <b-list-group flush>
                 <b-list-group-item>
-                    <div class="h6">Tags <span class="muted">({{ book.Tags.length }})</span></div>
-                    <b-list-group v-if="book.Tags.length" flush>
-                        <b-list-group-item><b-badge v-for="tag in book.Tags" variant="tags" v-bind:key="tag.id" v-bind:to="'/tag/' + tag.id" class="ml-1">{{ tag.tag }}</b-badge></b-list-group-item>
-                    </b-list-group>
+                    <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span></div>
+                    <TagSubList :tags="bookTags" />
+
+                    <!-- Adding a Tag to this Book Should be a Page Element Component -->
+
                 </b-list-group-item>
                 <b-list-group-item>
-                    <div class="h6">Authors <span class="muted">({{ book.BookAuthors.length }})</span></div>
-                    <b-list-group flush>
-                        <b-list-group-item v-for="author in book.BookAuthors" v-bind:key="author.author_id" v-bind:to="'/author/' + author.author_id">{{ getAuthorFullName(author.Author) }} <span class="text-muted">(as {{ author.ContributionType.name }})</span></b-list-group-item>
-                    </b-list-group>
+                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span></div>
+                    <AuthorSubList :authors="convertBookAuthorsToAuthorsList(bookAuthors)" />
+
+                    <!-- Adding an Author to this Book Should Be a Page Element Component -->
+
                 </b-list-group-item>
                 <b-list-group-item>
-                    <div class="h6">Notes <span class="muted">({{ book.Notes.length }})</span></div>
+                    <div class="h6">Notes <span class="muted">({{ bookNotes.length }})</span></div>
+                    <NotesList :notes="bookNotes" />
+                    <b-row class="mt-3"><b-col /><b-col cols="8"><NoteCreate v-on:noteCreated="fetchBookNotes" :bookId="book.id" /></b-col><b-col /></b-row>
                 </b-list-group-item>
             </b-list-group>
-
-
         </b-card>
     </b-card-group>
 </div></template>
 
 <script>
-import authorhelpers from '../Mixins/authorHelpers';
+import authorHelpers from '../Mixins/authorHelpers';
+import pageHelpers from '../Mixins/pageHelpers';
 import axios from 'axios';
-import Loading from '../PageElements/Loading.vue';
+import NoteCreate from '../PageElements/Books/NoteCreate.vue';
+import NotesList from '../PageElements/Books/NotesList.vue';
+import AuthorSubList from '../PageElements/AuthorSubList.vue';
+import TagSubList from '../PageElements/TagSubList.vue';
 export default {
     name: "ViewBook",
-    components: { Loading },
+    components: {
+        NotesList,
+        NoteCreate,
+        AuthorSubList,
+        TagSubList,
+    },
     data: function() {return {
-        displayLoading: true,
-        displayBook: false,
         book: {},
+        bookAuthors: [],
+        bookNotes: [],
+        bookTags: [],
     };},
-    mixins: [authorhelpers],
+    methods: {
+        fetchBookNotes: function() {
+            axios.get('/notes/book/' + this.book.id).then(response => {
+                this.bookNotes = response.data.Notes;
+            }).catch(() => {
+                this.bookNotes = [];
+                this.popError('Could not retrieve notes.');
+            });
+        },
+    },
+	mixins: [authorHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getBookBrowseBreadcrumb(),this.getBookViewBreadcrumb()]);
 
@@ -52,29 +78,30 @@ export default {
         if (!isNaN(bookId)) { // Check for Numeric Book ID Parameter
             if (bookId > 0) { // Validate Author ID Parameter (Positive Integer Greater Than Zero)
                 axios.get('/book/' + bookId).then(response => {
-
-                    /* eslint no-console: ["error", { allow: ["log"] }] */
-                    console.log('Book View:', response.data.Books[0]); // TODO Delete This
-
                     this.book = response.data.Books[0];
-                    this.displayLoading = false;
-                    this.displayBook = true;
+                    this.bookAuthors = this.book.BookAuthors;
+                    this.bookNotes = this.book.Notes;
+                    this.bookTags = this.book.Tags;
+                    this.transitionFromLoadingToPage();
+
+                    console.log('Book Authors:', this.bookAuthors); // TODO Delete This
+                    console.log('Authors from Book Authors:', this.convertBookAuthorsToAuthorsList(this.bookAuthors)); // TODO Delete This
+
                 }).catch(error => {
                     if (404 == error.response.status) { // Check Response Code for Recognized Errors (i.e. 404)
 
                         // TODO Handle Book Detail 404
 
                     } else { // Middle of Check Response Code for Recognized Errors (i.e. 404)
-                        this.$emit('errorOccurred', { display: 'Error retrieving book.', logging: 'Get Book Request Failure', bookId: bookId, error: error });
+                        this.transitionFromLoadingToError('Error retrieving book.'); // Non-404 Get Book Request Failure
                     } // End of Check Response Code for Recognized Errors (i.e. 404)
                 });
             } else { // Middle of Validate Author ID Parameter (Positive Integer Greater Than Zero)
-                this.$emit('errorOccurred', { display: 'Bad Book ID', logging: 'Book ID Parameter is Not a Positive Integer Greater Than Zero' });
+                this.transitionFromLoadingToError('Bad Book ID'); // Book ID Parameter is Not a Positive Integer Greater Than Zero
             } // End of Validate Author ID Parameter (Positive Integer Greater Than Zero)
         } else { // Middle of Check for Numeric Author ID Parameter
-            this.$emit('errorOccurred', { display: 'Bad Book ID', logging: 'Book ID Parameter is Not a Number' });
+            this.transitionFromLoadingToError('Bad Book ID'); // Book ID Parameter is Not a Number
         } // End of Check for Numeric Author ID Parameter
-        this.displayLoading = false;
     },
     props: ['bookId'],
 }

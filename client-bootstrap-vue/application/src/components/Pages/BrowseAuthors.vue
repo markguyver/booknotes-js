@@ -2,17 +2,17 @@
     <b-row v-if="displayLoading | displayError">
         <b-col cols="10" class="mx-auto">
             <Loading v-if="displayLoading" />
-            <div class="mx-auto">{{ errorMessage }}</div>
+            <PageError  v-if="displayError" :errorMessage="errorMessage" />
         </b-col>
     </b-row>
-    <b-row v-if="displayAuthors">
+    <b-row v-if="displayPage">
         <b-col class="pr-2">
             <SidebarFacets class="mr-2" :sidebarFacets="facetOptions" :sidebarFacetDataset="authors" v-on:resultsUpdated="updateAuthorsOnPage" />
         </b-col>
         <b-col cols="9" class="px-0 mr-3">
             <b-list-group>
                 <b-list-group-item v-bind:variant="author.deleted_at ? 'light' : ''" v-for="author in authorsOnPage" v-bind:key="author.id" v-bind:to="{ path: 'author/' + author.id }" class="d-flex justify-content-between align-items-center">
-                    {{ displayAuthorNameLastFirst(author) }}
+                    <span>{{ getAuthorNameLastFirstMiddle(author) }}</span>
                     <span>
                         <b-badge pill class="artist-badge text-light ml-1" variant="tags" v-for="tag in author.Tags" v-bind:key="tag.id" v-bind:to="'/tag/' + tag.id">{{ tag.tag }}</b-badge>
                         <b-badge pill class="artist-badge text-light ml-1" variant="info" v-if="author.bookCount">{{ author.bookCount + (author.bookCount > 1 ? ' books' : ' book') }}</b-badge>
@@ -26,8 +26,9 @@
 </div></template>
 
 <script>
+import authorhelpers from '../Mixins/authorHelpers';
+import pageHelpers from '../Mixins/pageHelpers';
 import axios from 'axios';
-import Loading from '../PageElements/Loading.vue';
 import SidebarFacets from '../PageElements/SidebarFacets.vue';
 
 const removePenNamesFilter = author => (!author.parent_author_id);
@@ -35,24 +36,10 @@ const removeSoftDeletedAuthors = author => !author.deleted_at;
 
 export default {
     name: "BrowseAuthors",
-    components: {
-        Loading,
-        SidebarFacets,
-    },
+    components: { SidebarFacets },
     data: function() {return {
         authors: [],
         authorsOnPage: [],
-        displayAuthors: false,
-        displayError: false,
-        displayLoading: true,
-        errorMessage: '',
-        breadcrumbs: [{
-            text: 'Home',
-            to: '/',
-        },{
-            text: 'Browse Authors',
-            active: true,
-        }],
         facetOptions: [{
             label: 'Show Deleted',
             type: 'checkbox',
@@ -66,7 +53,6 @@ export default {
         }],
     };},
     methods: {
-        displayAuthorNameLastFirst: author => author.last_name + (author.first_name ? ', ' + author.first_name + (author.middle_name ? ' ' + author.middle_name : '') : ''),
         defaultAuthorDisplay: function() {
             this.authorsOnPage = this.authors.filter(removePenNamesFilter).filter(removeSoftDeletedAuthors);
         },
@@ -74,23 +60,15 @@ export default {
             this.authorsOnPage = authorsToShow;
         },
     },
+	mixins: [authorhelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getAuthorBrowseBreadcrumb(true)]);
         axios.get('/authors').then(response => {
             this.authors = response.data.Authors;
             this.defaultAuthorDisplay();
-            this.displayLoading = false;
-            this.displayAuthors = true;
-        }).catch(error => {
-            this.$bvToast.toast('Could not retrieve authors.', {
-                title: 'Retrieval Error',
-                variant: 'danger',
-                solid: true,
-            });
-            this.errorMessage = 'Could not retrieve authors.';
-            this.$emit('errorOccurred', { display: 'Could not retrieve authors.', logging: 'Get All Authors Request Failure', error: error });
-            this.displayLoading = false;
-            this.displayError = true;
+            this.transitionFromLoadingToPage();
+        }).catch(() => {
+            this.transitionFromLoadingToError('Could not retrieve authors.');
         });
     },
 };

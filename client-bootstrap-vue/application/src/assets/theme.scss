@@ -33,12 +33,19 @@ $tobacco-highlight: #7e4d1b;
 
 // Booknotes-JS Variable Overrides
 $theme-colors: (
+
+  // Default Bootstrap Theme Colors
   "primary": $slate-midtone,
   "secondary": $eggplant-midtone,
   "info": $lavender-highlight,
   "danger": $crimson-highlight,
   "tags": $turquoise-highlight,
+
+  // Custom Theme Colors
   "pseudonym": $olive-highlight,
+  "crimson": $crimson-midtone,
+  "crimson-dark": $crimson-shadow,
+
 );
 
 // Bootstrap and its default variables

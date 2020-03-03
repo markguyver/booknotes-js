@@ -2,7 +2,7 @@
     <b-container class="booknotes-application">
         <Header v-bind:class="{ 'rounded-bottom': !breadcrumbs.length }" />
         <b-breadcrumb v-bind:items="breadcrumbs" v-if="breadcrumbs.length" class="mb-2"></b-breadcrumb>
-        <router-view class="my-2" v-on:errorOccurred="handleErrorMessage" v-on:breadcrumbsChange="setBreadcrumbs" :key="$route.fullPath" />
+        <router-view class="my-2" v-on:breadcrumbsChange="setBreadcrumbs" :key="$route.fullPath" />
         <Footer />
     </b-container>
 </template>
@@ -20,13 +20,6 @@ export default {
         breadcrumbs: [],
     };},
     methods: {
-        handleErrorMessage: function(errorMessage) {
-
-            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('BookNotes Parent App:', errorMessage); // TODO Delete This
-            // TODO Add Error Message Toaster
-
-        },
         setBreadcrumbs: function(breadcrumbsData) {
             this.breadcrumbs = breadcrumbsData;
         },

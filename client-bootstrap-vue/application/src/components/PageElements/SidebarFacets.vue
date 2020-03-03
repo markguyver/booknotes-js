@@ -11,6 +11,9 @@
 </template>
 
 <script>
+// import compiler from 'vue-template-compiler';
+// const processSidebarItemFacetConfiguration = sidebarItemFacetConfiguration => {
+// };
 export default {
     name: "SidebarFacets",
     data: function() {return {
