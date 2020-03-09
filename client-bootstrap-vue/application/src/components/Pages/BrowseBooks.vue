@@ -20,6 +20,7 @@
                     {{ book.title }}
                     <span>
                         <b-badge pill class="artist-badge text-light ml-1" variant="tags" v-for="tag in book.Tags" v-bind:key="tag.id" v-bind:to="'/tag/' + tag.id">{{ tag.tag }}</b-badge>
+                        <b-badge pill class="artist-badge text-light ml-1" variant="info" v-if="book.noteCount">{{ book.noteCount + (book.noteCount > 1 ? ' notes' : ' note') }}</b-badge>
                         <b-badge pill class="artist-badge text-light ml-1" variant="danger" v-if="book.deleted_at">Deleted</b-badge>
                     </span>
                 </b-list-group-item>

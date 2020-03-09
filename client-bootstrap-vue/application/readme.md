@@ -1,4 +1,13 @@
-# booknotes-js-client
+# Booknotes (JS): Server-Side Application
+
+
+
+
+----
+Vue CLI Readme Below:
+
+
+
 
 ## Project setup
 ```

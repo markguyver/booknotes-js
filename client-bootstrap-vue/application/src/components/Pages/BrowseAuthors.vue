@@ -7,7 +7,7 @@
     </b-row>
     <b-row v-if="displayPage">
         <b-col class="pr-2">
-            <SidebarFacets class="mr-2" :sidebarFacets="facetOptions" :sidebarFacetDataset="authors" v-on:resultsUpdated="updateAuthorsOnPage" />
+            <SidebarFacetsPanel class="mr-2" :sidebarFacets="facetOptions" :sidebarFacetDataset="authors" v-on:resultsUpdated="updateAuthorsOnPage" />
         </b-col>
         <b-col cols="9" class="px-0 mr-3">
             <b-list-group>
@@ -27,30 +27,20 @@
 
 <script>
 import authorhelpers from '../Mixins/authorHelpers';
+import facethelpers from '../Mixins/facethelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 import axios from 'axios';
-import SidebarFacets from '../PageElements/SidebarFacets.vue';
-
-const removePenNamesFilter = author => (!author.parent_author_id);
-const removeSoftDeletedAuthors = author => !author.deleted_at;
-
+import SidebarFacetsPanel from '../PageElements/SidebarFacetsPanel.vue';
 export default {
     name: "BrowseAuthors",
-    components: { SidebarFacets },
+    components: { SidebarFacetsPanel },
     data: function() {return {
         authors: [],
         authorsOnPage: [],
-        facetOptions: [{
-            label: 'Show Deleted',
-            type: 'checkbox',
-            filter: author => !author.deleted_at,
-            checked: false,
-        },{
-            label: 'Show Pseudonyms',
-            type: 'checkbox',
-            filter: author => !author.parent_author_id,
-            checked: false,
-        }],
+        facetOptions: [
+            this.getCheckboxFacetOption('Show Deleted', this.filterDeletedAuthors),
+            this.getCheckboxFacetOption('Show Pseudonyms', this.filterPseudonymAuthors),
+        ],
     };},
     methods: {
         defaultAuthorDisplay: function() {
@@ -60,7 +50,7 @@ export default {
             this.authorsOnPage = authorsToShow;
         },
     },
-	mixins: [authorhelpers, pageHelpers],
+	mixins: [authorhelpers, facethelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getAuthorBrowseBreadcrumb(true)]);
         axios.get('/authors').then(response => {

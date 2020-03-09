@@ -26,7 +26,7 @@
                 <b-list-group-item>
                     <div class="h6">Notes <span class="muted">({{ bookNotes.length }})</span></div>
                     <NotesList :notes="bookNotes" />
-                    <b-row class="mt-3"><b-col /><b-col cols="8"><NoteCreate v-on:noteCreated="fetchBookNotes" :bookId="book.id" /></b-col><b-col /></b-row>
+                    <b-row class="mt-3"><b-col /><b-col cols="12"><NoteCreate v-on:noteCreated="fetchBookNotes" :bookId="book.id" /></b-col><b-col /></b-row>
                 </b-list-group-item>
             </b-list-group>
         </b-card>

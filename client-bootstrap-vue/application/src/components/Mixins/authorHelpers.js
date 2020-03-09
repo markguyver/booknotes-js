@@ -9,10 +9,15 @@ const convertBookAuthorsToAuthorsList = bookAuthorsArray => bookAuthorsArray.map
     return author;
 });
 
+const filterDeletedAuthors = currentAuthor => !currentAuthor.deleted_at;
+const filterPseudonymAuthors = currentAuthor => !currentAuthor.parent_author_id;
+
 export default {
     methods: {
         getAuthorFullName,
         getAuthorNameLastFirstMiddle,
         convertBookAuthorsToAuthorsList,
+        filterDeletedAuthors,
+        filterPseudonymAuthors,
     },
 };

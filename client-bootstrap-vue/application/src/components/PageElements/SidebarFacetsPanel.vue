@@ -11,15 +11,12 @@
 </template>
 
 <script>
+import facetHelpers from '../Mixins/facetHelpers';
 // import compiler from 'vue-template-compiler';
 // const processSidebarItemFacetConfiguration = sidebarItemFacetConfiguration => {
 // };
 export default {
     name: "SidebarFacets",
-    data: function() {return {
-        sidebarItems: [],
-        displayApply: false,
-    };},
     methods: {
         showApply: function() {
             this.displayApply = true;
@@ -54,18 +51,9 @@ export default {
             required: true,
         },
     },
+    mixins: [facetHelpers],
     mounted: function() {
-        this.sidebarFacets.map((facetConfig, facetConfigIndex) => {
-            const sidebarItem = {
-                id: facetConfigIndex,
-                label: facetConfig.label,
-            };
-
-            if (facetConfig.type && 'checkbox' == facetConfig.type) { // Determine Form Input Type
-            } // End of Determine Form Input Type
-
-            this.sidebarItems.push(sidebarItem);
-        });
+        this.sidebarFacets.map(this.parseFacetItemOption);
     },
 };
 </script>

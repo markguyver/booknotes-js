@@ -25,5 +25,12 @@ export default {
                 solid: true,
             });
         },
+        popInfo: function(infoMessage, infoTitle = 'Success') {
+            this.$bvToast.toast(infoMessage, {
+                title: infoTitle,
+                variant: 'info',
+                solid: true,
+            });
+        },
     },
 };
