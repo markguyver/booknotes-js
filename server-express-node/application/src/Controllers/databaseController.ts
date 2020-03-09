@@ -19,6 +19,16 @@ export const validateIdParameter = (idToValidate: string, response: Response): n
     } // End of Validate ID Parameter
 };
 
+const handleDatabaseResults = (response: Response, results: Array<Model>, successStatusCode: number, responsePayloadResourceName: string): Response => {
+    if (results) { // Check for Retrieved Database Rows
+        const responsePayload = {};
+        // responsePayload[responsePayloadResourceName] = results;
+        response.status(successStatusCode).type('json').send(responsePayload);
+    } else { // Middle of Check for Retrieved Database Rows
+        response.status(404).send();
+    } // End of Check for Retrieved Database Rows
+    return response;
+};
 // TODO Write Curried Functions for Handling findAll() Results and Errors
 
 class Authors extends Model {

@@ -89,10 +89,24 @@ const getBookById = (request: Request, response: Response): Response => {
     } // End of Validate ID Parameter
     return response;
 };
+const createNewBook = (request: Request, response: Response): Response => {
+
+    // TODO Parse Request Body into Book Object
+
+    Books.create(request.body).then(() => {
+        Books.findOne({where: request.body}).then(result => {
+            response.type('json');
+            response.status(201);
+            response.send({ Books: [result] });
+        });
+    });
+    return response;
+};
 
 // Register Resource Routes
 export const booksRoutes = Router();
 booksRoutes.get('/', getAllBooks);
+booksRoutes.post('/', createNewBook);
 booksRoutes.get('/author/:authorId', getAllBooksByAuthorId);
 
 export const bookRoutes = Router();

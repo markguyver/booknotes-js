@@ -130,10 +130,24 @@ const getTagsByAuthorId = (request: Request, response: Response): Response => {
     } // End of Check Passed ID Parameter Validation
     return response;
 };
+const createNewTag = (request: Request, response: Response): Response => {
+
+    // TODO Parse Request Body into Tag Object
+
+    Tags.create(request.body).then(() => {
+        Tags.findOne({where: request.body}).then(result => {
+            response.type('json');
+            response.status(201);
+            response.send({ Tags: [result] });
+        });
+    });
+    return response;
+};
 
 // Register Resource Routes
 export const tagsRoutes = Router();
 tagsRoutes.get('/', getAllTags);
+tagsRoutes.post('/', createNewTag);
 tagsRoutes.get('/author/:authorId', getTagsByAuthorId);
 tagsRoutes.get('/book/:bookId', getTagsByBookId);
 
