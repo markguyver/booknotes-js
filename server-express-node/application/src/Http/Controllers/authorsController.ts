@@ -1,6 +1,6 @@
 import {Request, Response, Router} from 'express';
 import {Sequelize} from 'sequelize';
-import {sequelize} from './databaseController';
+import {sequelize} from '../../database';
 
 // Initialize Database Models
 const Authors = sequelize.models.Authors;

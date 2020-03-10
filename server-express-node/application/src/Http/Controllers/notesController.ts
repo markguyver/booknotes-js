@@ -1,5 +1,5 @@
 import {Request, Response, Router} from 'express';
-import {sequelize} from './databaseController';
+import {sequelize} from '../../database';
 
 // Initialize Database Models
 const Books = sequelize.models.Books;
@@ -17,7 +17,8 @@ const getAllNotesByBookId = (request: Request, response: Response): Response => 
                 response.status(404).send();
             } // End of Check for Results
         }).catch(error => {
-            response.status(500).send();
+            console.log('getAllNotesByBookId error:', error); // TODO Delete This
+            response.status(500).send(error); // TODO Remove Error Sending
         });
     } else { // Middle of Validate ID Parameter
         response.status(400).send('Invalid Book ID');

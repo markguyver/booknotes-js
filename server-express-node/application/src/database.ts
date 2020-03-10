@@ -169,6 +169,7 @@ BookAuthors.init({
 class Notes extends Model {
     public id!: number;
     public note!: string;
+    public title!: string;
     public book_id!: number;
 }
 Notes.init({
@@ -179,6 +180,10 @@ Notes.init({
         autoIncrement: true,
     },
     note: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
+    title: {
         type: DataTypes.TEXT,
         allowNull: false,
     },
@@ -242,5 +247,3 @@ Tags        .belongsToMany(Books, { through: 'book_tags', timestamps: false });
 Books       .belongsToMany(Tags, { through: 'book_tags', timestamps: false });
 Tags        .belongsToMany(Notes, { through: 'note_tags', timestamps: false });
 Notes       .belongsToMany(Tags, { through: 'note_tags', timestamps: false });
-
-sequelize.sync(); // TODO Switch to Migrations with Umzug
