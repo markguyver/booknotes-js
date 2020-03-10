@@ -5,11 +5,13 @@
             <PageError  v-if="displayError" :errorMessage="errorMessage" />
         </b-col>
     </b-row>
+    <b-row v-if="displayPage"></b-row>
     <b-row v-if="displayPage">
         <b-col class="pr-2">
             <SidebarFacetsPanel class="mr-2" :sidebarFacets="facetOptions" :sidebarFacetDataset="authors" v-on:resultsUpdated="updateAuthorsOnPage" />
         </b-col>
         <b-col cols="9" class="px-0 mr-3">
+            <div class="h6 ml-1 text-dark">Displaying {{ authorsOnPage.length }} author{{ (authorsOnPage.length == 1 ? '' : 's') }}</div>
             <b-list-group>
                 <b-list-group-item v-bind:variant="author.deleted_at ? 'light' : ''" v-for="author in authorsOnPage" v-bind:key="author.id" v-bind:to="{ path: 'author/' + author.id }" class="d-flex justify-content-between align-items-center">
                     <span>{{ getAuthorNameLastFirstMiddle(author) }}</span>
@@ -26,8 +28,8 @@
 </div></template>
 
 <script>
-import authorhelpers from '../Mixins/authorHelpers';
-import facethelpers from '../Mixins/facethelpers';
+import authorHelpers from '../Mixins/authorHelpers';
+import facetHelpers from '../Mixins/facetHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 import axios from 'axios';
 import SidebarFacetsPanel from '../PageElements/SidebarFacetsPanel.vue';
@@ -38,19 +40,19 @@ export default {
         authors: [],
         authorsOnPage: [],
         facetOptions: [
-            this.getCheckboxFacetOption('Show Deleted', this.filterDeletedAuthors),
-            this.getCheckboxFacetOption('Show Pseudonyms', this.filterPseudonymAuthors),
+            this.getCheckboxFacetItem('Show Deleted', this.filterDeletedAuthors),
+            this.getCheckboxFacetItem('Show Pseudonyms', this.filterPseudonymAuthors),
         ],
     };},
     methods: {
         defaultAuthorDisplay: function() {
-            this.authorsOnPage = this.authors.filter(removePenNamesFilter).filter(removeSoftDeletedAuthors);
+            this.authorsOnPage = this.authors.filter(this.filterPseudonymAuthors).filter(this.filterDeletedAuthors);
         },
         updateAuthorsOnPage: function(authorsToShow) {
             this.authorsOnPage = authorsToShow;
         },
     },
-	mixins: [authorhelpers, facethelpers, pageHelpers],
+	mixins: [authorHelpers, facetHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getAuthorBrowseBreadcrumb(true)]);
         axios.get('/authors').then(response => {

@@ -1,7 +1,7 @@
 <template><div class="note-create">
     <b-form>
         <ckeditor v-model="editorData" :config="editorConfig"></ckeditor>
-        <b-button class="mt-3" v-on:click="saveNote">Save Note</b-button>
+        <b-button class="mt-3" v-on:click="saveNote" variant="primary">Save Note</b-button>
     </b-form>
 </div></template>
 

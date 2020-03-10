@@ -53,7 +53,7 @@ export default {
     },
     mixins: [facetHelpers],
     mounted: function() {
-        this.sidebarFacets.map(this.parseFacetItemOption);
+        this.sidebarFacets.map(this.parseFacetItem);
     },
 };
 </script>
