@@ -64,27 +64,34 @@ This list is not comprehensive but includes the key dependencies.
 
 ### Client-Side Application
 
-* Docker
-* Vue 2
-* Vue CLI
-* Bootstrap
-* Axios
-* Apex Charts
-* CKEditor4
-* PopperJS
-* Serve
+* [Docker](https://docs.docker.com/reference/)
+* [NodeJS](https://nodejs.org/docs/latest-v12.x/api/)
+* [Vue 2](https://vuejs.org/v2/guide/)
+* [Vue CLI](https://cli.vuejs.org/)
+* [Bootstrap](https://getbootstrap.com/docs/4.4/getting-started/introduction/)
+* [Bootstrap-Vue](https://bootstrap-vue.js.org/docs/)
+* [Axios](https://github.com/axios/axios)
+* [Apex Charts](https://apexcharts.com/docs/installation/)
+* [CKEditor4](https://ckeditor.com/docs/ckeditor4/latest/)
+* [PopperJS](https://popper.js.org/)
+* [Serve](https://github.com/zeit/serve#readme)
 
 ### Server-Side Application
 
-* Docker
-* NodeJS
-* Typescript
-* Sequelize & Umzug
-* ExpressJS
-* Nodemon
-* PM2
+* [Docker](https://docs.docker.com/reference/)
+* [NodeJS](https://nodejs.org/docs/latest-v12.x/api/)
+* [Typescript](https://www.typescriptlang.org/docs/home.html)
+* [Sequelize](https://github.com/sequelize/sequelize)
+* [Umzug](https://github.com/sequelize/umzug)
+* [ExpressJS](https://expressjs.com/en/4x/api.html)
+* [Nodemon](https://github.com/remy/nodemon#nodemon)
+* [PM2](https://github.com/Unitech/pm2)
 
 ### Database
 
-* Docker
-* MariaDB
+* [Docker](https://docs.docker.com/reference/)
+* [MariaDB](https://mariadb.com/kb/en/documentation/)
+
+### Development
+
+* [Docker Compose](https://docs.docker.com/compose/)
