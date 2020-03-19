@@ -4,7 +4,12 @@
             <div class="h5 mx-auto pb-1">{{ sidebarHeaderText }}</div>
         </div>
         <b-form class="sidebar-facet-items">
-            <b-form-checkbox v-for="sidebarItem in sidebarItems" v-bind:key="sidebarItem.id" v-on:change="showApply" size="sm">{{ sidebarItem.label }}</b-form-checkbox>
+            <div v-for="sidebarItem in sidebarItems" v-bind:key="sidebarItem.id">
+
+
+                <b-form-checkbox v-if="verifyIsCheckboxOption(sidebarItem)" v-on:change="showApply" size="sm" v-model="sidebarItem.checked">{{ sidebarItem.label }}</b-form-checkbox>
+
+            </div>
         </b-form>
         <b-button class="mt-2" variant="primary" size="sm" block v-if="displayApply" v-on:click="applyFilters">Apply</b-button>
     </nav>
@@ -12,6 +17,7 @@
 
 <script>
 import facetHelpers from '../Mixins/facetHelpers';
+// import ramda from 'ramda';
 // import compiler from 'vue-template-compiler';
 // const processSidebarItemFacetConfiguration = sidebarItemFacetConfiguration => {
 // };
@@ -23,17 +29,17 @@ export default {
         },
         applyFilters: function() {
 
-            this.sidebarItems.map(sidebarItem => {
-                /* eslint no-console: ["error", { allow: ["log"] }] */
-                console.log('Apply Filters Sidebar Item:', sidebarItem);
-            });
+            // const newItems = this.sidebarItems.map(sidebarItem => {
+            //     /* eslint no-console: ["error", { allow: ["log"] }] */
+            //     console.log('Apply Filters Sidebar Item:', sidebarItem);
+            // });
 
             this.$emit('resultsUpdated', this.filterDataset());
             this.displayApply = false;
         },
         filterDataset: function() {
             // TODO Loop through form elements and apply filters
-            return this.sidebarFacetDataset;
+            return this.sidebarFacetDataset.filter(this.createFilterFunctionFromFacetItems(this.sidebarItems));
         },
     },
     props: {

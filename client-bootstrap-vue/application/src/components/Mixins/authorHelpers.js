@@ -1,4 +1,10 @@
-const getAuthorFullName = authorObject => (authorObject.first_name ? authorObject.first_name + ' ' : '') + (authorObject.middle_name ? authorObject.middle_name + ' ' : '') + authorObject.last_name;
+import { compose, filter, join, props } from 'ramda';
+
+const getAuthorFullName = compose(
+    join(' '),
+    filter(item => null != item),
+    props(['first_name', 'middle_name', 'last_name'])
+);
 const getAuthorNameLastFirstMiddle = authorObject => authorObject.last_name + (authorObject.first_name ? ', ' + authorObject.first_name + (authorObject.middle_name ? ' ' + authorObject.middle_name : '') : '');
 
 const convertBookAuthorsToAuthorsList = bookAuthorsArray => bookAuthorsArray.map(currentBookAuthor => {

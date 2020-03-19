@@ -28,6 +28,7 @@
 </div></template>
 
 <script>
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import authorHelpers from '../Mixins/authorHelpers';
 import facetHelpers from '../Mixins/facetHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
@@ -40,8 +41,8 @@ export default {
         authors: [],
         authorsOnPage: [],
         facetOptions: [
-            this.getCheckboxFacetItem('Show Deleted', this.filterDeletedAuthors),
-            this.getCheckboxFacetItem('Show Pseudonyms', this.filterPseudonymAuthors),
+            this.getCheckboxFacetItem('Show Deleted', this.defaultFilterUnchecked, this.filterDeletedAuthors),
+            this.getCheckboxFacetItem('Show Pseudonyms', this.defaultFilterUnchecked, this.filterPseudonymAuthors),
         ],
     };},
     methods: {
@@ -52,7 +53,7 @@ export default {
             this.authorsOnPage = authorsToShow;
         },
     },
-	mixins: [authorHelpers, facetHelpers, pageHelpers],
+	mixins: [apiResultsHelpers, authorHelpers, facetHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getAuthorBrowseBreadcrumb(true)]);
         axios.get('/authors').then(response => {
