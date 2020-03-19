@@ -1,6 +1,7 @@
 import {Request, Response, Router} from 'express';
 import {Sequelize} from 'sequelize';
 import {sequelize} from '../../database';
+import {respondWith500, respondWithBookNotFound, respondWithBooksPayload, respondInvalidBookId} from '../helpers';
 
 // Initialize Database Models
 const Authors = sequelize.models.Authors;
@@ -12,6 +13,7 @@ const Tags = sequelize.models.Tags;
 
 // Define Endpoint Handlers
 const getAllBooks = (request: Request, response: Response): Response => {
+    const respondWithBooks = respondWithBooksPayload(response);
     Books.findAll({
         attributes: [
             'id',
@@ -41,8 +43,9 @@ const getAllBooks = (request: Request, response: Response): Response => {
             attributes: ['id', 'tag', 'deleted_at'],
         }],
     }).then(results => {
-        response.type('json');
-        response.send({ Books: results });
+        respondWithBooks(results);
+        // response.type('json');
+        // response.send({ Books: results });
     });
     return response;
 };
@@ -52,6 +55,7 @@ const getAllBooksByAuthorId = (request: Request, response: Response): Response =
     return response;
 };
 const getBookById = (request: Request, response: Response): Response => {
+    const respondWithBooks = respondWithBooksPayload(response);
     const bookId = parseInt(request.params.bookId);
     if (!isNaN(bookId) && bookId > 0) { // Validate ID Parameter
         Books.findByPk(bookId, {
@@ -76,8 +80,9 @@ const getBookById = (request: Request, response: Response): Response => {
             }],
         }).then(result => {
             if (result) { // Check for Results
-                response.type('json');
-                response.send({ Books: [result] });
+                respondWithBooks([result]);
+                // response.type('json');
+                // response.send({ Books: [result] });
             } else { // Middle of Check for Results
                 response.status(404).send();
             } // End of Check for Results
