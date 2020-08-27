@@ -1,5 +1,5 @@
 # Image Configuration
-FROM node:12.16.1-alpine3.10
+FROM node:12.18.3-alpine3.12
 
 # Environment Provisioning
 EXPOSE 5000/tcp
