@@ -5,7 +5,7 @@ import {Model} from 'sequelize';
 
 const respondWithResourceList = curry((resourceName: string, response: Response, resourceData: Array<Model>, statusCode: number = 200) => {
     response
-        .sendStatus(statusCode)
+        .status(statusCode)
         .type('json')
         .send(Map().set(resourceName, resourceData).toJSON());
 });

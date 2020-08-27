@@ -169,7 +169,7 @@ Notes.init({
     },
     title: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true, // This is temporary and should be false after Vue UI updated
     },
     book_id: {
         type: DataTypes.INTEGER.UNSIGNED,
