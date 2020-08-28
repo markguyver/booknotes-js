@@ -1,16 +1,28 @@
 import {Response} from 'express';
 import {curry} from 'ramda';
 import {Sequelize, Model, DataTypes, ModelCtor, FindOptions} from 'sequelize';
-import {respondWith500, respondWithAuthorsPayload, respondWithAuthorNotFound, respondInvalidAuthorId} from './Http/helpers';
+import {
+    respondWith500,
+    respondWithAuthorsPayload, respondWithAuthorNotFound, respondInvalidAuthorId,
+    respondWithBooksPayload,
+    respondWithTagsPayload
+} from './Http/helpers';
+import {logger} from './logger';
 
-const databaseProtocol  = process.env.DB_PROTOCOL || 'mysql';
 const databaseHost      = process.env.DB_HOSTNAME || '';
-const databasePort      = process.env.DB_PORT || 3306;
+const databasePort      = process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306;
 const databaseUsername  = process.env.DB_USERNAME || 'root';
 const databasePassword  = process.env.DB_PASSWORD || '';
 const databaseSchema    = process.env.DB_SCHEMA || 'booknotes';
 
-export const sequelize = new Sequelize(databaseProtocol + '://' + databaseUsername + ':' + databasePassword + '@' + databaseHost + ':' + databasePort + '/' + databaseSchema);
+export const sequelize = new Sequelize(databaseSchema, databaseUsername, databasePassword, {
+    dialect: "mysql",
+    host: databaseHost,
+    port: databasePort,
+    logging: message => logger.debug(message),
+});
+
+
 
 class BookNotesModel extends Model {
 }
@@ -243,10 +255,18 @@ export const validateIdParameter = (idToValidate: string, response: Response): n
 };
 
 // TODO Define FindAllResource Curried Function
-const fetchAllAndRespond = curry((sequelizeModel: ModelCtor<Model<any, any>>, queryResultsHandler: Function, queryOptions: FindOptions, response: Response) => {
-    sequelizeModel.findAll(queryOptions).then(results => queryResultsHandler(response, results));
+const fetchAllAndRespond = curry((sequelizeModel: ModelCtor<Model<any, any>>, queryResultsHandler: Function, queryOptions: FindOptions, response: Response): Response => {
+
+    // TODO: Add Error Logging
+
+    sequelizeModel.findAll(queryOptions)
+        .then(results => queryResultsHandler(response, results))
+        .catch(error => respondWith500(response));
+    return response;
 });
-export const fetchAllAuthorsAndRespond = fetchAllAndRespond(sequelize.models.Authors, respondWithAuthorsPayload);
+export const fetchAllAuthorsAndRespond = fetchAllAndRespond(Authors, respondWithAuthorsPayload);
+export const fetchAllBooksAndRespond = fetchAllAndRespond(Books, respondWithBooksPayload);
+export const fetchAllTagsAndRespond = fetchAllAndRespond(Tags, respondWithTagsPayload);
 
 // TODO Define FindOneResource Curried Function
 const fetchByIdAndRespond = curry((sequelizeModel: ModelCtor<Model<any, any>>, queryResultsHandler: Function, notFoundHandler: Function, invalidIdHandler: Function, id: number, options: FindOptions, response: Response) => {
@@ -259,6 +279,9 @@ const fetchByIdAndRespond = curry((sequelizeModel: ModelCtor<Model<any, any>>, q
                 notFoundHandler(response);
             } // End of Check for Results
         }).catch(error => { // Middle of Perform Author Retrieval Query
+
+            // TODO: Add Error Logging
+
             respondWith500(response);
         }); // End of Perform Author Retrieval Query
     } else { // Middle of Validate ID Parameter

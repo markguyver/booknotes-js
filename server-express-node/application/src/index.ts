@@ -1,5 +1,6 @@
 import bodyParser from 'body-parser';
 import express from 'express';
+import {logger, expressLogger} from './logger';
 
 import {authorsRoutes, authorRoutes} from './Http/Controllers/authorsController';
 import {booksRoutes, bookRoutes} from './Http/Controllers/booksController';
@@ -14,6 +15,7 @@ const port = process.env.APP_PORT || 5000;
 expressServerInstance.disable('x-powered-by');
 
 // Server Middleware
+expressServerInstance.use(expressLogger);
 expressServerInstance.use(bodyParser.json());
 expressServerInstance.use(bodyParser.urlencoded({ extended: true }));
 
@@ -39,4 +41,4 @@ expressServerInstance.use('/tags', tagsRoutes);
 expressServerInstance.use('/tag', tagRoutes);
 
 // Start the Server
-expressServerInstance.listen(port, () => console.log(`Booknotes API Server started on port: ${port}`));
+expressServerInstance.listen(port, () => logger.info(`Booknotes API Server started on port: ${port}`));

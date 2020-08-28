@@ -5,6 +5,7 @@ services:
     command: npm run develop
     environment:
       - DB_HOSTNAME=booknotesjs_database-relational_1
+      - LOG_LEVEL=debug
     image: booknotes-js-server
     networks:
       - booknotes-network
