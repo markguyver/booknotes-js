@@ -37,7 +37,7 @@ In the root directory, there is a `docker-compose.yml` file which can be used to
     **Server:**
 
     ```bash
-    docker exec -it --rm -v ~/Documents/Projects/booknotes-js/server/application:/var/node booknotesjs_server:latest sh
+    docker exec -it --rm -v ~/Documents/Projects/booknotes-js/server/application:/var/node booknotesjs_server_1:latest sh -l
     ```
 
     ```bash
@@ -47,7 +47,7 @@ In the root directory, there is a `docker-compose.yml` file which can be used to
     **Client:**
 
     ```bash
-    docker exec -it --rm -v ~/Documents/Projects/booknotes-js/client/application:/var/node booknotesjs_client:latest sh
+    docker exec -it --rm -v ~/Documents/Projects/booknotes-js/client/application:/var/node booknotesjs_client_1:latest sh -l
     ```
 
     ```bash
@@ -55,8 +55,6 @@ In the root directory, there is a `docker-compose.yml` file which can be used to
     ```
 
 4. Connect to MariaDB and create the `booknotes` schema (_or whichever schema you choose to use via the `.env` file_).
-
-5. Set up your `.env` files.
 
 ## Technologies Used
 
@@ -72,7 +70,9 @@ This list is not comprehensive but includes the key dependencies.
 * [Bootstrap-Vue](https://bootstrap-vue.js.org/docs/)
 * [Axios](https://github.com/axios/axios)
 * [Apex Charts](https://apexcharts.com/docs/installation/)
+* [Vue Apex Charts](https://apexcharts.com/docs/vue-charts/)
 * [CKEditor4](https://ckeditor.com/docs/ckeditor4/latest/)
+* [CKEditor4-Vue](https://github.com/ckeditor/ckeditor4-vue)
 * [PopperJS](https://popper.js.org/)
 * [Serve](https://github.com/zeit/serve#readme)
 
@@ -81,12 +81,16 @@ This list is not comprehensive but includes the key dependencies.
 * [Docker](https://docs.docker.com/reference/)
 * [NodeJS](https://nodejs.org/docs/latest-v12.x/api/)
 * [Typescript](https://www.typescriptlang.org/docs/home.html)
+* [Mysql2](https://github.com/sidorares/node-mysql2#readme)
 * [Sequelize](https://github.com/sequelize/sequelize)
 * [Umzug](https://github.com/sequelize/umzug)
 * [ExpressJS](https://expressjs.com/en/4x/api.html)
 * [Nodemon](https://github.com/remy/nodemon#nodemon)
 * [PM2](https://github.com/Unitech/pm2)
 * [Redoc](https://github.com/Redocly/redoc)
+* [Pino](https://getpino.io/)
+* [Express Pino](https://github.com/pinojs/express-pino-logger)
+* [Ramda](https://ramdajs.com/)
 
 ### Database
 
