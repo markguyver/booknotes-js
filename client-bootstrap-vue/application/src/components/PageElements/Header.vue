@@ -1,6 +1,6 @@
 <template><div id="header">
     <b-navbar type="dark" variant="primary">
-        <b-navbar-brand to="/"><b-icon icon="book-half-fill"></b-icon> Booknotes</b-navbar-brand>
+        <b-navbar-brand to="/"><b-icon icon="book-half"></b-icon> Booknotes</b-navbar-brand>
         <b-navbar-nav class="ml-auto">
             <b-nav-item-dropdown text="Authors" right>
                 <b-dropdown-item to="/authors">Browse Authors</b-dropdown-item>
