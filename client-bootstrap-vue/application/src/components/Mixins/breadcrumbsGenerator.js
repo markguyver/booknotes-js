@@ -48,9 +48,6 @@ const generateBreadcrumbsForResource = resource => {
 
 resourcesToGenerateBreadcrumbsFor.map(generateBreadcrumbsForResource);
 
-/* eslint no-console: ["error", { allow: ["log"] }] */
-console.log('Breadcrumb Generated Data:', breadcrumbData); // TODO Delete This
-
 export default {
     data: () => breadcrumbData,
     methods: breadcrumbGenerator,
