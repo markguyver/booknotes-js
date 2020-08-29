@@ -24,9 +24,11 @@ export default {
     }; },
     methods: {
         showApply: function() {
+            // Pause for a few milliseconds to allow new DOM state to be set
             setTimeout(() => this.displayApply = JSON.stringify(this.lastDataState) != JSON.stringify(this.getCurrentDataState()), 100);
         },
         applyFilters: function() {
+            // Pause for a few milliseconds to allow new DOM state to be set
             setTimeout(() => {
                 this.$emit('resultsUpdated', this.filterDataset());
                 this.displayApply = false;
@@ -67,6 +69,7 @@ export default {
     mounted: function() {
         this.sidebarFacets.map(this.parseFacetItem);
         this.setCurrentDataState();
+        this.applyFilters(); // Send First Displayable Result Set
     },
 };
 </script>

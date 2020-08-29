@@ -28,7 +28,6 @@
 </div></template>
 
 <script>
-import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import authorHelpers from '../Mixins/authorHelpers';
 import facetHelpers from '../Mixins/facetHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
@@ -46,19 +45,15 @@ export default {
         ],
     };},
     methods: {
-        defaultAuthorDisplay: function() {
-            this.authorsOnPage = this.authors.filter(this.filterPseudonymAuthors).filter(this.filterDeletedAuthors);
-        },
         updateAuthorsOnPage: function(authorsToShow) {
             this.authorsOnPage = authorsToShow;
         },
     },
-	mixins: [apiResultsHelpers, authorHelpers, facetHelpers, pageHelpers],
+	mixins: [authorHelpers, facetHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getAuthorBrowseBreadcrumb(true)]);
         axios.get('/authors').then(response => {
             this.authors = response.data.Authors;
-            this.defaultAuthorDisplay();
             this.transitionFromLoadingToPage();
         }).catch(() => {
             this.transitionFromLoadingToError('Could not retrieve authors.');

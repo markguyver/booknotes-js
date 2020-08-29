@@ -6,15 +6,11 @@
         </b-col>
     </b-row>
     <b-row v-if="displayPage">
-
-        <!-- Temporarily Hide Sidebar
         <b-col class="pr-2">
-            SidebarFacets Goes Here
+            <SidebarFacetsPanel class="mr-2" :sidebarFacets="facetOptions" :sidebarFacetDataset="books" v-on:resultsUpdated="updateBooksOnPage" />
         </b-col>
         <b-col cols="9" class="px-0 mr-3">
-        -->
-
-        <b-col class="mx-0">
+            <div class="h6 ml-1 text-dark">Displaying {{ booksOnPage.length }} book{{ (booksOnPage.length == 1 ? '' : 's') }}</div>
             <b-list-group>
                 <b-list-group-item v-bind:variant="book.deleted_at ? 'light' : ''" v-for="book in booksOnPage" v-bind:key="book.id" v-bind:to="{ path: 'book/' + book.id }" class="d-flex justify-content-between align-items-center">
                     {{ book.title }}
@@ -30,25 +26,31 @@
 </div></template>
 
 <script>
+import bookHelpers from '../Mixins/bookHelpers';
+import facetHelpers from '../Mixins/facetHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 import axios from 'axios';
+import SidebarFacetsPanel from '../PageElements/SidebarFacetsPanel.vue';
 export default {
+    name: "BrowseBooks",
+    components: { SidebarFacetsPanel },
     data: function() { return {
         books: [],
         booksOnPage: [],
+        facetOptions: [
+            this.getCheckboxFacetItem('Show Deleted', this.showDeletedBooks, this.filterDeletedBooks),
+        ],
     }; },
-    name: "BrowseBooks",
-	mixins: [pageHelpers],
+    methods: {
+        updateBooksOnPage: function(booksToShow) {
+            this.booksOnPage = booksToShow;
+        },
+    },
+	mixins: [bookHelpers, facetHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getBookBrowseBreadcrumb(true)]);
         axios.get('/books').then(response => {
             this.books = response.data.Books;
-            this.booksOnPage = this.books;
-
-            /* eslint no-console: ["error", { allow: ["log"] }] */
-            console.log('Browse Books:', this.books);
-
-            // this.defaultAuthorDisplay();
             this.transitionFromLoadingToPage();
         }).catch(() => {
             this.transitionFromLoadingToError('Could not retrieve books.');

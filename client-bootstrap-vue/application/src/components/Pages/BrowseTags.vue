@@ -6,15 +6,11 @@
         </b-col>
     </b-row>
     <b-row v-if="displayPage">
-
-        <!-- Temporarily Hide Sidebar
         <b-col class="pr-2">
-            SidebarFacets Goes Here
+            <SidebarFacetsPanel class="mr-2" :sidebarFacets="facetOptions" :sidebarFacetDataset="tags" v-on:resultsUpdated="updateTagsOnPage" />
         </b-col>
         <b-col cols="9" class="px-0 mr-3">
-        -->
-
-        <b-col class="mx-0">
+            <div class="h6 ml-1 text-dark">Displaying {{ tagsOnPage.length }} tag{{ (tagsOnPage.length == 1 ? '' : 's') }}</div>
             <b-list-group>
                 <b-list-group-item v-bind:variant="tag.deleted_at ? 'light' : ''" v-for="tag in tagsOnPage" v-bind:key="tag.id" v-bind:to="{ path: 'tag/' + tag.id }" class="d-flex justify-content-between align-items-center">
                     {{ tag.tag }}
@@ -31,25 +27,33 @@
 </div></template>
 
 <script>
+import facetHelpers from '../Mixins/facetHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
+import tagHelpers from '../Mixins/tagHelpers';
 import axios from 'axios';
+import SidebarFacetsPanel from '../PageElements/SidebarFacetsPanel.vue';
 export default {
+    name: "BrowseTags",
+    components: { SidebarFacetsPanel },
     data: function() { return {
         tags: [],
         tagsOnPage: [],
+        facetOptions: [
+            this.getCheckboxFacetItem('Show Deleted', this.showDeletedTags, this.filterDeletedTags),
+            this.getCheckboxFacetItem('Show No Authors', this.showTagsWithNoAuthors, this.filterTagsWithNoAuthors),
+            this.getCheckboxFacetItem('Show No Books', this.showTagsWithNoBooks, this.filterTagsWithNoBooks),
+        ],
     }; },
-    name: "BrowseTags",
-	mixins: [pageHelpers],
+    methods: {
+        updateTagsOnPage: function(tagsToShow) {
+            this.tagsOnPage = tagsToShow;
+        },
+    },
+	mixins: [facetHelpers, pageHelpers, tagHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getTagBrowseBreadcrumb(true)]);
         axios.get('/tags').then(response => {
             this.tags = response.data.Tags;
-            this.tagsOnPage = this.tags;
-
-            /* eslint no-console: ["error", { allow: ["log"] }] */
-            console.log('Browse Tags:', this.tags);
-
-            // this.defaultAuthorDisplay();
             this.transitionFromLoadingToPage();
         }).catch(() => {
             this.transitionFromLoadingToError('Could not retrieve tags.');
