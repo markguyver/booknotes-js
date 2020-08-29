@@ -40,8 +40,8 @@ export default {
         tagsOnPage: [],
         facetOptions: [
             this.getCheckboxFacetItem('Show Deleted', this.showDeletedTags, this.filterDeletedTags),
-            this.getCheckboxFacetItem('Show No Authors', this.showTagsWithNoAuthors, this.filterTagsWithNoAuthors),
-            this.getCheckboxFacetItem('Show No Books', this.showTagsWithNoBooks, this.filterTagsWithNoBooks),
+            this.getCheckboxFacetItem('Hide No Authors', this.filterTagsWithNoAuthors, this.showTagsWithNoAuthors),
+            this.getCheckboxFacetItem('Hide No Books', this.filterTagsWithNoBooks, this.showTagsWithNoBooks),
         ],
     }; },
     methods: {
