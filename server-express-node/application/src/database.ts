@@ -19,7 +19,7 @@ export const sequelize = new Sequelize(databaseSchema, databaseUsername, databas
     dialect: "mysql",
     host: databaseHost,
     port: databasePort,
-    logging: message => logger.debug(message),
+    logging: message => logger.debug({source:"Sequelize"}, message),
 });
 
 
