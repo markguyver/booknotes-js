@@ -2,6 +2,7 @@
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
 import PortalVue from 'portal-vue';
 import Vue from 'vue';
+import VueApexCharts from 'vue-apexcharts'
 import VueRouter from 'vue-router';
 
 // Application Imports
@@ -21,6 +22,7 @@ Vue.use(VueRouter);
 Vue.use(IconsPlugin);
 Vue.mixin(BreadcrumbsMixin);
 Vue.mixin(DateTimeHelpers);
+Vue.component('apexchart', VueApexCharts);
 
 // Configure Application
 const router = new VueRouter({routes});
