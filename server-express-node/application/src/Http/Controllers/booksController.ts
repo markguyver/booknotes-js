@@ -1,15 +1,17 @@
 import {Request, Response, Router} from 'express';
 import {Sequelize} from 'sequelize';
-import {sequelize} from '../../database';
+import {sequelizeInstance} from '../../database';
 import {respondWith500, respondWithBookNotFound, respondWithBooksPayload, respondInvalidBookId} from '../helpers';
 
 // Initialize Database Models
-const Authors = sequelize.models.Authors;
-const BookAuthors = sequelize.models.BookAuthors;
-const Books = sequelize.models.Books;
-const ContributionTypes = sequelize.models.ContributionTypes;
-const Notes = sequelize.models.Notes;
-const Tags = sequelize.models.Tags;
+const Authors = sequelizeInstance.models.Authors;
+const BookAuthors = sequelizeInstance.models.BookAuthors;
+const Books = sequelizeInstance.models.Books;
+const ContributionTypes = sequelizeInstance.models.ContributionTypes;
+const Notes = sequelizeInstance.models.Notes;
+const Tags = sequelizeInstance.models.Tags;
+
+// TODO: Use fetchAllBooksAndRespond
 
 // Define Endpoint Handlers
 const getAllBooks = (request: Request, response: Response): Response => {

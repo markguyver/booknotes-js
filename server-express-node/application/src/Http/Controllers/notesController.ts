@@ -1,10 +1,10 @@
 import {Request, Response, Router} from 'express';
-import {sequelize} from '../../database';
+import {sequelizeInstance} from '../../database';
 import {respondWith500, respondWithNotesNotFound, respondWithNotesPayload} from '../helpers';
 
 // Initialize Database Models
-const Books = sequelize.models.Books;
-const Notes = sequelize.models.Notes;
+const Books = sequelizeInstance.models.Books;
+const Notes = sequelizeInstance.models.Notes;
 
 // Define Endpoint Handlers
 const getAllNotesByBookId = (request: Request, response: Response): Response => {

@@ -1,14 +1,15 @@
 import {Request, Response, Router} from 'express';
-import {Sequelize, Op} from 'sequelize';
-import {sequelize, fetchAllAuthorsAndRespond, fetchAllBooksAndRespond, fetchAllTagsAndRespond} from '../../database';
+import {Sequelize} from 'sequelize';
+import {sequelizeInstance} from '../../database';
+import {fetchAllAuthorsAndRespond, fetchAllBooksAndRespond, fetchAllTagsAndRespond} from '../helpers';
 
 // Initialize Database Models
-const Authors = sequelize.models.Authors;
-const BookAuthors = sequelize.models.BookAuthors;
-const Books = sequelize.models.Books;
-const ContributionTypes = sequelize.models.ContributionTypes;
-const Notes = sequelize.models.Notes;
-const Tags = sequelize.models.Tags;
+const Authors = sequelizeInstance.models.Authors;
+const BookAuthors = sequelizeInstance.models.BookAuthors;
+const Books = sequelizeInstance.models.Books;
+const ContributionTypes = sequelizeInstance.models.ContributionTypes;
+const Notes = sequelizeInstance.models.Notes;
+const Tags = sequelizeInstance.models.Tags;
 
 // Define Endpoint Handlers
 const getResourceCounts = (request: Request, response: Response): Response => {
@@ -17,6 +18,7 @@ const getResourceCounts = (request: Request, response: Response): Response => {
     // TODO Get Author Count
     // TODO Get Book Count
     // TODO Get Note Count
+    // TODO Use PromiseAll to Manage Queries
 
     return response;
 };
