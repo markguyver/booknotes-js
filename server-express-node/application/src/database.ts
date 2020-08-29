@@ -22,8 +22,6 @@ export const sequelize = new Sequelize(databaseSchema, databaseUsername, databas
     logging: message => logger.debug({source:"Sequelize"}, message),
 });
 
-
-
 class BookNotesModel extends Model {
 }
 
