@@ -6,8 +6,7 @@
         <b-form class="sidebar-facet-items">
             <div v-for="sidebarItem in sidebarItems" v-bind:key="sidebarItem.id">
 
-
-                <b-form-checkbox v-if="verifyIsCheckboxOption(sidebarItem)" v-on:change="showApply" size="sm" v-model="sidebarItem.checked">{{ sidebarItem.label }}</b-form-checkbox>
+                <b-form-checkbox v-if="verifyIsCheckboxOption(sidebarItem)" v-on:change="showApply" size="sm" v-model="sidebarItems[sidebarItem.id].applyFilter">{{ sidebarItem.label }}</b-form-checkbox>
 
             </div>
         </b-form>
@@ -17,30 +16,37 @@
 
 <script>
 import facetHelpers from '../Mixins/facetHelpers';
-// import ramda from 'ramda';
-// import compiler from 'vue-template-compiler';
-// const processSidebarItemFacetConfiguration = sidebarItemFacetConfiguration => {
-// };
+import {allPass} from 'ramda';
 export default {
     name: "SidebarFacets",
+    data: function() { return {
+        lastDataState: [],
+    }; },
     methods: {
         showApply: function() {
-            this.displayApply = true;
+            setTimeout(() => this.displayApply = JSON.stringify(this.lastDataState) != JSON.stringify(this.getCurrentDataState()), 100);
         },
         applyFilters: function() {
-
-            // const newItems = this.sidebarItems.map(sidebarItem => {
-            //     /* eslint no-console: ["error", { allow: ["log"] }] */
-            //     console.log('Apply Filters Sidebar Item:', sidebarItem);
-            // });
-
-            this.$emit('resultsUpdated', this.filterDataset());
-            this.displayApply = false;
+            setTimeout(() => {
+                this.$emit('resultsUpdated', this.filterDataset());
+                this.displayApply = false;
+                this.setCurrentDataState();
+            }, 100);
         },
         filterDataset: function() {
-            // TODO Loop through form elements and apply filters
             return this.sidebarFacetDataset.filter(this.createFilterFunctionFromFacetItems(this.sidebarItems));
         },
+        createFilterFunctionFromFacetItems: function(facets) {
+            return allPass(facets.map(currentFacet => currentFacet.currentFilterFunction()));
+        },
+        getCurrentDataState: function() {
+            const currentDataState = [];
+            this.sidebarItems.forEach(facet => currentDataState.push(facet.applyFilter));
+            return currentDataState;
+        },
+        setCurrentDataState: function() {
+            this.lastDataState = this.getCurrentDataState();
+        }
     },
     props: {
         sidebarHeaderText: {
@@ -60,6 +66,7 @@ export default {
     mixins: [facetHelpers],
     mounted: function() {
         this.sidebarFacets.map(this.parseFacetItem);
+        this.setCurrentDataState();
     },
 };
 </script>

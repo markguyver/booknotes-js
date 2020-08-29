@@ -41,8 +41,8 @@ export default {
         authors: [],
         authorsOnPage: [],
         facetOptions: [
-            this.getCheckboxFacetItem('Show Deleted', this.defaultFilterUnchecked, this.filterDeletedAuthors),
-            this.getCheckboxFacetItem('Show Pseudonyms', this.defaultFilterUnchecked, this.filterPseudonymAuthors),
+            this.getCheckboxFacetItem('Show Deleted', this.showDeletedAuthors, this.filterDeletedAuthors),
+            this.getCheckboxFacetItem('Show Pseudonyms', this.showPseudonymAuthors, this.filterPseudonymAuthors),
         ],
     };},
     methods: {

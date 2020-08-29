@@ -1,4 +1,4 @@
-import { compose, filter, join, props } from 'ramda';
+import { always, compose, filter, join, props } from 'ramda';
 
 const getAuthorFullName = compose(
     join(' '),
@@ -15,8 +15,12 @@ const convertBookAuthorsToAuthorsList = bookAuthorsArray => bookAuthorsArray.map
     return author;
 });
 
+const alwaysTrue = always(true);
+
 const filterDeletedAuthors = currentAuthor => !currentAuthor.deleted_at;
+const showDeletedAuthors = alwaysTrue;
 const filterPseudonymAuthors = currentAuthor => !currentAuthor.parent_author_id;
+const showPseudonymAuthors = alwaysTrue;
 
 export default {
     methods: {
@@ -24,6 +28,8 @@ export default {
         getAuthorNameLastFirstMiddle,
         convertBookAuthorsToAuthorsList,
         filterDeletedAuthors,
+        showDeletedAuthors,
         filterPseudonymAuthors,
+        showPseudonymAuthors,
     },
 };
