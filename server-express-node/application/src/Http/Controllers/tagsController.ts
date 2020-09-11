@@ -11,42 +11,32 @@ const Notes = sequelizeInstance.models.Notes;
 const Tags = sequelizeInstance.models.Tags;
 
 // Define Endpoint Handlers
-const getAllTags = (request: Request, response: Response): Response => {
-
-    // TODO Fix Author Count, Book Count, and Note Count From this Query
-    // TODO Refactor This to Use Curried Function: fetchAllTagsAndRespond()
-
-    Tags.findAll({
-        attributes: [
-            'id',
-            'tag',
-            'deleted_at',
-            [Sequelize.fn('COUNT', Sequelize.col('Authors.id')), 'authorCount'],
-            [Sequelize.fn('COUNT', Sequelize.col('Books.id')), 'bookCount'],
-            [Sequelize.fn('COUNT', Sequelize.col('Notes.id')), 'noteCount'],
-        ],
-        group: ['id', 'tag', 'deleted_at'],
-        order: [['tag', 'ASC']],
-        paranoid: false,
-        include: [{
-            model: Authors,
-            required: false,
-            attributes: [],
-        },{
-            model: Books,
-            required: false,
-            attributes: [],
-        },{
-            model: Notes,
-            required: false,
-            attributes: [],
-        }],
-    }).then(results => {
-        response.type('json');
-        response.send({ Tags: results });
-    });
-    return response;
-};
+const getAllTags = (request: Request, response: Response): Response => fetchAllTagsAndRespond({
+    attributes: [
+        'id',
+        'tag',
+        'deleted_at',
+        [Sequelize.fn('COUNT', Sequelize.col('Authors.id')), 'authorCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('Books.id')), 'bookCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('Notes.id')), 'noteCount'],
+    ],
+    group: ['id', 'tag', 'deleted_at'],
+    order: [['tag', 'ASC']],
+    paranoid: false,
+    include: [{
+        model: Authors,
+        required: false,
+        attributes: [],
+    },{
+        model: Books,
+        required: false,
+        attributes: [],
+    },{
+        model: Notes,
+        required: false,
+        attributes: [],
+    }],
+}, response);
 const getTagById = (request: Request, response: Response): Response => {
 
     // TODO Refactor This

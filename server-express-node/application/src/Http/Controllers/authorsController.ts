@@ -13,40 +13,37 @@ const Tags = sequelizeInstance.models.Tags;
 // TODO Use Curried Functions
 
 // Define Endpoint Handlers
-const getAllAuthors = (request: Request, response: Response): Response => {
-    fetchAllAuthorsAndRespond({
-        attributes: [
-            'id',
-            'first_name',
-            'middle_name',
-            'last_name',
-            'parent_author_id',
-            'deleted_at',
-            [Sequelize.fn('COUNT', Sequelize.col('BookAuthors.author_id')), 'bookCount'],
-        ],
-        group: [
-            'id',
-            'first_name',
-            'middle_name',
-            'last_name',
-            'parent_author_id',
-            'deleted_at',
-            'Tags.id',
-            'Tags.tag',
-        ],
-        order: [['last_name', 'ASC'], ['first_name', 'ASC'], ['middle_name', 'ASC']],
-        paranoid: false,
-        include: [{
-            model: BookAuthors,
-            required: false,
-            attributes: [],
-        },{
-            model: Tags,
-            required: false,
-        }],
-    }, response);
-    return response;
-};
+const getAllAuthors = (request: Request, response: Response): Response => fetchAllAuthorsAndRespond({
+    attributes: [
+        'id',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'parent_author_id',
+        'deleted_at',
+        [Sequelize.fn('COUNT', Sequelize.col('BookAuthors.author_id')), 'bookCount'],
+    ],
+    group: [
+        'id',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'parent_author_id',
+        'deleted_at',
+        'Tags.id',
+        'Tags.tag',
+    ],
+    order: [['last_name', 'ASC'], ['first_name', 'ASC'], ['middle_name', 'ASC']],
+    paranoid: false,
+    include: [{
+        model: BookAuthors,
+        required: false,
+        attributes: [],
+    },{
+        model: Tags,
+        required: false,
+    }],
+}, response);
 const createNewAuthor = (request: Request, response: Response): Response => {
 
     // TODO Parse Request Body into Author Object

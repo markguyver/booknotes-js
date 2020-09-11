@@ -1,7 +1,7 @@
 import {Request, Response, Router} from 'express';
 import {Sequelize} from 'sequelize';
 import {sequelizeInstance} from '../../database';
-import {respondWith500, respondWithBookNotFound, respondWithBooksPayload, respondInvalidBookId} from '../helpers';
+import {fetchAllBooksAndRespond, respondWith500, respondWithBookNotFound, respondWithBooksPayload, respondInvalidBookId} from '../helpers';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
@@ -14,43 +14,35 @@ const Tags = sequelizeInstance.models.Tags;
 // TODO: Use fetchAllBooksAndRespond
 
 // Define Endpoint Handlers
-const getAllBooks = (request: Request, response: Response): Response => {
-    const respondWithBooks = respondWithBooksPayload(response);
-    Books.findAll({
-        attributes: [
-            'id',
-            'title',
-            'deleted_at',
-            [Sequelize.fn('COUNT', Sequelize.col('Notes.book_id')), 'noteCount'],
-        ],
-        group: [
-            'id',
-            'title',
-            'deleted_at',
-            'Tags.id',
-            'Tags.tag',
-            'Tags.deleted_at',
-        ],
-        order: [['title', 'ASC']],
+const getAllBooks = (request: Request, response: Response): Response => fetchAllBooksAndRespond({
+    attributes: [
+        'id',
+        'title',
+        'deleted_at',
+        [Sequelize.fn('COUNT', Sequelize.col('Notes.book_id')), 'noteCount'],
+    ],
+    group: [
+        'id',
+        'title',
+        'deleted_at',
+        'Tags.id',
+        'Tags.tag',
+        'Tags.deleted_at',
+    ],
+    order: [['title', 'ASC']],
+    paranoid: false,
+    include: [{
+        model: Notes,
+        required: false,
         paranoid: false,
-        include: [{
-            model: Notes,
-            required: false,
-            paranoid: false,
-            attributes: [],
-        }, {
-            model: Tags,
-            required: false,
-            paranoid: false,
-            attributes: ['id', 'tag', 'deleted_at'],
-        }],
-    }).then(results => {
-        respondWithBooks(results);
-        // response.type('json');
-        // response.send({ Books: results });
-    });
-    return response;
-};
+        attributes: [],
+    }, {
+        model: Tags,
+        required: false,
+        paranoid: false,
+        attributes: ['id', 'tag', 'deleted_at'],
+    }],
+}, response);
 const getAllBooksByAuthorId = (request: Request, response: Response): Response => {
     const authorId = request.params.authorId;
     response.send({coming:'soon',authorId:authorId});
