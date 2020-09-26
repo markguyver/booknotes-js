@@ -4,11 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "compile": "tsc",
-    "develop": "rm -rf dist && npm run compile && nodemon dist",
+    "compile": "rm -rf dist && tsc",
+    "develop": "npm run compile && nodemon dist",
     "documentation": "redoc-cli bundle redoc.json",
-    "migrate": "node database/migrate.js",
-    "rollback": "node database/rollback.js",
     "start": "pm2 start dist/index.js"
   },
   "author": "Mark Chavez <mark.chavez@startmail.com>",
