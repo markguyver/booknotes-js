@@ -54,7 +54,19 @@ In the root directory, there is a `docker-compose.yml` file which can be used to
     npm install
     ```
 
-4. Connect to MariaDB and create the `booknotes` schema (_or whichever schema you choose to use via the `.env` file_).
+4. Connect to MariaDB and create the `booknotes` schema (_or whichever schema you choose to use via the `.env` file_). You will also need to run the migrations and (_optionally_) the seeders.
+
+    **Server:**
+
+    ```bash
+    docker exec -it --rm --network booknotes-network -v ~/Documents/Projects/booknotes-js/server/application:/var/node booknotesjs_server_1:latest sh -l
+    ```
+
+    ```bash
+    cd database
+    sequelize db:migrate:all
+    sequelize db:seed:all
+    ```
 
 ## Technologies Used
 

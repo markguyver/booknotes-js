@@ -1,1 +1,0 @@
-const {sequelize, umzug} = require('./bootstrapMigrations');

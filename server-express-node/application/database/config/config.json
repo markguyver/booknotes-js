@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "root",
+    "password": null,
+    "database": "booknotes",
+    "host": "booknotesjs_database-relational_1",
+    "dialect": "mysql"
+  }
+}
