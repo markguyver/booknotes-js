@@ -5,7 +5,7 @@ import {Model, ModelCtor, FindOptions} from 'sequelize';
 import {sequelizeInstance} from '../database';
 import {logger} from '../logger';
 
-const respondWithResourceList = curry((resourceName: string, response: Response, resourceData: Array<Model>, statusCode: number = 200) => {
+export const respondWithResourceList = curry((resourceName: string, response: Response, resourceData: Array<Model>, statusCode: number = 200) => {
     response
         .status(statusCode)
         .type('json')

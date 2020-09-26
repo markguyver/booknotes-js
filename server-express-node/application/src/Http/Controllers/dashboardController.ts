@@ -1,7 +1,7 @@
 import {Request, Response, Router} from 'express';
 import {Sequelize} from 'sequelize';
 import {sequelizeInstance} from '../../database';
-import {fetchAllAuthorsAndRespond, fetchAllBooksAndRespond, fetchAllTagsAndRespond} from '../helpers';
+import {fetchAllAuthorsAndRespond, fetchAllBooksAndRespond, fetchAllTagsAndRespond, respondWithResourceList} from '../helpers';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
@@ -22,6 +22,7 @@ const getResourceCounts = (request: Request, response: Response): Response => {
 
     return response;
 };
+// const getResourceCounts = (request: Request, response: Response): Response => respondWithResourceList('Counts', response, results, statusCode);
 const getAuthorLeaderboard = (request: Request, response: Response): Response => fetchAllAuthorsAndRespond({
     attributes: [
         'id',
