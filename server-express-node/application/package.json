@@ -22,8 +22,7 @@
     "pino": "^6.5.1",
     "ramda": "^0.27.1",
     "sequelize": "^5.22.3",
-    "sequelize-cli": "^5.5.1",
-    "umzug": "^2.3.0"
+    "sequelize-cli": "^5.5.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.32",

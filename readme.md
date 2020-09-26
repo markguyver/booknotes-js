@@ -95,7 +95,7 @@ This list is not comprehensive but includes the key dependencies.
 * [Typescript](https://www.typescriptlang.org/docs/home.html)
 * [Mysql2](https://github.com/sidorares/node-mysql2#readme)
 * [Sequelize](https://github.com/sequelize/sequelize)
-* [Umzug](https://github.com/sequelize/umzug)
+* [Sequelize CLI](https://github.com/sequelize/cli)
 * [ExpressJS](https://expressjs.com/en/4x/api.html)
 * [Nodemon](https://github.com/remy/nodemon#nodemon)
 * [PM2](https://github.com/Unitech/pm2)
