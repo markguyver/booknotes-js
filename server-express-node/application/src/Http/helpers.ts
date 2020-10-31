@@ -17,9 +17,9 @@ export const respondWithContributionTypesPayload = respondWithResourceList('Cont
 export const respondWithNotesPayload = respondWithResourceList('Notes');
 export const respondWithTagsPayload = respondWithResourceList('Tags');
 
-export const respondWith400 = (response: Response): Response => response.sendStatus(400);
-export const respondWith404 = (response: Response): Response => response.sendStatus(404);
-export const respondWith500 = (response: Response): Response => response.sendStatus(500);
+export const respondWith400 = (response: Response): Response => response.status(400);
+export const respondWith404 = (response: Response): Response => response.status(404);
+export const respondWith500 = (response: Response): Response => response.status(500);
 
 const respondWithResource404 = curry((resourceName: string, response: Response) => respondWith404(response).send(resourceName + ' not found'));
 export const respondWithAuthorNotFound = respondWithResource404('Author');
@@ -55,12 +55,9 @@ const Tags = sequelizeInstance.models.Tags;
 
 // TODO Define FindAllResource Curried Function
 const fetchAllAndRespond = curry((sequelizeModel: ModelCtor<Model<any, any>>, queryResultsHandler: Function, queryOptions: FindOptions, response: Response): Response => {
-
-    // TODO: Add Error Logging
-
     sequelizeModel.findAll(queryOptions)
         .then(results => queryResultsHandler(response, results))
-        .catch(error => respondWith500(response));
+        .catch(error => respondWith500(response)); // TODO: Add Error Logging?
     return response;
 });
 export const fetchAllAuthorsAndRespond = fetchAllAndRespond(Authors, respondWithAuthorsPayload);

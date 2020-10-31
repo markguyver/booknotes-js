@@ -9,21 +9,21 @@
         <b-card body-class="px-2 py-2">
             <b-card-title>{{ book.title }}</b-card-title>
             <b-list-group flush>
-                <b-list-group-item>
+                <b-list-group-item id="book-tags">
                     <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span></div>
                     <TagSubList :tags="bookTags" />
 
                     <!-- Adding a Tag to this Book Should be a Page Element Component -->
 
                 </b-list-group-item>
-                <b-list-group-item>
-                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span></div>
+                <b-list-group-item id="book-authors">
+                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <b-icon :icon="addAuthorIcon" :variant="addAuthorIconVariant" v-b-hover="handleIconHover" @mousedown="handleIconClick"></b-icon></div>
                     <AuthorSubList :authors="convertBookAuthorsToAuthorsList(bookAuthors)" />
 
                     <!-- Adding an Author to this Book Should Be a Page Element Component -->
 
                 </b-list-group-item>
-                <b-list-group-item>
+                <b-list-group-item id="book-notes">
                     <div class="h6">Notes <span class="muted">({{ bookNotes.length }})</span></div>
                     <NotesList :notes="bookNotes" />
                     <b-row class="mt-3"><b-col /><b-col cols="12"><NoteCreate v-on:noteCreated="fetchBookNotes" :bookId="book.id" /></b-col><b-col /></b-row>
@@ -54,6 +54,9 @@ export default {
         bookAuthors: [],
         bookNotes: [],
         bookTags: [],
+        addAuthorIcon: 'plus-circle',
+        addAuthorIconVariant: 'primary',
+        addAuthorIconClicked: false,
     };},
     methods: {
         fetchBookNotes: function() {
@@ -63,6 +66,20 @@ export default {
                 this.bookNotes = [];
                 this.popError('Could not retrieve notes.');
             });
+        },
+        handleIconHover: function(isHovered) {
+            this.addAuthorIcon = isHovered || this.addAuthorIconClicked ? 'plus-circle-fill' : 'plus-circle';
+        },
+        handleIconClick: function() {
+            this.addAuthorIconClicked = true;
+            this.addAuthorIconVariant = 'secondary';
+            const changeIconBack = () => {
+                this.addAuthorIconVariant = 'primary';
+                this.addAuthorIconClicked = false;
+                this.addAuthorIcon = 'plus-circle';
+                window.removeEventListener('mouseup', changeIconBack);
+            };
+            window.addEventListener('mouseup', changeIconBack);
         },
     },
 	mixins: [authorHelpers, pageHelpers],
@@ -113,5 +130,8 @@ export default {
 }
 #book-view .list-group .list-group-item .list-group .list-group-item span {
     font-size: 0.7rem;
+}
+#book-view .list-group .list-group-item div.h6 svg:hover {
+
 }
 </style>
