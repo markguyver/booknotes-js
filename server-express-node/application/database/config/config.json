@@ -3,7 +3,7 @@
     "username": "root",
     "password": null,
     "database": "booknotes",
-    "host": "booknotesjs_database-relational_1",
+    "host": "booknotes-js-database-relational",
     "dialect": "mysql"
   }
 }

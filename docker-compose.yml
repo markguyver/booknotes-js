@@ -3,8 +3,9 @@ services:
   server:
     build: ./server-express-node
     command: npm run develop
+    container_name: booknotes-js-server
     environment:
-      - DB_HOSTNAME=booknotesjs_database-relational_1
+      - DB_HOSTNAME=booknotes-js-database-relational
       - LOG_LEVEL=debug
     image: booknotes-js-server
     networks:
@@ -16,8 +17,7 @@ services:
   client:
     build: ./client-bootstrap-vue
     command: npm run serve -- --port 3000
-    environment:
-      APP_API_URL: server
+    container_name: booknotes-js-client
     image: booknotes-js-client
     networks:
       - booknotes-network
@@ -26,6 +26,7 @@ services:
     volumes:
       - ./client-bootstrap-vue/application:/var/node
   database-relational:
+    container_name: booknotes-js-database-relational
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
     image: mariadb:10.5.5
