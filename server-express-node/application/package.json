@@ -7,7 +7,7 @@
     "compile": "rm -rf dist && tsc",
     "develop": "npm run compile && nodemon dist",
     "documentation": "redoc-cli bundle redoc.json",
-    "start": "pm2 start dist/index.js"
+    "start": "node dist/index.js"
   },
   "author": "Mark Chavez <mark.chavez@startmail.com>",
   "license": "MIT",
@@ -19,8 +19,7 @@
     "mysql2": "^2.1.0",
     "pino": "^6.5.1",
     "ramda": "^0.27.1",
-    "sequelize": "^5.22.3",
-    "sequelize-cli": "^5.5.1"
+    "sequelize": "^5.22.3"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.32",
@@ -34,7 +33,10 @@
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "eslint": "^6.8.0",
+    "nodemon": "^2.0.7",
     "redoc": "^2.0.0-rc.40",
-    "typescript": "^3.9.7"
+    "sequelize-cli": "^5.5.1",
+    "typescript": "^3.9.7",
+    "uglify-js": "^3.13.2"
   }
 }
