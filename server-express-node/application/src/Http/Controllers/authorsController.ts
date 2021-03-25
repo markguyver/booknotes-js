@@ -10,8 +10,6 @@ const Books = sequelizeInstance.models.Books;
 const ContributionTypes = sequelizeInstance.models.ContributionTypes;
 const Tags = sequelizeInstance.models.Tags;
 
-// TODO Use Curried Functions
-
 // Define Endpoint Handlers
 const getAllAuthors = (request: Request, response: Response): Response => fetchAllAuthorsAndRespond({
     attributes: [
@@ -48,46 +46,42 @@ const createNewAuthor = (request: Request, response: Response): Response => {
 
     // TODO Parse Request Body into Author Object
 
-    const respondWithAuthor = respondWithAuthorsPayload(response);
     Authors.create(request.body).then(() => {
         Authors.findOne({where: request.body})
-            .then(result => respondWithAuthor(result ? [result] : [], 201))
+            .then(result => respondWithAuthorsPayload(response, result ? [result] : [], 201))
             .catch(error => respondWith500(response));
     });
     return response;
 };
-const getAuthorById = (request: Request, response: Response): Response => {
-    fetchAuthorByIdAndRespond(parseInt(request.params.authorId), {
+const getAuthorById = (request: Request, response: Response): Response => fetchAuthorByIdAndRespond(parseInt(request.params.authorId), {
+    paranoid: false,
+    include: [{
+        model: Authors,
+        required: false,
+        as: 'ActualAuthor',
         paranoid: false,
+    },{
+        model: Authors,
+        required: false,
+        as: 'Pseudonyms',
+        paranoid: false,
+    },{
+        model: BookAuthors,
+        required: false,
         include: [{
-            model: Authors,
-            required: false,
-            as: 'ActualAuthor',
-            paranoid: false,
-        },{
-            model: Authors,
-            required: false,
-            as: 'Pseudonyms',
-            paranoid: false,
-        },{
-            model: BookAuthors,
-            required: false,
-            include: [{
-                model: Books,
-                required: false,
-                paranoid: false,
-            },{
-                model: ContributionTypes,
-                required: false,
-            }],
-        },{
-            model: Tags,
+            model: Books,
             required: false,
             paranoid: false,
+        },{
+            model: ContributionTypes,
+            required: false,
         }],
-    }, response);
-    return response;
-};
+    },{
+        model: Tags,
+        required: false,
+        paranoid: false,
+    }],
+}, response);
 
 // Register Resource Routes
 export const authorsRoutes = Router();

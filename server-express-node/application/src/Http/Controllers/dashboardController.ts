@@ -1,7 +1,7 @@
 import {Request, Response, Router} from 'express';
 import {Sequelize} from 'sequelize';
 import {sequelizeInstance} from '../../database';
-import {fetchAllAuthorsAndRespond, fetchAllBooksAndRespond, fetchAllTagsAndRespond, respondWithResourceList} from '../helpers';
+import {fetchAllAuthorsAndRespond, fetchAllBooksAndRespond, fetchAllTagsAndRespond} from '../helpers';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;

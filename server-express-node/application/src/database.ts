@@ -13,7 +13,7 @@ export const sequelizeInstance = new Sequelize(databaseSchema, databaseUsername,
     dialect: "mysql",
     host: databaseHost,
     port: databasePort,
-    logging: message => logger.debug({source:"Sequelize"}, message),
+    logging: message => logger.info({source:"Sequelize"}, message),
 });
 
 // Create Base Model for All Tables

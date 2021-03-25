@@ -4,6 +4,7 @@ import {logger, expressLogger} from './logger';
 
 import {authorsRoutes, authorRoutes} from './Http/Controllers/authorsController';
 import {booksRoutes, bookRoutes} from './Http/Controllers/booksController';
+import {contributionTypesRoutes, contributionTypeRoutes} from './Http/Controllers/contributionTypesController';
 import {dashboardRoutes} from './Http/Controllers/dashboardController';
 import {notesRoutes} from './Http/Controllers/notesController';
 import {tagsRoutes, tagRoutes} from './Http/Controllers/tagsController';
@@ -29,6 +30,10 @@ expressServerInstance.use('/author', authorRoutes);
 // Books Resource Requests
 expressServerInstance.use('/books', booksRoutes);
 expressServerInstance.use('/book', bookRoutes);
+
+// Contribution Types Resource Requests
+expressServerInstance.use('/contribution-types', contributionTypesRoutes);
+expressServerInstance.use('/contribution-type', contributionTypeRoutes);
 
 // Dashboard Requests
 expressServerInstance.use('/dashboard', dashboardRoutes);

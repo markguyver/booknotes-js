@@ -2,7 +2,7 @@ import {Request, Response, Router} from 'express';
 import {Map} from 'immutable';
 import {Sequelize} from 'sequelize';
 import {sequelizeInstance} from '../../database';
-import {fetchAllTagsAndRespond, validateIdParameter} from '../helpers';
+import {fetchAllTagsAndRespond} from '../helpers';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
@@ -78,7 +78,8 @@ const getTagsByBookId = (request: Request, response: Response): Response => {
 
     // TODO Refactor This
 
-    const bookId = validateIdParameter(request.params.bookId, response);
+    const bookId = parseInt(request.params.bookId);
+    // const bookId = validateIdParameter(request.params.bookId, response);
     if (bookId) { // Check Passed ID Parameter Validation
         Tags.findAll({
             attributes: ['id', 'tag'],
@@ -107,7 +108,8 @@ const getTagsByAuthorId = (request: Request, response: Response): Response => {
 
     // TODO Refactor This
 
-    const authorId = validateIdParameter(request.params.authorId, response);
+    const authorId = parseInt(request.params.authorId);
+    // const authorId = validateIdParameter(request.params.authorId, response);
     if (authorId) { // Check Passed ID Parameter Validation
         Tags.findAll({
             attributes: ['id', 'tag'],
