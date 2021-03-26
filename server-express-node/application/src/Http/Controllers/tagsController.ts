@@ -14,6 +14,11 @@ import {
     insertNewResourceAndRespond
 } from '../helpers';
 
+// Types
+interface TagObject {
+    tag: string;
+};
+
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
 const Books = sequelizeInstance.models.Books;
@@ -29,6 +34,23 @@ export const fetchAllTagsAndRespond = fetchAllAndRespond(Tags, respondWithTagsPa
 const fetchTagByIdAndRespond = fetchByIdAndRespond(Tags, respondWithTagsPayload, respondWithTagNotFound);
 // const fetchTagsByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
 // const fetchTagsByBookIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
+const extractNewTagFromRequestData = (request: Request): TagObject => ({ tag: request.body.tag || '' });
+const validateExtractedNewTagFromRequestData = (extractedBook: TagObject) => {
+    const validationResult = { type: 'success', message: '' };
+    if ((null == extractedBook.tag) || ('string' != typeof extractedBook.tag) || (extractedBook.tag.length < 1)) { // Verify Tag (required) Parameter Is Set
+        validationResult.type = 'failure';
+        validationResult.message = 'Missing (required) tag';
+    } // End of Verify Tag (required) Parameter Is Set
+    return validationResult;
+};
+const createTagRecordFromRequestData = insertNewResourceAndRespond(
+    Tags,
+    extractNewTagFromRequestData,
+    validateExtractedNewTagFromRequestData,
+    respondWith400,
+    respondWith500,
+    respondWithTagsPayload
+);
 
 // Define Endpoint Handlers
 const getAllTags = (request: Request, response: Response): Response => fetchAllTagsAndRespond({
@@ -154,24 +176,11 @@ const getTagsByAuthorId = (request: Request, response: Response): Response => {
     } // End of Check Passed ID Parameter Validation
     return response;
 };
-const createNewTag = (request: Request, response: Response): Response => {
-
-    // TODO Parse Request Body into Tag Object
-
-    Tags.create(request.body).then(() => {
-        Tags.findOne({where: request.body}).then(result => {
-            response.type('json');
-            response.status(201);
-            response.send({ Tags: [result] });
-        });
-    });
-    return response;
-};
 
 // Register Resource Routes
 export const tagsRoutes = Router();
 tagsRoutes.get('/', getAllTags);
-tagsRoutes.post('/', createNewTag);
+tagsRoutes.post('/', createTagRecordFromRequestData);
 tagsRoutes.get('/author/:authorId', getTagsByAuthorId);
 tagsRoutes.get('/book/:bookId', getTagsByBookId);
 

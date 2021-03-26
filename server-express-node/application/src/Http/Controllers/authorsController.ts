@@ -139,8 +139,7 @@ const getAuthorById = (request: Request, response: Response): Response => fetchA
 // Register Resource Routes
 export const authorsRoutes = Router();
 authorsRoutes.get('/', getAllAuthors);
-authorsRoutes.post('/', createNewAuthor);
-authorsRoutes.post('/test', createAuthorRecordFromRequestData); // TODO: Delete This
+authorsRoutes.post('/', createAuthorRecordFromRequestData);
 
 export const authorRoutes = Router();
 authorRoutes.get('/:authorId', getAuthorById);

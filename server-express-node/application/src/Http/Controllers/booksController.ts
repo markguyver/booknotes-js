@@ -13,6 +13,11 @@ import {
     insertNewResourceAndRespond
 } from '../helpers';
 
+// Types
+interface BookObject {
+    title: string;
+};
+
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
 const BookAuthors = sequelizeInstance.models.BookAuthors;
@@ -29,6 +34,23 @@ export const respondInvalidBookId = respondInvalidResourceId('Book');
 export const fetchAllBooksAndRespond = fetchAllAndRespond(Books, respondWithBooksPayload);
 const fetchBookByIdAndRespond = fetchByIdAndRespond(Books, respondWithBooksPayload, respondWithBookNotFound, respondInvalidBookId);
 // const fetchBooksByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
+const extractNewBookFromRequestData = (request: Request): BookObject => ({ title: request.body.title || '' });
+const validateExtractedNewBookFromRequestData = (extractedBook: BookObject) => {
+    const validationResult = { type: 'success', message: '' };
+    if ((null == extractedBook.title) || ('string' != typeof extractedBook.title) || (extractedBook.title.length < 1)) { // Verify Title (required) Parameter Is Set
+        validationResult.type = 'failure';
+        validationResult.message = 'Missing (required) book title';
+    } // End of Verify Title (required) Parameter Is Set
+    return validationResult;
+};
+const createBookRecordFromRequestData = insertNewResourceAndRespond(
+    Books,
+    extractNewBookFromRequestData,
+    validateExtractedNewBookFromRequestData,
+    respondWith400,
+    respondWith500,
+    respondWithBooksPayload
+);
 
 // Define Endpoint Handlers
 const getAllBooks = (request: Request, response: Response): Response => fetchAllBooksAndRespond({
@@ -86,24 +108,11 @@ const getBookById = (request: Request, response: Response): Response => fetchBoo
         required: false,
     }],
 }, response);
-const createNewBook = (request: Request, response: Response): Response => {
-
-    // TODO Parse Request Body into Book Object
-
-    Books.create(request.body).then(() => {
-        Books.findOne({where: request.body}).then(result => {
-            response.type('json');
-            response.status(201);
-            response.send({ Books: [result] });
-        });
-    });
-    return response;
-};
 
 // Register Resource Routes
 export const booksRoutes = Router();
 booksRoutes.get('/', getAllBooks);
-booksRoutes.post('/', createNewBook);
+booksRoutes.post('/', createBookRecordFromRequestData);
 booksRoutes.get('/author/:authorId', getAllBooksByAuthorId);
 
 export const bookRoutes = Router();
