@@ -46,4 +46,4 @@ expressServerInstance.use('/tags', tagsRoutes);
 expressServerInstance.use('/tag', tagRoutes);
 
 // Start the Server
-expressServerInstance.listen(port, () => logger.info(`Booknotes API Server started on port: ${port}`));
+expressServerInstance.listen(port, () => logger.info(`Booknotes API Server started on ${process.env.HOSTNAME}:${port}`));
