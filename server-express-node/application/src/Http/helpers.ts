@@ -1,12 +1,13 @@
-import {Request, Response} from 'express';
-import {Map} from 'immutable';
-import {curry} from 'ramda';
-import {Model, ModelCtor, FindOptions, WhereOptions} from 'sequelize';
+import { Request, Response } from 'express';
+import { Map } from 'immutable';
+import { curry } from 'ramda';
+import { Model, ModelCtor, FindOptions, WhereOptions } from 'sequelize';
 
 // Prepare Types
 export enum foreignKeyNames {
+    author_id = 'author_id',
     book_id = 'book_id',
-    author_id = 'author_id'
+    tag_id = 'tag_id'
 };
 
 // Prepare General Helpers (like validation)
@@ -78,12 +79,14 @@ export const fetchResourceByForeignIdAndRespond = curry((
     notFoundHandler: Function,
     invalidIdHandler: Function,
     foreignKeyName: foreignKeyNames,
-    foreignId: number,
+    foreignIdExtractor: Function,
+    extractedForeignIdValidator: Function,
     options: FindOptions,
     request: Request,
     response: Response
 ): Response => {
-    if (looksLikeAnId(foreignId)) { // Validate Foreign ID Parameter
+    const foreignId = foreignIdExtractor(request);
+    if (extractedForeignIdValidator(foreignId)) { // Validate Foreign ID Parameter
         sequelizeModel.findAll(makeForeignKeyWhereQuery(foreignId, foreignKeyName, options)).then(result => {
             if (result) {// Check for Results
                 queryResultsHandler(response, result);

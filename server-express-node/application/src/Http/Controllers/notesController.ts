@@ -3,18 +3,11 @@ import { sequelizeInstance } from '../../database';
 import {
     foreignKeyNames,
     looksLikeAnId,
-    respondWith400,
-    respondWith500,
     respondWithResourceList,
     respondWithResource404,
-    respondInvalidResourceId,
-    extractIdParameterFromRequestData,
-    fetchAllAndRespond,
-    fetchByIdAndRespond,
-    fetchResourceByForeignIdAndRespond,
-    insertNewResourceAndRespond
+    fetchResourceByForeignIdAndRespond
 } from '../helpers';
-import { respondInvalidBookId } from './booksController';
+import { respondInvalidBookId, extractBookIdFromRequestData } from './booksController';
 
 // Initialize Database Models
 const Books = sequelizeInstance.models.Books;
@@ -26,8 +19,7 @@ export const respondWithNotesNotFound = respondWithResource404('Notes');
 const fetchNotesByBookIdAndRespond = fetchResourceByForeignIdAndRespond(Notes, respondWithNotesPayload, respondWithNotesNotFound, respondInvalidBookId, foreignKeyNames.book_id);
 
 // Define Endpoint Handlers
-// TODO: Add ID Fetcher From Request Body
-const getAllNotesByBookId = (request: Request, response: Response): Response => fetchNotesByBookIdAndRespond(parseInt(request.params.bookId), {}, request, response);
+const getAllNotesByBookId = fetchNotesByBookIdAndRespond(extractBookIdFromRequestData, looksLikeAnId, {});
 const addNoteByBookId = (request: Request, response: Response): Response => {
     const bookId = parseInt(request.params.bookId);
     if (!isNaN(bookId) && bookId > 0) { // Validate ID Parameter

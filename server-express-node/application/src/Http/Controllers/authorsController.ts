@@ -2,6 +2,7 @@ import { Request, Router } from 'express';
 import { Sequelize } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import {
+    foreignKeyNames,
     looksLikeAnId,
     respondWith400,
     respondWith500,
@@ -13,6 +14,7 @@ import {
     fetchByIdAndRespond,
     insertNewResourceAndRespond
 } from '../helpers';
+import { respondInvalidBookId, extractBookIdFromRequestData } from './booksController';
 
 // Types
 interface AuthorObject {
@@ -32,12 +34,13 @@ const Tags = sequelizeInstance.models.Tags;
 
 // Prepare Resource-Specific (i.e. Exported) Methods
 export const respondWithAuthorsPayload = respondWithResourceList('Authors');
+export const respondWithAuthorsNotFound = respondWithResource404('Authors');
 export const respondWithAuthorNotFound = respondWithResource404('Author');
 export const respondInvalidAuthorId = respondInvalidResourceId('Author');
 export const fetchAllAuthorsAndRespond = fetchAllAndRespond(Authors, respondWithAuthorsPayload);
 const fetchAuthorByIdAndRespond = fetchByIdAndRespond(Authors, respondWithAuthorsPayload, respondWithAuthorNotFound, respondInvalidAuthorId);
-// const fetchAuthorsByBookIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
-const extractAuthorIdFromRequestData = (request: Request): number => extractIdParameterFromRequestData('author_id', request) || extractIdParameterFromRequestData('authorId', request);
+// const fetchAuthorsByBookIdAndRespond = fetchResourceByForeignIdAsManyAndRespond(Authors, respondWithAuthorsPayload, respondWithAuthorsNotFound, respondInvalidBookId, foreignKeyNames.book_id);
+export const extractAuthorIdFromRequestData = (request: Request): number => extractIdParameterFromRequestData('author_id', request) || extractIdParameterFromRequestData('authorId', request);
 const extractNewAuthorFromRequestData = (request: Request): AuthorObject => ({
     first_name:         request.body.first_name           || null,
     middle_name:        request.body.middle_name          || null,

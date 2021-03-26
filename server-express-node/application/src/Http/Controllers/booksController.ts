@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import { Sequelize } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import {
+    foreignKeyNames,
     looksLikeAnId,
     respondWith400,
     respondWith500,
@@ -13,6 +14,7 @@ import {
     fetchByIdAndRespond,
     insertNewResourceAndRespond
 } from '../helpers';
+import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from './authorsController';
 
 // Types
 interface BookObject {
@@ -35,7 +37,7 @@ export const respondInvalidBookId = respondInvalidResourceId('Book');
 export const fetchAllBooksAndRespond = fetchAllAndRespond(Books, respondWithBooksPayload);
 const fetchBookByIdAndRespond = fetchByIdAndRespond(Books, respondWithBooksPayload, respondWithBookNotFound, respondInvalidBookId);
 // const fetchBooksByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
-const extractBookIdFromRequestData = (request: Request): number => extractIdParameterFromRequestData('book_id', request) || extractIdParameterFromRequestData('bookId', request);
+export const extractBookIdFromRequestData = (request: Request): number => extractIdParameterFromRequestData('book_id', request) || extractIdParameterFromRequestData('bookId', request);
 const extractNewBookFromRequestData = (request: Request): BookObject => ({ title: request.body.title || '' });
 const validateExtractedNewBookFromRequestData = (extractedBook: BookObject) => {
     const validationResult = { type: 'success', message: '' };
