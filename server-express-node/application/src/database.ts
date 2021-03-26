@@ -215,26 +215,29 @@ Tags.init({
     underscored: true,
 });
 
+
+// Define Model Relationships
+
 // Authors <=> Authors
-Authors.belongsTo(Authors, { foreignKey: 'parent_author_id', as: 'ActualAuthor' });
-Authors.hasMany(Authors, { foreignKey: 'parent_author_id', as: 'Pseudonyms' });
+Authors             .belongsTo(Authors, { foreignKey: 'parent_author_id', as: 'ActualAuthor' });
+Authors             .hasMany(Authors, { foreignKey: 'parent_author_id', as: 'Pseudonyms' });
 
 // Authors <=> Books <=> Contribution Types
-Authors.hasMany(BookAuthors);
-Books.hasMany(BookAuthors);
-ContributionTypes.hasMany(BookAuthors);
-BookAuthors.belongsTo(Authors);
-BookAuthors.belongsTo(Books);
-BookAuthors.belongsTo(ContributionTypes);
+Authors             .hasMany(BookAuthors);
+Books               .hasMany(BookAuthors);
+ContributionTypes   .hasMany(BookAuthors);
+BookAuthors         .belongsTo(Authors);
+BookAuthors         .belongsTo(Books);
+BookAuthors         .belongsTo(ContributionTypes);
 
 // Books <=> Notes
-Books.hasMany(Notes);
-Notes.belongsTo(Books);
+Books               .hasMany(Notes);
+Notes               .belongsTo(Books);
 
 // Tags <=> Authors , Tags <=> Books , Tags <=> Notes
-Tags        .belongsToMany(Authors, { through: 'author_tags', timestamps: false });
-Authors     .belongsToMany(Tags, { through: 'author_tags', timestamps: false });
-Tags        .belongsToMany(Books, { through: 'book_tags', timestamps: false });
-Books       .belongsToMany(Tags, { through: 'book_tags', timestamps: false });
-Tags        .belongsToMany(Notes, { through: 'note_tags', timestamps: false });
-Notes       .belongsToMany(Tags, { through: 'note_tags', timestamps: false });
+Tags                .belongsToMany(Authors, { through: 'author_tags', timestamps: false });
+Authors             .belongsToMany(Tags, { through: 'author_tags', timestamps: false });
+Tags                .belongsToMany(Books, { through: 'book_tags', timestamps: false });
+Books               .belongsToMany(Tags, { through: 'book_tags', timestamps: false });
+Tags                .belongsToMany(Notes, { through: 'note_tags', timestamps: false });
+Notes               .belongsToMany(Tags, { through: 'note_tags', timestamps: false });
