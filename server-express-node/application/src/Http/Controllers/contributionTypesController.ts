@@ -1,7 +1,27 @@
 import {DataTypes, Model} from 'sequelize';
 import {Request, Response, Router} from 'express';
 import {sequelizeInstance} from '../../database';
-import {fetchAllContributionTypesAndRespond, fetchContributionTypeByIdAndRespond} from '../helpers';
+import {
+    looksLikeAnId,
+    respondWith400,
+    respondWith500,
+    respondWithResourceList,
+    respondWithResource404,
+    respondInvalidResourceId,
+    fetchAllAndRespond,
+    fetchByIdAndRespond,
+    insertNewResourceAndRespond
+} from '../helpers';
+
+// Initialize Database Models
+const ContributionTypes = sequelizeInstance.models.ContributionTypes;
+
+// Prepare Resource-Specific (i.e. Exported) Methods
+export const respondWithContributionTypesPayload = respondWithResourceList('ContributionTypes');
+export const respondWithContributionTypeNotFound = respondWithResource404('Contribution Type');
+export const respondInvalidContributionTypeId = respondInvalidResourceId('Contribution Type');
+const fetchAllContributionTypesAndRespond = fetchAllAndRespond(ContributionTypes, respondWithContributionTypesPayload);
+const fetchContributionTypeByIdAndRespond = fetchByIdAndRespond(ContributionTypes, respondWithContributionTypesPayload, respondWithContributionTypeNotFound, respondInvalidContributionTypeId);
 
 // Define Endpoint Handlers
 const getAllContributionTypes = (request: Request, response: Response): Response => fetchAllContributionTypesAndRespond({}, response);

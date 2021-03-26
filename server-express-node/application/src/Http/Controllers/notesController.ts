@@ -1,10 +1,28 @@
-import {Request, Response, Router} from 'express';
-import {sequelizeInstance} from '../../database';
-import {fetchNotesByBookIdAndRespond, respondWith500, respondWithNotesNotFound, respondWithNotesPayload} from '../helpers';
+import { Request, Response, Router } from 'express';
+import { sequelizeInstance } from '../../database';
+import {
+    foreignKeyNames,
+    looksLikeAnId,
+    respondWith400,
+    respondWith500,
+    respondWithResourceList,
+    respondWithResource404,
+    respondInvalidResourceId,
+    fetchAllAndRespond,
+    fetchByIdAndRespond,
+    fetchResourceByForeignIdAndRespond,
+    insertNewResourceAndRespond
+} from '../helpers';
+import { respondInvalidBookId } from './booksController';
 
 // Initialize Database Models
 const Books = sequelizeInstance.models.Books;
 const Notes = sequelizeInstance.models.Notes;
+
+// Prepare Resource-Specific (i.e. Exported) Methods
+export const respondWithNotesPayload = respondWithResourceList('Notes');
+export const respondWithNotesNotFound = respondWithResource404('Notes');
+const fetchNotesByBookIdAndRespond = fetchResourceByForeignIdAndRespond(Notes, respondWithNotesPayload, respondWithNotesNotFound, respondInvalidBookId, foreignKeyNames.book_id);
 
 // Define Endpoint Handlers
 const getAllNotesByBookId = (request: Request, response: Response): Response => fetchNotesByBookIdAndRespond(parseInt(request.params.bookId), {}, response);

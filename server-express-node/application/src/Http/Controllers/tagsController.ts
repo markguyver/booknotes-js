@@ -2,13 +2,33 @@ import {Request, Response, Router} from 'express';
 import {Map} from 'immutable';
 import {Sequelize} from 'sequelize';
 import {sequelizeInstance} from '../../database';
-import {fetchAllTagsAndRespond} from '../helpers';
+import {
+    looksLikeAnId,
+    respondWith400,
+    respondWith500,
+    respondWithResourceList,
+    respondWithResource404,
+    respondInvalidResourceId,
+    fetchAllAndRespond,
+    fetchByIdAndRespond,
+    insertNewResourceAndRespond
+} from '../helpers';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
 const Books = sequelizeInstance.models.Books;
 const Notes = sequelizeInstance.models.Notes;
 const Tags = sequelizeInstance.models.Tags;
+
+// Prepare Resource-Specific (i.e. Exported) Methods
+export const respondWithTagsPayload = respondWithResourceList('Tags');
+export const respondWithTagNotFound = respondWithResource404('Tag');
+export const respondWithTagsNotFound = respondWithResource404('Tags');
+export const respondInvalidTagId = respondInvalidResourceId('Tag');
+export const fetchAllTagsAndRespond = fetchAllAndRespond(Tags, respondWithTagsPayload);
+const fetchTagByIdAndRespond = fetchByIdAndRespond(Tags, respondWithTagsPayload, respondWithTagNotFound);
+// const fetchTagsByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
+// const fetchTagsByBookIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
 
 // Define Endpoint Handlers
 const getAllTags = (request: Request, response: Response): Response => fetchAllTagsAndRespond({

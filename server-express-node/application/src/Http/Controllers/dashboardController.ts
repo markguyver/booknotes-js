@@ -1,15 +1,17 @@
-import {Request, Response, Router} from 'express';
-import {Sequelize} from 'sequelize';
-import {sequelizeInstance} from '../../database';
-import {fetchAllAuthorsAndRespond, fetchAllBooksAndRespond, fetchAllTagsAndRespond} from '../helpers';
+import { Request, Response, Router } from 'express';
+import { Sequelize } from 'sequelize';
+import { sequelizeInstance } from '../../database';
+import { fetchAllAuthorsAndRespond } from './authorsController';
+import { fetchAllBooksAndRespond } from './booksController';
+import { fetchAllTagsAndRespond } from './tagsController';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
 const BookAuthors = sequelizeInstance.models.BookAuthors;
 const Books = sequelizeInstance.models.Books;
-const ContributionTypes = sequelizeInstance.models.ContributionTypes;
 const Notes = sequelizeInstance.models.Notes;
-const Tags = sequelizeInstance.models.Tags;
+
+// Prepare Resource-Specific (i.e. Exported) Methods
 
 // Define Endpoint Handlers
 const getResourceCounts = (request: Request, response: Response): Response => {

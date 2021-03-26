@@ -1,7 +1,17 @@
 import {Request, Response, Router} from 'express';
 import {Sequelize} from 'sequelize';
 import {sequelizeInstance} from '../../database';
-import {fetchAllBooksAndRespond, fetchBookByIdAndRespond} from '../helpers';
+import {
+    looksLikeAnId,
+    respondWith400,
+    respondWith500,
+    respondWithResourceList,
+    respondWithResource404,
+    respondInvalidResourceId,
+    fetchAllAndRespond,
+    fetchByIdAndRespond,
+    insertNewResourceAndRespond
+} from '../helpers';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
@@ -10,6 +20,15 @@ const Books = sequelizeInstance.models.Books;
 const ContributionTypes = sequelizeInstance.models.ContributionTypes;
 const Notes = sequelizeInstance.models.Notes;
 const Tags = sequelizeInstance.models.Tags;
+
+// Prepare Resource-Specific (i.e. Exported) Methods
+export const respondWithBooksPayload = respondWithResourceList('Books');
+export const respondWithBookNotFound = respondWithResource404('Book');
+export const respondWithBooksNotFound = respondWithResource404('Books');
+export const respondInvalidBookId = respondInvalidResourceId('Book');
+export const fetchAllBooksAndRespond = fetchAllAndRespond(Books, respondWithBooksPayload);
+const fetchBookByIdAndRespond = fetchByIdAndRespond(Books, respondWithBooksPayload, respondWithBookNotFound, respondInvalidBookId);
+// const fetchBooksByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
 
 // Define Endpoint Handlers
 const getAllBooks = (request: Request, response: Response): Response => fetchAllBooksAndRespond({
