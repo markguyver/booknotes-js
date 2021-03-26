@@ -1,16 +1,13 @@
-import {DataTypes, Model} from 'sequelize';
-import {Request, Response, Router} from 'express';
-import {sequelizeInstance} from '../../database';
+import { Router } from 'express';
+import { sequelizeInstance } from '../../database';
 import {
     looksLikeAnId,
-    respondWith400,
-    respondWith500,
     respondWithResourceList,
     respondWithResource404,
     respondInvalidResourceId,
+    extractIdParameterFromRequestData,
     fetchAllAndRespond,
-    fetchByIdAndRespond,
-    insertNewResourceAndRespond
+    fetchByIdAndRespond
 } from '../helpers';
 
 // Initialize Database Models
@@ -22,10 +19,11 @@ export const respondWithContributionTypeNotFound = respondWithResource404('Contr
 export const respondInvalidContributionTypeId = respondInvalidResourceId('Contribution Type');
 const fetchAllContributionTypesAndRespond = fetchAllAndRespond(ContributionTypes, respondWithContributionTypesPayload);
 const fetchContributionTypeByIdAndRespond = fetchByIdAndRespond(ContributionTypes, respondWithContributionTypesPayload, respondWithContributionTypeNotFound, respondInvalidContributionTypeId);
+const extractContributionTypeIdFromRequestData = extractIdParameterFromRequestData('contributionTypeId');
 
 // Define Endpoint Handlers
-const getAllContributionTypes = (request: Request, response: Response): Response => fetchAllContributionTypesAndRespond({}, response);
-const getContributionTypeById = (request: Request, response: Response): Response => fetchContributionTypeByIdAndRespond(parseInt(request.params.contributionTypeId), {}, response);
+const getAllContributionTypes = fetchAllContributionTypesAndRespond({});
+const getContributionTypeById = fetchContributionTypeByIdAndRespond(extractContributionTypeIdFromRequestData, looksLikeAnId, {});
 
 // Register Resource Routes
 export const contributionTypesRoutes = Router();

@@ -31,12 +31,14 @@ export const respondWithResourceList = curry((resourceName: string, response: Re
 );
 export const respondWithResource404 = curry((resourceName: string, response: Response) => respondWith404(response, resourceName + ' not found'));
 export const respondInvalidResourceId = curry((resourceName: string, response: Response) => respondWith400(response, 'Invalid ' + resourceName + ' ID'));
+export const extractIdParameterFromRequestData = curry((parameterName: string, request: Request): number => parseInt(request.body[parameterName]) || parseInt(request.params[parameterName]) || NaN);
 
 // Prepare HTTP Resource ORM Helpers
 export const fetchAllAndRespond = curry((
     sequelizeModel: ModelCtor<Model<any, any>>,
     queryResultsHandler: Function,
     queryOptions: FindOptions,
+    request: Request,
     response: Response
 ): Response => {
     sequelizeModel.findAll(queryOptions)
@@ -49,12 +51,15 @@ export const fetchByIdAndRespond = curry((
     queryResultsHandler: Function,
     notFoundHandler: Function,
     invalidIdHandler: Function,
-    id: number,
+    idExtractor: Function,
+    extractedIdValidator: Function,
     options: FindOptions,
+    request: Request,
     response: Response
 ): Response => {
     const respondWithResults = queryResultsHandler(response);
-    if (looksLikeAnId(id)) { // Validate ID Parameter
+    const id = idExtractor(request);
+    if (extractedIdValidator(id)) { // Validate ID Parameter
         sequelizeModel.findByPk(id, options).then(result => {
             if (result) { // Check for Results
                 respondWithResults([result]);
@@ -75,6 +80,7 @@ export const fetchResourceByForeignIdAndRespond = curry((
     foreignKeyName: foreignKeyNames,
     foreignId: number,
     options: FindOptions,
+    request: Request,
     response: Response
 ): Response => {
     if (looksLikeAnId(foreignId)) { // Validate Foreign ID Parameter

@@ -1,6 +1,6 @@
-import {Request, Response, Router} from 'express';
-import {Sequelize} from 'sequelize';
-import {sequelizeInstance} from '../../database';
+import { Request, Router } from 'express';
+import { Sequelize } from 'sequelize';
+import { sequelizeInstance } from '../../database';
 import {
     looksLikeAnId,
     respondWith400,
@@ -8,6 +8,7 @@ import {
     respondWithResourceList,
     respondWithResource404,
     respondInvalidResourceId,
+    extractIdParameterFromRequestData,
     fetchAllAndRespond,
     fetchByIdAndRespond,
     insertNewResourceAndRespond
@@ -36,6 +37,7 @@ export const respondInvalidAuthorId = respondInvalidResourceId('Author');
 export const fetchAllAuthorsAndRespond = fetchAllAndRespond(Authors, respondWithAuthorsPayload);
 const fetchAuthorByIdAndRespond = fetchByIdAndRespond(Authors, respondWithAuthorsPayload, respondWithAuthorNotFound, respondInvalidAuthorId);
 // const fetchAuthorsByBookIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
+const extractAuthorIdFromRequestData = (request: Request): number => extractIdParameterFromRequestData('author_id', request) || extractIdParameterFromRequestData('authorId', request);
 const extractNewAuthorFromRequestData = (request: Request): AuthorObject => ({
     first_name:         request.body.first_name           || null,
     middle_name:        request.body.middle_name          || null,
@@ -64,7 +66,7 @@ const createAuthorRecordFromRequestData = insertNewResourceAndRespond(
 );
 
 // Define Endpoint Handlers
-const getAllAuthors = (request: Request, response: Response): Response => fetchAllAuthorsAndRespond({
+const getAllAuthors = fetchAllAuthorsAndRespond({
     attributes: [
         'id',
         'first_name',
@@ -94,19 +96,8 @@ const getAllAuthors = (request: Request, response: Response): Response => fetchA
         model: Tags,
         required: false,
     }],
-}, response);
-const createNewAuthor = (request: Request, response: Response): Response => {
-
-    // TODO Parse Request Body into Author Object
-
-    Authors.create(request.body).then(() => {
-        Authors.findOne({where: request.body})
-            .then(result => respondWithAuthorsPayload(response, result ? [result] : [], 201))
-            .catch(error => respondWith500(response));
-    });
-    return response;
-};
-const getAuthorById = (request: Request, response: Response): Response => fetchAuthorByIdAndRespond(parseInt(request.params.authorId), {
+});
+const getAuthorById = fetchAuthorByIdAndRespond(extractAuthorIdFromRequestData, looksLikeAnId, {
     paranoid: false,
     include: [{
         model: Authors,
@@ -134,7 +125,7 @@ const getAuthorById = (request: Request, response: Response): Response => fetchA
         required: false,
         paranoid: false,
     }],
-}, response);
+});
 
 // Register Resource Routes
 export const authorsRoutes = Router();

@@ -1,7 +1,6 @@
-import {Request, Response, Router} from 'express';
-import {Map} from 'immutable';
-import {Sequelize} from 'sequelize';
-import {sequelizeInstance} from '../../database';
+import { Request, Response, Router } from 'express';
+import { Sequelize } from 'sequelize';
+import { sequelizeInstance } from '../../database';
 import {
     looksLikeAnId,
     respondWith400,
@@ -9,6 +8,7 @@ import {
     respondWithResourceList,
     respondWithResource404,
     respondInvalidResourceId,
+    extractIdParameterFromRequestData,
     fetchAllAndRespond,
     fetchByIdAndRespond,
     insertNewResourceAndRespond
@@ -53,7 +53,7 @@ const createTagRecordFromRequestData = insertNewResourceAndRespond(
 );
 
 // Define Endpoint Handlers
-const getAllTags = (request: Request, response: Response): Response => fetchAllTagsAndRespond({
+const getAllTags = fetchAllTagsAndRespond({
     attributes: [
         'id',
         'tag',
@@ -78,7 +78,7 @@ const getAllTags = (request: Request, response: Response): Response => fetchAllT
         required: false,
         attributes: [],
     }],
-}, response);
+});
 const getTagById = (request: Request, response: Response): Response => {
 
     // TODO Refactor This

@@ -25,7 +25,7 @@ const getResourceCounts = (request: Request, response: Response): Response => {
     return response;
 };
 // const getResourceCounts = (request: Request, response: Response): Response => respondWithResourceList('Counts', response, results, statusCode);
-const getAuthorLeaderboard = (request: Request, response: Response): Response => fetchAllAuthorsAndRespond({
+const getAuthorLeaderboard = fetchAllAuthorsAndRespond({
     attributes: [
         'id',
         'first_name',
@@ -50,8 +50,8 @@ const getAuthorLeaderboard = (request: Request, response: Response): Response =>
         required: true,
         attributes: [],
     }],
-}, response);
-const getBookLeaderboard = (request: Request, response: Response): Response => fetchAllBooksAndRespond({
+});
+const getBookLeaderboard = fetchAllBooksAndRespond({
     attributes: [
         'id',
         'title',
@@ -70,8 +70,8 @@ const getBookLeaderboard = (request: Request, response: Response): Response => f
         required: true,
         attributes: [],
     }],
-}, response);
-const getTagLeaderboard = (request: Request, response: Response): Response => fetchAllTagsAndRespond({
+});
+const getTagLeaderboard = fetchAllTagsAndRespond({
     attributes: [
         'id',
         'tag',
@@ -95,7 +95,7 @@ const getTagLeaderboard = (request: Request, response: Response): Response => fe
         required: false,
         attributes: [],
     }],
-}, response);
+});
 
 // Register Resource Routes
 export const dashboardRoutes = Router();

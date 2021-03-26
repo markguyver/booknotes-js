@@ -8,6 +8,7 @@ import {
     respondWithResourceList,
     respondWithResource404,
     respondInvalidResourceId,
+    extractIdParameterFromRequestData,
     fetchAllAndRespond,
     fetchByIdAndRespond,
     fetchResourceByForeignIdAndRespond,
@@ -25,7 +26,8 @@ export const respondWithNotesNotFound = respondWithResource404('Notes');
 const fetchNotesByBookIdAndRespond = fetchResourceByForeignIdAndRespond(Notes, respondWithNotesPayload, respondWithNotesNotFound, respondInvalidBookId, foreignKeyNames.book_id);
 
 // Define Endpoint Handlers
-const getAllNotesByBookId = (request: Request, response: Response): Response => fetchNotesByBookIdAndRespond(parseInt(request.params.bookId), {}, response);
+// TODO: Add ID Fetcher From Request Body
+const getAllNotesByBookId = (request: Request, response: Response): Response => fetchNotesByBookIdAndRespond(parseInt(request.params.bookId), {}, request, response);
 const addNoteByBookId = (request: Request, response: Response): Response => {
     const bookId = parseInt(request.params.bookId);
     if (!isNaN(bookId) && bookId > 0) { // Validate ID Parameter

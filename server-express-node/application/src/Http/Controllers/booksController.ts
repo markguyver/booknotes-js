@@ -1,6 +1,6 @@
-import {Request, Response, Router} from 'express';
-import {Sequelize} from 'sequelize';
-import {sequelizeInstance} from '../../database';
+import { Request, Response, Router } from 'express';
+import { Sequelize } from 'sequelize';
+import { sequelizeInstance } from '../../database';
 import {
     looksLikeAnId,
     respondWith400,
@@ -8,6 +8,7 @@ import {
     respondWithResourceList,
     respondWithResource404,
     respondInvalidResourceId,
+    extractIdParameterFromRequestData,
     fetchAllAndRespond,
     fetchByIdAndRespond,
     insertNewResourceAndRespond
@@ -34,6 +35,7 @@ export const respondInvalidBookId = respondInvalidResourceId('Book');
 export const fetchAllBooksAndRespond = fetchAllAndRespond(Books, respondWithBooksPayload);
 const fetchBookByIdAndRespond = fetchByIdAndRespond(Books, respondWithBooksPayload, respondWithBookNotFound, respondInvalidBookId);
 // const fetchBooksByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
+const extractBookIdFromRequestData = (request: Request): number => extractIdParameterFromRequestData('book_id', request) || extractIdParameterFromRequestData('bookId', request);
 const extractNewBookFromRequestData = (request: Request): BookObject => ({ title: request.body.title || '' });
 const validateExtractedNewBookFromRequestData = (extractedBook: BookObject) => {
     const validationResult = { type: 'success', message: '' };
@@ -53,7 +55,7 @@ const createBookRecordFromRequestData = insertNewResourceAndRespond(
 );
 
 // Define Endpoint Handlers
-const getAllBooks = (request: Request, response: Response): Response => fetchAllBooksAndRespond({
+const getAllBooks = fetchAllBooksAndRespond({
     attributes: [
         'id',
         'title',
@@ -81,13 +83,13 @@ const getAllBooks = (request: Request, response: Response): Response => fetchAll
         paranoid: false,
         attributes: ['id', 'tag', 'deleted_at'],
     }],
-}, response);
+});
 const getAllBooksByAuthorId = (request: Request, response: Response): Response => {
     const authorId = request.params.authorId;
     response.send({coming:'soon',authorId:authorId});
     return response;
 };
-const getBookById = (request: Request, response: Response): Response => fetchBookByIdAndRespond(parseInt(request.params.bookId), {
+const getBookById = fetchBookByIdAndRespond(extractBookIdFromRequestData, looksLikeAnId, {
     paranoid: false,
     include: [{
         model: Notes,
@@ -107,7 +109,7 @@ const getBookById = (request: Request, response: Response): Response => fetchBoo
         model: Tags,
         required: false,
     }],
-}, response);
+});
 
 // Register Resource Routes
 export const booksRoutes = Router();
