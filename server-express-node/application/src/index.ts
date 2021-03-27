@@ -1,13 +1,13 @@
 import bodyParser from 'body-parser';
 import express from 'express';
-import {logger, expressLogger} from './logger';
+import { logger, expressLogger } from './logger';
 
-import {authorsRoutes, authorRoutes} from './Http/Controllers/authorsController';
-import {booksRoutes, bookRoutes} from './Http/Controllers/booksController';
-import {contributionTypesRoutes, contributionTypeRoutes} from './Http/Controllers/contributionTypesController';
-import {dashboardRoutes} from './Http/Controllers/dashboardController';
-import {notesRoutes} from './Http/Controllers/notesController';
-import {tagsRoutes, tagRoutes} from './Http/Controllers/tagsController';
+import { authorsRoutes, authorRoutes } from './Http/Controllers/authorsController';
+import { booksRoutes, bookRoutes } from './Http/Controllers/booksController';
+import { contributionTypesRoutes, contributionTypeRoutes } from './Http/Controllers/contributionTypesController';
+import { dashboardRoutes } from './Http/Controllers/dashboardController';
+import { notesRoutes } from './Http/Controllers/notesController';
+import { tagsRoutes, tagRoutes } from './Http/Controllers/tagsController';
 
 const expressServerInstance = express();
 const port = process.env.APP_PORT || 5000;
