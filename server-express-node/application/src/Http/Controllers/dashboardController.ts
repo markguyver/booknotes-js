@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express';
-import { Sequelize } from 'sequelize';
+import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import { fetchAllAuthorsAndRespond } from './authorsController';
 import { fetchAllBooksAndRespond } from './booksController';
@@ -11,21 +11,8 @@ const BookAuthors = sequelizeInstance.models.BookAuthors;
 const Books = sequelizeInstance.models.Books;
 const Notes = sequelizeInstance.models.Notes;
 
-// Prepare Resource-Specific (i.e. Exported) Methods
-
-// Define Endpoint Handlers
-const getResourceCounts = (request: Request, response: Response): Response => {
-    response.send({ status: 'Coming Soon' }); // TODO Delete This
-
-    // TODO Get Author Count
-    // TODO Get Book Count
-    // TODO Get Note Count
-    // TODO Use PromiseAll to Manage Queries
-
-    return response;
-};
-// const getResourceCounts = (request: Request, response: Response): Response => respondWithResourceList('Counts', response, results, statusCode);
-const getAuthorLeaderboard = fetchAllAuthorsAndRespond({
+// Prepare Resource-Specific Variables
+const authorListWithBookCountDescending: FindOptions = {
     attributes: [
         'id',
         'first_name',
@@ -50,8 +37,8 @@ const getAuthorLeaderboard = fetchAllAuthorsAndRespond({
         required: true,
         attributes: [],
     }],
-});
-const getBookLeaderboard = fetchAllBooksAndRespond({
+};
+const bookListWithNoteCountDescending: FindOptions = {
     attributes: [
         'id',
         'title',
@@ -70,8 +57,8 @@ const getBookLeaderboard = fetchAllBooksAndRespond({
         required: true,
         attributes: [],
     }],
-});
-const getTagLeaderboard = fetchAllTagsAndRespond({
+};
+const tagListWithAuthorAndBookCountsInAlphabeticalOrder: FindOptions = {
     attributes: [
         'id',
         'tag',
@@ -95,7 +82,23 @@ const getTagLeaderboard = fetchAllTagsAndRespond({
         required: false,
         attributes: [],
     }],
-});
+};
+
+// Define Endpoint Handlers
+const getResourceCounts = (request: Request, response: Response): Response => {
+    response.send({ status: 'Coming Soon' }); // TODO Delete This
+
+    // TODO Get Author Count
+    // TODO Get Book Count
+    // TODO Get Note Count
+    // TODO Use PromiseAll to Manage Queries
+
+    return response;
+};
+// const getResourceCounts = (request: Request, response: Response): Response => respondWithResourceList('Counts', response, results, statusCode);
+const getAuthorLeaderboard = fetchAllAuthorsAndRespond(authorListWithBookCountDescending);
+const getBookLeaderboard = fetchAllBooksAndRespond(bookListWithNoteCountDescending);
+const getTagLeaderboard = fetchAllTagsAndRespond(tagListWithAuthorAndBookCountsInAlphabeticalOrder);
 
 // Register Resource Routes
 export const dashboardRoutes = Router();

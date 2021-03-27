@@ -1,5 +1,12 @@
-import {Sequelize, Model, DataTypes} from 'sequelize';
-import {logger} from './logger';
+import { Sequelize, Model, DataTypes, FindOptions, WhereOptions } from 'sequelize';
+import { logger } from './logger';
+
+// Prepare General Helpers
+export const insertWhereEqualsToQueryOptions = (columnName: string, columnValue: number|string, queryOptions: FindOptions): FindOptions => {
+    const whereClause: WhereOptions = {};
+    whereClause[columnName] = columnValue;
+    return Object.assign({ where: whereClause }, queryOptions);
+};
 
 // Prepare Sequelize Database Connection
 

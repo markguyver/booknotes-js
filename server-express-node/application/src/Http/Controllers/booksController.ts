@@ -1,23 +1,26 @@
 import { Request, Response, Router } from 'express';
-import { Sequelize } from 'sequelize';
+import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import {
-    foreignKeyNames,
+    validationResponse,
     looksLikeAnId,
+    isNonEmptyString,
     respondWith400,
     respondWith500,
     respondWithResourceList,
     respondWithResource404,
     respondInvalidResourceId,
-    extractIdParameterFromRequestData,
-    fetchAllAndRespond,
-    fetchByIdAndRespond,
-    insertNewResourceAndRespond
+    extractIntParameterValueFromRequestData,
+    extractStringParameterValueFromRequestData,
+    findAllAndRespond,
+    findByPKAndRespond,
+    createAndRespond
 } from '../helpers';
 import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from './authorsController';
 
 // Types
 interface BookObject {
+    id?: number;
     title: string;
 };
 
@@ -29,35 +32,8 @@ const ContributionTypes = sequelizeInstance.models.ContributionTypes;
 const Notes = sequelizeInstance.models.Notes;
 const Tags = sequelizeInstance.models.Tags;
 
-// Prepare Resource-Specific (i.e. Exported) Methods
-export const respondWithBooksPayload = respondWithResourceList('Books');
-export const respondWithBookNotFound = respondWithResource404('Book');
-export const respondWithBooksNotFound = respondWithResource404('Books');
-export const respondInvalidBookId = respondInvalidResourceId('Book');
-export const fetchAllBooksAndRespond = fetchAllAndRespond(Books, respondWithBooksPayload);
-const fetchBookByIdAndRespond = fetchByIdAndRespond(Books, respondWithBooksPayload, respondWithBookNotFound, respondInvalidBookId);
-// const fetchBooksByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
-export const extractBookIdFromRequestData = (request: Request): number => extractIdParameterFromRequestData('book_id', request) || extractIdParameterFromRequestData('bookId', request);
-const extractNewBookFromRequestData = (request: Request): BookObject => ({ title: request.body.title || '' });
-const validateExtractedNewBookFromRequestData = (extractedBook: BookObject) => {
-    const validationResult = { type: 'success', message: '' };
-    if ((null == extractedBook.title) || ('string' != typeof extractedBook.title) || (extractedBook.title.length < 1)) { // Verify Title (required) Parameter Is Set
-        validationResult.type = 'failure';
-        validationResult.message = 'Missing (required) book title';
-    } // End of Verify Title (required) Parameter Is Set
-    return validationResult;
-};
-const createBookRecordFromRequestData = insertNewResourceAndRespond(
-    Books,
-    extractNewBookFromRequestData,
-    validateExtractedNewBookFromRequestData,
-    respondWith400,
-    respondWith500,
-    respondWithBooksPayload
-);
-
-// Define Endpoint Handlers
-const getAllBooks = fetchAllBooksAndRespond({
+// Prepare Resource-Specific Variables
+const bookListWithNoteCountQueryOptions: FindOptions = {
     attributes: [
         'id',
         'title',
@@ -85,13 +61,8 @@ const getAllBooks = fetchAllBooksAndRespond({
         paranoid: false,
         attributes: ['id', 'tag', 'deleted_at'],
     }],
-});
-const getAllBooksByAuthorId = (request: Request, response: Response): Response => {
-    const authorId = request.params.authorId;
-    response.send({coming:'soon',authorId:authorId});
-    return response;
 };
-const getBookById = fetchBookByIdAndRespond(extractBookIdFromRequestData, looksLikeAnId, {
+const detailedBookQueryOptions: FindOptions = {
     paranoid: false,
     include: [{
         model: Notes,
@@ -111,7 +82,47 @@ const getBookById = fetchBookByIdAndRespond(extractBookIdFromRequestData, looksL
         model: Tags,
         required: false,
     }],
-});
+};
+
+// Prepare Resource-Specific Data Handler Methods
+export const extractBookIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('book_id', request) || extractIntParameterValueFromRequestData('bookId', request);
+const extractNewBookFromRequestData = (request: Request): BookObject => ({ title: extractStringParameterValueFromRequestData('title', request) });
+const validateExtractedNewBookFromRequestData = (extractedBook: BookObject): validationResponse => {
+    const validationResult = { type: 'success', message: '' };
+    if (!isNonEmptyString(extractedBook.title)) { // Verify Title (required) Parameter Is Set
+        validationResult.type = 'failure';
+        validationResult.message = 'Missing (required) book title';
+    } // End of Verify Title (required) Parameter Is Set
+    return validationResult;
+};
+
+// Prepare Resource-Specific Response HandlerMethods
+export const respondWithBooksPayload = respondWithResourceList('Books');
+export const respondWithBookNotFound = respondWithResource404('Book');
+export const respondWithBooksNotFound = respondWithResource404('Books');
+export const respondInvalidBookId = respondInvalidResourceId('Book');
+
+// Prepare Resource-Specific ORM Methods
+export const fetchAllBooksAndRespond = findAllAndRespond(Books, respondWithBooksPayload);
+const fetchBookByIdAndRespond = findByPKAndRespond(Books, respondWithBooksPayload, respondWithBookNotFound, respondInvalidBookId);
+// const fetchBooksByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
+const createBookRecordFromRequestData = createAndRespond(
+    Books,
+    extractNewBookFromRequestData,
+    validateExtractedNewBookFromRequestData,
+    respondWith400,
+    respondWith500,
+    respondWithBooksPayload
+);
+
+// Define Endpoint Handlers
+const getAllBooks = fetchAllBooksAndRespond(bookListWithNoteCountQueryOptions);
+const getAllBooksByAuthorId = (request: Request, response: Response): Response => {
+    const authorId = request.params.authorId;
+    response.send({coming:'soon',authorId:authorId});
+    return response;
+};
+const getBookById = fetchBookByIdAndRespond(extractBookIdFromRequestData, looksLikeAnId, detailedBookQueryOptions);
 
 // Register Resource Routes
 export const booksRoutes = Router();

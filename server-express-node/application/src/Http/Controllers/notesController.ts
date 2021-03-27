@@ -1,11 +1,12 @@
 import { Request, Response, Router } from 'express';
+import { FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import {
-    foreignKeyNames,
     looksLikeAnId,
     respondWithResourceList,
     respondWithResource404,
-    fetchResourceByForeignIdAndRespond
+    FindAllByFKAndRespond,
+    createAndRespond
 } from '../helpers';
 import { respondInvalidBookId, extractBookIdFromRequestData } from './booksController';
 
@@ -13,13 +14,23 @@ import { respondInvalidBookId, extractBookIdFromRequestData } from './booksContr
 const Books = sequelizeInstance.models.Books;
 const Notes = sequelizeInstance.models.Notes;
 
-// Prepare Resource-Specific (i.e. Exported) Methods
+// Prepare Resource-Specific Variables
+const notesListQueryOptions: FindOptions = {};
+
+// Prepare Resource-Specific Response HandlerMethods
 export const respondWithNotesPayload = respondWithResourceList('Notes');
 export const respondWithNotesNotFound = respondWithResource404('Notes');
-const fetchNotesByBookIdAndRespond = fetchResourceByForeignIdAndRespond(Notes, respondWithNotesPayload, respondWithNotesNotFound, respondInvalidBookId, foreignKeyNames.book_id);
 
 // Define Endpoint Handlers
-const getAllNotesByBookId = fetchNotesByBookIdAndRespond(extractBookIdFromRequestData, looksLikeAnId, {});
+const getAllNotesByBookId = FindAllByFKAndRespond(
+    Notes,
+    respondWithNotesPayload,
+    respondInvalidBookId,
+    'book_id',
+    extractBookIdFromRequestData,
+    looksLikeAnId,
+    notesListQueryOptions
+);
 const addNoteByBookId = (request: Request, response: Response): Response => {
     const bookId = parseInt(request.params.bookId);
     if (!isNaN(bookId) && bookId > 0) { // Validate ID Parameter
