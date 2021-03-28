@@ -98,11 +98,11 @@ This list is not comprehensive but includes the key dependencies.
 * [Sequelize CLI](https://github.com/sequelize/cli)
 * [ExpressJS](https://expressjs.com/en/4x/api.html)
 * [Nodemon](https://github.com/remy/nodemon#nodemon)
-* [PM2](https://github.com/Unitech/pm2)
 * [Redoc](https://github.com/Redocly/redoc)
 * [Pino](https://getpino.io/)
 * [Express Pino](https://github.com/pinojs/express-pino-logger)
 * [Ramda](https://ramdajs.com/)
+* [UglifyJS](http://lisperator.net/uglifyjs/)
 
 ### Database
 
