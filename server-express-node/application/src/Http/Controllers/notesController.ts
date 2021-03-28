@@ -2,55 +2,76 @@ import { Request, Response, Router } from 'express';
 import { FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import {
+    validationResponseBaseFail,
+    validationResponseBaseSuccess,
+    validationResponse,
     looksLikeAnId,
+    isNonEmptyString,
+    respondWith400,
+    respondWith500,
     respondWithResourceList,
-    respondWithResource404,
+    respondWithResourceNotFound,
+    respondInvalidResourceId,
+    extractIntParameterValueFromRequestData,
+    extractStringParameterValueFromRequestData,
+    findByPKAndRespond,
     FindAllByFKAndRespond,
     createAndRespond
 } from '../helpers';
 import { respondInvalidBookId, extractBookIdFromRequestData } from './booksController';
+
+// Types
+interface NoteObject {
+    id?:    number | undefined;
+    note?:   string;
+};
 
 // Initialize Database Models
 const Books = sequelizeInstance.models.Books;
 const Notes = sequelizeInstance.models.Notes;
 
 // Prepare Resource-Specific Variables
-const notesListQueryOptions: FindOptions = {};
+const listNotesQueryOptions: FindOptions = {};
+const displayNoteQueryOptions: FindOptions = {};
 
-// Prepare Resource-Specific Response HandlerMethods
+// Prepare Resource-Specific Data Handler Methods
+export const extractNoteIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('note_id', request) || extractIntParameterValueFromRequestData('noteId', request);
+const extractNewNoteFromRequestData = (request: Request): NoteObject => ({ note: extractStringParameterValueFromRequestData('note', request) });
+export const validateExtractedNote = (extractedNote: NoteObject): validationResponse => {
+    if (false == isNonEmptyString(extractedNote.note).boolean) { // Verify Note (required) Parameter Is Set
+        return validationResponseBaseFail('Missing (required) note');
+    } // End of Verify Note (required) Parameter Is Set
+    return validationResponseBaseSuccess();
+};
+
+// Prepare Resource-Specific Response Handler Methods
 export const respondWithNotesPayload = respondWithResourceList('Notes');
-export const respondWithNotesNotFound = respondWithResource404('Notes');
+export const respondWithNoteNotFound = respondWithResourceNotFound('Note');
+export const respondWithNotesNotFound = respondWithResourceNotFound('Notes');
+export const respondWithInvalidNoteId = respondInvalidResourceId('Note');
+
+// Prepare Resource-Specific ORM Methods
+export const fetchNoteById = findByPKAndRespond(Notes, respondWithNotesPayload, respondWithNoteNotFound, respondWithInvalidNoteId, looksLikeAnId);
+const fetchNoteByIdFromRequestData = fetchNoteById(extractNoteIdFromRequestData);
+export const fetchNotesByBookId = FindAllByFKAndRespond(Notes, respondWithNotesPayload, respondInvalidBookId, 'book_id', looksLikeAnId);
+const fetchNotesByBookIdFromRequestData = fetchNotesByBookId(extractBookIdFromRequestData);
+export const createNoteRecord = createAndRespond(
+    Notes,
+    respondWith400,
+    respondWith500,
+    respondWithNotesPayload,
+    validateExtractedNote
+);
+const createNoteRecordFromRequestData = createNoteRecord(extractNewNoteFromRequestData);
 
 // Define Endpoint Handlers
-const getAllNotesByBookId = FindAllByFKAndRespond(
-    Notes,
-    respondWithNotesPayload,
-    respondInvalidBookId,
-    'book_id',
-    extractBookIdFromRequestData,
-    looksLikeAnId,
-    notesListQueryOptions
-);
-const addNoteByBookId = (request: Request, response: Response): Response => {
-    const bookId = parseInt(request.params.bookId);
-    if (!isNaN(bookId) && bookId > 0) { // Validate ID Parameter
-
-        // TODO Parse Request Body into Notes Object
-
-        Notes.create(request.body).then(() => {
-            Notes.findOne({where: request.body}).then(result => {
-                response.type('json');
-                response.status(201);
-                response.send({ Notes: [result] });
-            });
-        });
-    } else { // Middle of Validate ID Parameter
-        response.status(400).send('Invalid Book ID');
-    } // End of Validate ID Parameter
-    return response;
-};
+const displayNoteById = fetchNoteByIdFromRequestData(displayNoteQueryOptions);
+const listAllNotesByBookId = fetchNotesByBookIdFromRequestData(listNotesQueryOptions);
 
 // Register Resource Routes
 export const notesRoutes = Router();
-notesRoutes.get('/book/:bookId', getAllNotesByBookId);
-notesRoutes.post('/book/:bookId', addNoteByBookId);
+notesRoutes.get('/book/:bookId', listAllNotesByBookId);
+notesRoutes.post('/book/:bookId', createNoteRecordFromRequestData);
+
+export const noteRoutes = Router();
+noteRoutes.get('/:noteId', displayNoteById);

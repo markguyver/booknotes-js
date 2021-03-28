@@ -6,7 +6,7 @@ import { authorsRoutes, authorRoutes } from './Http/Controllers/authorsControlle
 import { booksRoutes, bookRoutes } from './Http/Controllers/booksController';
 import { contributionTypesRoutes, contributionTypeRoutes } from './Http/Controllers/contributionTypesController';
 import { dashboardRoutes } from './Http/Controllers/dashboardController';
-import { notesRoutes } from './Http/Controllers/notesController';
+import { notesRoutes, noteRoutes } from './Http/Controllers/notesController';
 import { tagsRoutes, tagRoutes } from './Http/Controllers/tagsController';
 
 const expressServerInstance = express();
@@ -40,6 +40,7 @@ expressServerInstance.use('/dashboard', dashboardRoutes);
 
 // Notes Resource Requests
 expressServerInstance.use('/notes', notesRoutes);
+expressServerInstance.use('/note', noteRoutes);
 
 // Tags Resource Requests
 expressServerInstance.use('/tags', tagsRoutes);

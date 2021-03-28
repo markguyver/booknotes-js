@@ -2,13 +2,15 @@ import { Request, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import {
+    validationResponseBaseFail,
+    validationResponseBaseSuccess,
     validationResponse,
     looksLikeAnId,
     isNonEmptyString,
     respondWith400,
     respondWith500,
     respondWithResourceList,
-    respondWithResource404,
+    respondWithResourceNotFound,
     respondInvalidResourceId,
     extractIntParameterValueFromRequestData,
     extractStringParameterValueFromRequestData,
@@ -20,11 +22,11 @@ import { respondInvalidBookId, extractBookIdFromRequestData } from './booksContr
 
 // Types
 interface AuthorObject {
-    id?: number;
-    first_name?: string;
-    middle_name?: string;
-    last_name: string;
-    parent_author_id?: number;
+    id?:                number | undefined;
+    first_name?:        string | undefined;
+    middle_name?:       string | undefined;
+    last_name?:         string;
+    parent_author_id?:  number | undefined;
 };
 
 // Initialize Database Models
@@ -35,7 +37,7 @@ const ContributionTypes = sequelizeInstance.models.ContributionTypes;
 const Tags = sequelizeInstance.models.Tags;
 
 // Prepare Resource-Specific Variables
-const authorListWithBookCountQueryOptions: FindOptions = {
+const listAuthorsWithBookCountQueryOptions: FindOptions = {
     attributes: [
         'id',
         'first_name',
@@ -66,7 +68,7 @@ const authorListWithBookCountQueryOptions: FindOptions = {
         required: false,
     }],
 };
-const detailedAuthorQueryOptions: FindOptions = {
+const displayAuthorQueryOptions: FindOptions = {
     paranoid: false,
     include: [{
         model: Authors,
@@ -95,6 +97,7 @@ const detailedAuthorQueryOptions: FindOptions = {
         paranoid: false,
     }],
 };
+const listAuthorsByBookIdQueryOptions: FindOptions = {};
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractAuthorIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('author_id', request) || extractIntParameterValueFromRequestData('authorId', request);
@@ -104,49 +107,44 @@ const extractNewAuthorFromRequestData = (request: Request): AuthorObject => ({
     last_name:          extractStringParameterValueFromRequestData('last_name', request),
     parent_author_id:   extractIntParameterValueFromRequestData('parent_author_id', request) || undefined,
 });
-const validateExtractedNewAuthorFromRequestData = (extractedAuthor: AuthorObject): validationResponse => {
-    const validationResult = { type: 'success', message: '' };
-    if (!isNonEmptyString(extractedAuthor.last_name)) { // Verify Last Name (required) Parameter Is Set
-        validationResult.type = 'failure';
-        validationResult.message = 'Missing (required) author last name';
+export const validateExtractedAuthor = (extractedAuthor: AuthorObject): validationResponse => {
+    if (false == isNonEmptyString(extractedAuthor.last_name).boolean) { // Verify Last Name (required) Parameter Is Set
+        return validationResponseBaseFail('Missing (required) author last name');
     } // End of Verify Last Name (required) Parameter Is Set
-
-    // TODO: Short-Circuit This Function to Avoid Further Validation When Error Already Found
-
-    if (extractedAuthor.parent_author_id && !looksLikeAnId(extractedAuthor.parent_author_id)) { // Validate Parent Author ID (i.e. pseudonym)
-        validationResult.type = 'failure';
-        validationResult.message = 'Invalid parent author id';
+    if (extractedAuthor.parent_author_id && false == looksLikeAnId(extractedAuthor.parent_author_id).boolean) { // Validate Parent Author ID (i.e. pseudonym)
+        validationResponseBaseFail('Invalid parent author id');
     } // End of Validate Parent Author ID (i.e. pseudonym)
-    return validationResult;
+    return validationResponseBaseSuccess();
 };
 
-// Prepare Resource-Specific Response HandlerMethods
+// Prepare Resource-Specific Response Handler Methods
 export const respondWithAuthorsPayload = respondWithResourceList('Authors');
-export const respondWithAuthorsNotFound = respondWithResource404('Authors');
-export const respondWithAuthorNotFound = respondWithResource404('Author');
+export const respondWithAuthorsNotFound = respondWithResourceNotFound('Authors');
+export const respondWithAuthorNotFound = respondWithResourceNotFound('Author');
 export const respondInvalidAuthorId = respondInvalidResourceId('Author');
 
 // Prepare Resource-Specific ORM Methods
-export const fetchAllAuthorsAndRespond = findAllAndRespond(Authors, respondWithAuthorsPayload);
-const fetchAuthorByIdAndRespond = findByPKAndRespond(Authors, respondWithAuthorsPayload, respondWithAuthorNotFound, respondInvalidAuthorId);
+const fetchAllAuthors = findAllAndRespond(Authors, respondWithAuthorsPayload);
+export const fetchAuthorById = findByPKAndRespond(Authors, respondWithAuthorsPayload, respondWithAuthorNotFound, respondInvalidAuthorId, looksLikeAnId);
+const fetchAuthorByIdFromRequestData = fetchAuthorById(extractAuthorIdFromRequestData);
 // const fetchAuthorsByBookIdAndRespond = fetchResourceByForeignIdAsManyAndRespond(Authors, respondWithAuthorsPayload, respondWithAuthorsNotFound, respondInvalidBookId, foreignKeyNames.book_id);
-const createAuthorRecordFromRequestData = createAndRespond(
+export const createAuthorRecord = createAndRespond(
     Authors,
-    extractNewAuthorFromRequestData,
-    validateExtractedNewAuthorFromRequestData,
     respondWith400,
     respondWith500,
-    respondWithAuthorsPayload
+    respondWithAuthorsPayload,
+    validateExtractedAuthor
 );
+const createAuthorRecordFromRequestData = createAuthorRecord(extractNewAuthorFromRequestData);
 
 // Define Endpoint Handlers
-const getAllAuthors = fetchAllAuthorsAndRespond(authorListWithBookCountQueryOptions);
-const getAuthorById = fetchAuthorByIdAndRespond(extractAuthorIdFromRequestData, looksLikeAnId, detailedAuthorQueryOptions);
+const listAllAuthors = fetchAllAuthors(listAuthorsWithBookCountQueryOptions);
+const displayAuthorById = fetchAuthorByIdFromRequestData(displayAuthorQueryOptions);
 
 // Register Resource Routes
 export const authorsRoutes = Router();
-authorsRoutes.get('/', getAllAuthors);
+authorsRoutes.get('/', listAllAuthors);
 authorsRoutes.post('/', createAuthorRecordFromRequestData);
 
 export const authorRoutes = Router();
-authorRoutes.get('/:authorId', getAuthorById);
+authorRoutes.get('/:authorId', displayAuthorById);

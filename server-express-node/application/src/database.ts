@@ -1,4 +1,4 @@
-import { Sequelize, Model, DataTypes, FindOptions, WhereOptions } from 'sequelize';
+import { Sequelize, Model, ModelType, DataTypes, FindOptions, Includeable, WhereOptions } from 'sequelize';
 import { logger } from './logger';
 
 // Prepare General Helpers
@@ -6,6 +6,13 @@ export const insertWhereEqualsToQueryOptions = (columnName: string, columnValue:
     const whereClause: WhereOptions = {};
     whereClause[columnName] = columnValue;
     return Object.assign({ where: whereClause }, queryOptions);
+};
+export const retrieveJoinedModelFromQueryOptions = (model: ModelType, queryOptions: FindOptions): Includeable|undefined => {
+    if (queryOptions.include) { // Check for Include Section in queryOptions Parameter
+        return queryOptions.include.find(item => ('object' == typeof item) && ('model' in item) && (model == item.model));
+    } else { // Middle of Check for Include Section in queryOptions Parameter
+        return undefined;
+    } // End of Check for Include Section in queryOptions Parameter
 };
 
 // Prepare Sequelize Database Connection
@@ -46,14 +53,17 @@ Authors.init({
     first_name: {
         type: DataTypes.STRING(255),
         allowNull: true,
+        unique: 'uniqueFullName',
     },
     middle_name: {
         type: DataTypes.STRING(255),
         allowNull: true,
+        unique: 'uniqueFullName',
     },
     last_name: {
         type: DataTypes.STRING(255),
         allowNull: false,
+        unique: 'uniqueFullName',
     },
     parent_author_id: {
         type: DataTypes.INTEGER.UNSIGNED,
@@ -97,6 +107,7 @@ Books.init({
     title: {
         type: DataTypes.STRING(255),
         allowNull: false,
+        unique: true,
     },
 },{
     sequelize: sequelizeInstance,
@@ -121,6 +132,7 @@ ContributionTypes.init({
     name: {
         type: DataTypes.STRING(255),
         allowNull: false,
+        unique: true,
     },
 },{
     sequelize: sequelizeInstance,
@@ -212,6 +224,7 @@ Tags.init({
     tag: {
         type: DataTypes.STRING(255),
         allowNull: false,
+        unique: true,
     },
 },{
     sequelize: sequelizeInstance,
