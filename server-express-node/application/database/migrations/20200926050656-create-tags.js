@@ -12,6 +12,7 @@ module.exports = {
       tag: {
           type: Sequelize.STRING(255),
           allowNull: false,
+          unique: true,
       },
       deleted_at: {
           type: Sequelize.DATE,

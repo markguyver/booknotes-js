@@ -12,14 +12,17 @@ module.exports = {
       first_name: {
           type: Sequelize.STRING(255),
           allowNull: true,
+          unique: 'uniqueFullName',
       },
       middle_name: {
           type: Sequelize.STRING(255),
           allowNull: true,
+          unique: 'uniqueFullName',
       },
       last_name: {
           type: Sequelize.STRING(255),
           allowNull: false,
+          unique: 'uniqueFullName',
       },
       parent_author_id: {
           type: Sequelize.INTEGER.UNSIGNED,
