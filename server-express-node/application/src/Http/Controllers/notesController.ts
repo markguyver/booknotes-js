@@ -1,31 +1,14 @@
 import { Request, Router } from 'express';
 import { FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
+import { extractStringParameterValueFromRequestData } from '../helpers';
 import {
-    validationResponse,
-    validationResponseBaseFail,
-    validationResponseBaseSuccess,
-    looksLikeAnId,
-    isNonEmptyString,
-    respondWith400,
-    respondWith500,
-    respondWithResourceList,
-    respondWithResourceNotFound,
-    respondInvalidResourceId,
-    extractIntParameterValueFromRequestData,
-    extractStringParameterValueFromRequestData,
-    provideFindOptionsModified,
-    findByPKAndRespond,
-    // FindAllByFKAndRespond,
-    createAndRespond
-} from '../helpers';
-import { respondInvalidBookId, extractBookIdFromRequestData } from './booksController';
-
-// Types
-interface NoteObject {
-    id?:    number | undefined;
-    note?:   string;
-};
+    NoteObject,
+    extractNoteIdFromRequestData,
+    fetchNoteById,
+    createNoteRecord
+} from '../Models/notesModel';
+import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
 
 // Initialize Database Models
 const Notes = sequelizeInstance.models.Notes;
@@ -34,35 +17,14 @@ const Notes = sequelizeInstance.models.Notes;
 const listNotesQueryOptions: FindOptions = {};
 const displayNoteQueryOptions: FindOptions = {};
 
-// Prepare Resource-Specific Response Handler Methods
-export const respondWithNotesPayload = respondWithResourceList('Notes');
-export const respondWithNoteNotFound = respondWithResourceNotFound('Note');
-export const respondWithNotesNotFound = respondWithResourceNotFound('Notes');
-export const respondWithInvalidNoteId = respondInvalidResourceId('Note');
-
 // Prepare Resource-Specific Data Handler Methods
-export const extractNoteIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('note_id', request) || extractIntParameterValueFromRequestData('noteId', request);
 const extractNewNoteFromRequestData = (request: Request): NoteObject => ({ note: extractStringParameterValueFromRequestData('note', request) });
-export const validateExtractedNote = (extractedNote: NoteObject): validationResponse => {
-    if (false == isNonEmptyString(extractedNote.note).boolean) { // Verify Note (required) Parameter Is Set
-        return validationResponseBaseFail('Missing (required) note');
-    } // End of Verify Note (required) Parameter Is Set
-    return validationResponseBaseSuccess();
-};
 
 // Prepare Resource-Specific ORM Methods
-export const fetchNoteById = findByPKAndRespond(Notes, respondWithNotesPayload, respondWithNoteNotFound, respondWithInvalidNoteId, looksLikeAnId);
 const fetchNoteByIdFromRequestData = fetchNoteById(extractNoteIdFromRequestData);
 // TODO: Replace fetchNotesByBookId() => fetchAllNotes = fetchAllAndRespond(Notes, respondWithNotesPayload); fetchAllNotes(listNotesQueryOptions, provideFindOptionsModified(addWhereBookIdClauseToNoteListQueryOptions));
 // export const fetchNotesByBookId = FindAllByFKAndRespond(Notes, respondWithNotesPayload, respondInvalidBookId, 'book_id', looksLikeAnId);
 // const fetchNotesByBookIdFromRequestData = fetchNotesByBookId(extractBookIdFromRequestData);
-export const createNoteRecord = createAndRespond(
-    Notes,
-    respondWith400,
-    respondWith500,
-    respondWithNotesPayload,
-    validateExtractedNote
-);
 const createNoteRecordFromRequestData = createNoteRecord(extractNewNoteFromRequestData);
 
 // Define Endpoint Handlers

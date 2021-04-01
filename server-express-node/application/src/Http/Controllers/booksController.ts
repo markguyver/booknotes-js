@@ -1,40 +1,25 @@
 import { Request, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
-import { logger } from '../../logger';
 import {
-    validationResponse,
-    validationResponseBaseFail,
-    validationResponseBaseSuccess,
-    looksLikeAnId,
-    isNonEmptyString,
-    respondWith400,
-    respondWith500,
-    respondWithResourceList,
-    respondWithResourceNotFound,
-    respondInvalidResourceId,
     addWhereForeignIdClauseToResourceListQueryOptions,
-    extractIntParameterValueFromRequestData,
     extractStringParameterValueFromRequestData,
     provideFindOptionsUnmodified,
-    provideFindOptionsModified,
-    findAllAndRespond,
-    findByPKAndRespond,
-    createAndRespond
+    provideFindOptionsModified
 } from '../helpers';
-import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from './authorsController';
-import { respondInvalidTagId, extractTagIdFromRequestData } from './tagsController';
-
-// Types
-interface BookObject {
-    id?:        number | undefined;
-    title?:     string;
-};
+import {
+    BookObject,
+    extractBookIdFromRequestData,
+    fetchAllBooks,
+    fetchBookById,
+    createBookRecord
+} from '../Models/booksModel';
+import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from '../Models/authorsModel';
+import { respondInvalidTagId, extractTagIdFromRequestData } from '../Models/tagsModel';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
 const BookAuthors = sequelizeInstance.models.BookAuthors;
-const Books = sequelizeInstance.models.Books;
 const ContributionTypes = sequelizeInstance.models.ContributionTypes;
 const Notes = sequelizeInstance.models.Notes;
 const Tags = sequelizeInstance.models.Tags;
@@ -111,29 +96,8 @@ const listBooksByTagIdQueryOptions: FindOptions = {
     }],
 };
 
-// Prepare Resource-Specific Response Handler Methods
-export const respondWithBooksPayload = respondWithResourceList('Books');
-export const respondWithBookNotFound = respondWithResourceNotFound('Book');
-export const respondWithBooksNotFound = respondWithResourceNotFound('Books');
-export const respondInvalidBookId = respondInvalidResourceId('Book');
-
 // Prepare Resource-Specific Data Handler Methods
-export const extractBookIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('book_id', request) || extractIntParameterValueFromRequestData('bookId', request);
 const extractNewBookFromRequestData = (request: Request): BookObject => ({ title: extractStringParameterValueFromRequestData('title', request) });
-export const validateExtractedBook = (extractedBook: BookObject): validationResponse => {
-    if (!isNonEmptyString(extractedBook.title)) { // Verify Title (required) Parameter Is Set
-        return validationResponseBaseFail('Missing (required) book title');
-    } // End of Verify Title (required) Parameter Is Set
-    return validationResponseBaseSuccess();
-};
-
-logger.info({
-    extractAuthorIdFromRequestData: typeof extractAuthorIdFromRequestData,
-    extractBookIdFromRequestData: typeof extractBookIdFromRequestData,
-    extractTagIdFromRequestData: typeof extractTagIdFromRequestData,
-    respondInvalidAuthorId: typeof respondInvalidAuthorId,
-}, 'Books'); // TODO: Delete This
-
 const addWhereAuthorIdClauseToBookListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
     BookAuthors,
     extractAuthorIdFromRequestData,
@@ -148,16 +112,7 @@ const addWhereTagIdClauseToBookListQueryOptions = addWhereForeignIdClauseToResou
 );
 
 // Prepare Resource-Specific ORM Methods
-export const fetchAllBooks = findAllAndRespond(Books, respondWithBooksPayload);
-export const fetchBookById = findByPKAndRespond(Books, respondWithBooksPayload, respondWithBookNotFound, respondInvalidBookId, looksLikeAnId);
 const fetchBookByIdFromRequestData = fetchBookById(extractBookIdFromRequestData);
-export const createBookRecord = createAndRespond(
-    Books,
-    respondWith400,
-    respondWith500,
-    respondWithBooksPayload,
-    validateExtractedBook
-);
 const createBookRecordFromRequestData = createBookRecord(extractNewBookFromRequestData);
 
 // Define Endpoint Handlers

@@ -52,17 +52,6 @@ export const addWhereForeignIdClauseToResourceListQueryOptions = curry((
     queryOptions: FindOptions | { include: Includeable[] },
     request: Request
 ): FindOptions => {
-
-    logger.info({ application: {
-        sequelizeModelToAddForeignIdWhereClauseTo: sequelizeModelToAddForeignIdWhereClauseTo,
-        foreignIdExtrator: foreignIdExtrator,
-        foreignIdExtratorType: typeof foreignIdExtrator,
-        foreignKeyName: foreignKeyName,
-        queryOptions: queryOptions,
-        requestParams: request.params,
-        requestBody: request.body,
-    } }, 'addWhereForeignIdClauseToResourceListQueryOptions() Parameter Check'); // TODO: Delete This
-
     const foreignId = foreignIdExtrator(request);
     if (looksLikeAnId(foreignId).boolean) { // Validate Extracted Foreign ID
         const clonedQueryOptions = Object.assign({}, queryOptions);

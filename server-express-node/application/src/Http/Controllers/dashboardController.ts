@@ -2,9 +2,9 @@ import { Request, Response, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import { provideFindOptionsUnmodified } from '../helpers';
-import { fetchAllAuthors } from './authorsController';
-import { fetchAllBooks } from './booksController';
-import { fetchAllTags } from './tagsController';
+import { fetchAllAuthors } from '../Models/authorsModel';
+import { fetchAllBooks } from '../Models/booksModel';
+import { fetchAllTags } from '../Models/tagsModel';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;

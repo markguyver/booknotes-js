@@ -1,0 +1,56 @@
+import { Request } from 'express';
+import { sequelizeInstance } from '../../database';
+import {
+    validationResponse,
+    validationResponseBaseFail,
+    validationResponseBaseSuccess,
+    looksLikeAnId,
+    isNonEmptyString,
+    respondWith400,
+    respondWith500,
+    respondWithResourceList,
+    respondWithResourceNotFound,
+    respondInvalidResourceId,
+    extractIntParameterValueFromRequestData,
+    findAllAndRespond,
+    findByPKAndRespond,
+    createAndRespond
+} from '../helpers';
+
+// Types
+export interface TagObject {
+    id?:    number | undefined;
+    tag?:   string;
+};
+
+// Initialize Database Models
+const Authors = sequelizeInstance.models.Authors;
+const Books = sequelizeInstance.models.Books;
+const Notes = sequelizeInstance.models.Notes;
+const Tags = sequelizeInstance.models.Tags;
+
+// Prepare Resource-Specific Response Handler Methods
+export const respondWithTagsPayload = respondWithResourceList('Tags');
+export const respondWithTagNotFound = respondWithResourceNotFound('Tag');
+export const respondWithTagsNotFound = respondWithResourceNotFound('Tags');
+export const respondInvalidTagId = respondInvalidResourceId('Tag');
+
+// Prepare Resource-Specific Data Handler Methods
+export const extractTagIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('tag_id', request) || extractIntParameterValueFromRequestData('tagId', request);
+export const validateExtractedTag = (extractedBook: TagObject): validationResponse => {
+    if (false == isNonEmptyString(extractedBook.tag).boolean) { // Verify Tag (required) Parameter Is Set
+        return validationResponseBaseFail('Missing (required) tag');
+    } // End of Verify Tag (required) Parameter Is Set
+    return validationResponseBaseSuccess();
+};
+
+// Prepare Resource-Specific ORM Methods
+export const fetchAllTags = findAllAndRespond(Tags, respondWithTagsPayload);
+export const fetchTagById = findByPKAndRespond(Tags, respondWithTagsPayload, respondWithTagNotFound, respondInvalidTagId, looksLikeAnId);
+export const createTagRecord = createAndRespond(
+    Tags,
+    respondWith400,
+    respondWith500,
+    respondWithTagsPayload,
+    validateExtractedTag
+);
