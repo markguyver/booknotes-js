@@ -87,16 +87,16 @@ const listTagsByBookIdQueryOptions: FindOptions = {
 // Prepare Resource-Specific Data Handler Methods
 const extractNewTagFromRequestData = (request: Request): TagObject => ({ tag: extractStringParameterValueFromRequestData('tag', request) });
 const addWhereAuthorIdClauseToTagListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
-    Tags,
+    Authors,
     extractAuthorIdFromRequestData,
     respondInvalidAuthorId,
-    'author_tags.author_id'
+    'id' // Authors.id
 );
 const addWhereBookIdClauseToTagListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
-    Tags,
+    Books,
     extractBookIdFromRequestData,
     respondInvalidBookId,
-    'book_tags.book_id'
+    'id' // Books.id
 );
 
 // Prepare Resource-Specific ORM Methods

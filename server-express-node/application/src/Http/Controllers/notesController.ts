@@ -11,11 +11,18 @@ import {
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
 
 // Initialize Database Models
+const Books = sequelizeInstance.models.Books;
 const Notes = sequelizeInstance.models.Notes;
 
 // Prepare Resource-Specific Variables
 const listNotesQueryOptions: FindOptions = {};
-const displayNoteQueryOptions: FindOptions = {};
+const displayNoteQueryOptions: FindOptions = {
+    include: [{
+        model: Books,
+        required: true,
+        paranoid: false,
+    }],
+};
 
 // Prepare Resource-Specific Data Handler Methods
 const extractNewNoteFromRequestData = (request: Request): NoteObject => ({ note: extractStringParameterValueFromRequestData('note', request) });
