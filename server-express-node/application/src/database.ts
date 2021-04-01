@@ -1,18 +1,15 @@
-import { Sequelize, Model, ModelType, DataTypes, FindOptions, Includeable, WhereOptions } from 'sequelize';
+import { Sequelize, Model, DataTypes, Includeable, WhereOptions } from 'sequelize';
 import { logger } from './logger';
 
 // Prepare General Helpers
-export const insertWhereEqualsToQueryOptions = (columnName: string, columnValue: number|string, queryOptions: FindOptions): FindOptions => {
+export const insertWhereEqualsToQueryOptions = (
+    columnName: string,
+    columnValue: number|string,
+    queryOptions: Includeable
+): Includeable => {
     const whereClause: WhereOptions = {};
     whereClause[columnName] = columnValue;
     return Object.assign({ where: whereClause }, queryOptions);
-};
-export const retrieveJoinedModelFromQueryOptions = (model: ModelType, queryOptions: FindOptions): Includeable|undefined => {
-    if (queryOptions.include) { // Check for Include Section in queryOptions Parameter
-        return queryOptions.include.find(item => ('object' == typeof item) && ('model' in item) && (model == item.model));
-    } else { // Middle of Check for Include Section in queryOptions Parameter
-        return undefined;
-    } // End of Check for Include Section in queryOptions Parameter
 };
 
 // Prepare Sequelize Database Connection
@@ -23,8 +20,10 @@ const databaseUsername  = process.env.DB_USERNAME || 'root';
 const databasePassword  = process.env.DB_PASSWORD || '';
 const databaseSchema    = process.env.DB_SCHEMA || 'booknotes';
 
+// TODO: Switch dialect to mariadb
 export const sequelizeInstance = new Sequelize(databaseSchema, databaseUsername, databasePassword, {
     dialect: "mysql",
+    dialectOptions: { connectTimeout: 1000 },
     host: databaseHost,
     port: databasePort,
     logging: message => logger.info({source:"Sequelize"}, message),

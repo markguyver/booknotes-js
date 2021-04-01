@@ -1,9 +1,10 @@
 import { Request, Response, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
-import { fetchAllAuthorsAndRespond } from './authorsController';
-import { fetchAllBooksAndRespond } from './booksController';
-import { fetchAllTagsAndRespond } from './tagsController';
+import { provideFindOptionsUnmodified } from '../helpers';
+import { fetchAllAuthors } from './authorsController';
+import { fetchAllBooks } from './booksController';
+import { fetchAllTags } from './tagsController';
 
 // Initialize Database Models
 const Authors = sequelizeInstance.models.Authors;
@@ -96,9 +97,9 @@ const getResourceCounts = (request: Request, response: Response): Response => {
     return response;
 };
 // const getResourceCounts = (request: Request, response: Response): Response => respondWithResourceList('Counts', response, results, statusCode);
-const getAuthorLeaderboard = fetchAllAuthorsAndRespond(authorListWithBookCountDescending);
-const getBookLeaderboard = fetchAllBooksAndRespond(bookListWithNoteCountDescending);
-const getTagLeaderboard = fetchAllTagsAndRespond(tagListWithAuthorAndBookCountsInAlphabeticalOrder);
+const getAuthorLeaderboard = fetchAllAuthors(provideFindOptionsUnmodified(authorListWithBookCountDescending));
+const getBookLeaderboard = fetchAllBooks(provideFindOptionsUnmodified(bookListWithNoteCountDescending));
+const getTagLeaderboard = fetchAllTags(provideFindOptionsUnmodified(tagListWithAuthorAndBookCountsInAlphabeticalOrder));
 
 // Register Resource Routes
 export const dashboardRoutes = Router();

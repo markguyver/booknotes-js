@@ -1,10 +1,11 @@
 import { Request, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
+import { logger } from '../../logger';
 import {
+    validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
-    validationResponse,
     looksLikeAnId,
     isNonEmptyString,
     respondWith400,
@@ -12,13 +13,17 @@ import {
     respondWithResourceList,
     respondWithResourceNotFound,
     respondInvalidResourceId,
+    addWhereForeignIdClauseToResourceListQueryOptions,
     extractIntParameterValueFromRequestData,
     extractStringParameterValueFromRequestData,
+    provideFindOptionsUnmodified,
+    provideFindOptionsModified,
     findAllAndRespond,
     findByPKAndRespond,
     createAndRespond
 } from '../helpers';
 import { respondInvalidBookId, extractBookIdFromRequestData } from './booksController';
+import { respondInvalidTagId, extractTagIdFromRequestData } from './tagsController';
 
 // Types
 interface AuthorObject {
@@ -97,7 +102,32 @@ const displayAuthorQueryOptions: FindOptions = {
         paranoid: false,
     }],
 };
-const listAuthorsByBookIdQueryOptions: FindOptions = {};
+const listAuthorsByBookIdQueryOptions: FindOptions = {
+    order: [['last_name', 'ASC'], ['first_name', 'ASC'], ['middle_name', 'ASC']],
+    paranoid: false,
+    include: [{
+        model: BookAuthors,
+        required: true,
+        include: [{
+            model: ContributionTypes,
+            required: false,
+        }]
+    }],
+};
+const listAuthorsByTagIdQueryOptions: FindOptions = {
+    order: [['last_name', 'ASC'], ['first_name', 'ASC'], ['middle_name', 'ASC']],
+    paranoid: false,
+    include: [{
+        model: Tags,
+        required: true,
+    }],
+};
+
+// Prepare Resource-Specific Response Handler Methods
+export const respondWithAuthorsPayload = respondWithResourceList('Authors');
+export const respondWithAuthorsNotFound = respondWithResourceNotFound('Authors');
+export const respondWithAuthorNotFound = respondWithResourceNotFound('Author');
+export const respondInvalidAuthorId = respondInvalidResourceId('Author');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractAuthorIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('author_id', request) || extractIntParameterValueFromRequestData('authorId', request);
@@ -117,17 +147,29 @@ export const validateExtractedAuthor = (extractedAuthor: AuthorObject): validati
     return validationResponseBaseSuccess();
 };
 
-// Prepare Resource-Specific Response Handler Methods
-export const respondWithAuthorsPayload = respondWithResourceList('Authors');
-export const respondWithAuthorsNotFound = respondWithResourceNotFound('Authors');
-export const respondWithAuthorNotFound = respondWithResourceNotFound('Author');
-export const respondInvalidAuthorId = respondInvalidResourceId('Author');
+logger.info({
+    extractAuthorIdFromRequestData: typeof extractAuthorIdFromRequestData,
+    extractBookIdFromRequestData: typeof extractBookIdFromRequestData,
+    extractTagIdFromRequestData: typeof extractTagIdFromRequestData,
+}, 'Authors'); // TODO: Delete This
+
+const addWhereBookIdClauseToAuthorListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
+    BookAuthors,
+    extractBookIdFromRequestData,
+    respondInvalidBookId,
+    'book_id' // BookAuthors.book_id
+);
+const addWhereTagIdClauseToAuthorListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
+    Tags,
+    extractTagIdFromRequestData,
+    respondInvalidTagId,
+    'id' // Tags.id
+);
 
 // Prepare Resource-Specific ORM Methods
-const fetchAllAuthors = findAllAndRespond(Authors, respondWithAuthorsPayload);
+export const fetchAllAuthors = findAllAndRespond(Authors, respondWithAuthorsPayload);
 export const fetchAuthorById = findByPKAndRespond(Authors, respondWithAuthorsPayload, respondWithAuthorNotFound, respondInvalidAuthorId, looksLikeAnId);
 const fetchAuthorByIdFromRequestData = fetchAuthorById(extractAuthorIdFromRequestData);
-// const fetchAuthorsByBookIdAndRespond = fetchResourceByForeignIdAsManyAndRespond(Authors, respondWithAuthorsPayload, respondWithAuthorsNotFound, respondInvalidBookId, foreignKeyNames.book_id);
 export const createAuthorRecord = createAndRespond(
     Authors,
     respondWith400,
@@ -138,13 +180,17 @@ export const createAuthorRecord = createAndRespond(
 const createAuthorRecordFromRequestData = createAuthorRecord(extractNewAuthorFromRequestData);
 
 // Define Endpoint Handlers
-const listAllAuthors = fetchAllAuthors(listAuthorsWithBookCountQueryOptions);
+const listAllAuthors = fetchAllAuthors(provideFindOptionsUnmodified(listAuthorsWithBookCountQueryOptions));
 const displayAuthorById = fetchAuthorByIdFromRequestData(displayAuthorQueryOptions);
+const listAuthorsByBookIdFromRequestData = fetchAllAuthors(provideFindOptionsModified(listAuthorsByBookIdQueryOptions, addWhereBookIdClauseToAuthorListQueryOptions));
+const listAuthorsByTagIdFromRequestData = fetchAllAuthors(provideFindOptionsModified(listAuthorsByTagIdQueryOptions, addWhereTagIdClauseToAuthorListQueryOptions));
 
 // Register Resource Routes
 export const authorsRoutes = Router();
 authorsRoutes.get('/', listAllAuthors);
 authorsRoutes.post('/', createAuthorRecordFromRequestData);
+authorsRoutes.get('/book/:bookId', listAuthorsByBookIdFromRequestData);
+authorsRoutes.get('/tag/:tagId', listAuthorsByTagIdFromRequestData);
 
 export const authorRoutes = Router();
 authorRoutes.get('/:authorId', displayAuthorById);

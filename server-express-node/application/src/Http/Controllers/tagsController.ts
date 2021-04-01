@@ -1,10 +1,11 @@
 import { Request, Response, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
+import { logger } from '../../logger';
 import {
+    validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
-    validationResponse,
     looksLikeAnId,
     isNonEmptyString,
     respondWith400,
@@ -12,14 +13,17 @@ import {
     respondWithResourceList,
     respondWithResourceNotFound,
     respondInvalidResourceId,
+    addWhereForeignIdClauseToResourceListQueryOptions,
     extractIntParameterValueFromRequestData,
     extractStringParameterValueFromRequestData,
+    provideFindOptionsUnmodified,
+    provideFindOptionsModified,
     findAllAndRespond,
     findByPKAndRespond,
     createAndRespond
 } from '../helpers';
-import { extractAuthorIdFromRequestData } from './authorsController';
-import { extractBookIdFromRequestData } from './booksController';
+import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from './authorsController';
+import { respondInvalidBookId, extractBookIdFromRequestData } from './booksController';
 
 // Types
 interface TagObject {
@@ -77,15 +81,21 @@ const displayTagWithAuthorsBooksAndNotes: FindOptions = {
         }],
     }],
 };
-
-// Prepare Resource-Specific Data Handler Methods
-const extractTagIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('tag_id', request) || extractIntParameterValueFromRequestData('tagId', request);
-const extractNewTagFromRequestData = (request: Request): TagObject => ({ tag: extractStringParameterValueFromRequestData('tag', request) });
-export const validateExtractedTag = (extractedBook: TagObject): validationResponse => {
-    if (false == isNonEmptyString(extractedBook.tag).boolean) { // Verify Tag (required) Parameter Is Set
-        return validationResponseBaseFail('Missing (required) tag');
-    } // End of Verify Tag (required) Parameter Is Set
-    return validationResponseBaseSuccess();
+const listTagsByAuthorIdQueryOptions: FindOptions = {
+    order: [['tag', 'ASC']],
+    include: [{
+        model: Authors,
+        required: true,
+        paranoid: false,
+    }],
+};
+const listTagsByBookIdQueryOptions: FindOptions = {
+    order: [['tag', 'ASC']],
+    include: [{
+        model: Books,
+        required: true,
+        paranoid: false,
+    }],
 };
 
 // Prepare Resource-Specific Response Handler Methods
@@ -94,12 +104,40 @@ export const respondWithTagNotFound = respondWithResourceNotFound('Tag');
 export const respondWithTagsNotFound = respondWithResourceNotFound('Tags');
 export const respondInvalidTagId = respondInvalidResourceId('Tag');
 
+// Prepare Resource-Specific Data Handler Methods
+export const extractTagIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('tag_id', request) || extractIntParameterValueFromRequestData('tagId', request);
+const extractNewTagFromRequestData = (request: Request): TagObject => ({ tag: extractStringParameterValueFromRequestData('tag', request) });
+export const validateExtractedTag = (extractedBook: TagObject): validationResponse => {
+    if (false == isNonEmptyString(extractedBook.tag).boolean) { // Verify Tag (required) Parameter Is Set
+        return validationResponseBaseFail('Missing (required) tag');
+    } // End of Verify Tag (required) Parameter Is Set
+    return validationResponseBaseSuccess();
+};
+
+logger.info({
+    extractAuthorIdFromRequestData: typeof extractAuthorIdFromRequestData,
+    extractBookIdFromRequestData: typeof extractBookIdFromRequestData,
+    extractTagIdFromRequestData: typeof extractTagIdFromRequestData,
+    respondInvalidAuthorId: typeof respondInvalidAuthorId,
+}, 'Tags'); // TODO: Delete This
+
+const addWhereAuthorIdClauseToTagListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
+    Tags,
+    extractAuthorIdFromRequestData,
+    respondInvalidAuthorId,
+    'author_tags.author_id'
+);
+const addWhereBookIdClauseToTagListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
+    Tags,
+    extractBookIdFromRequestData,
+    respondInvalidBookId,
+    'book_tags.book_id'
+);
+
 // Prepare Resource-Specific ORM Methods
-const fetchAllTags = findAllAndRespond(Tags, respondWithTagsPayload);
+export const fetchAllTags = findAllAndRespond(Tags, respondWithTagsPayload);
 export const fetchTagById = findByPKAndRespond(Tags, respondWithTagsPayload, respondWithTagNotFound, respondInvalidTagId, looksLikeAnId);
 const fetchTagByIdFromRequestData = fetchTagById(extractTagIdFromRequestData);
-// const fetchTagsByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
-// const fetchTagsByBookIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
 export const createTagRecord = createAndRespond(
     Tags,
     respondWith400,
@@ -110,7 +148,7 @@ export const createTagRecord = createAndRespond(
 const createTagRecordFromRequestData = createTagRecord(extractNewTagFromRequestData);
 
 // Define Endpoint Handlers
-const listAllTags = fetchAllTags(listTagsWithAuthorBookAndNoteCountsQueryOptions);
+const listAllTags = fetchAllTags(provideFindOptionsUnmodified(listTagsWithAuthorBookAndNoteCountsQueryOptions));
 const displayTagById = fetchTagByIdFromRequestData(displayTagWithAuthorsBooksAndNotes);
 const listTagsByBookId = (request: Request, response: Response): Response => {
 
@@ -172,13 +210,15 @@ const listTagsByAuthorId = (request: Request, response: Response): Response => {
     } // End of Check Passed ID Parameter Validation
     return response;
 };
+const listTagsByAuthorIdFromRequestData = fetchAllTags(provideFindOptionsModified(listTagsByAuthorIdQueryOptions, addWhereAuthorIdClauseToTagListQueryOptions));
+const listTagsByBookIdFromRequestData = fetchAllTags(provideFindOptionsModified(listTagsByBookIdQueryOptions, addWhereBookIdClauseToTagListQueryOptions));
 
 // Register Resource Routes
 export const tagsRoutes = Router();
 tagsRoutes.get('/', listAllTags);
 tagsRoutes.post('/', createTagRecordFromRequestData);
-tagsRoutes.get('/author/:authorId', listTagsByAuthorId);
-tagsRoutes.get('/book/:bookId', listTagsByBookId);
+tagsRoutes.get('/author/:authorId', listTagsByAuthorIdFromRequestData);
+tagsRoutes.get('/book/:bookId', listTagsByBookIdFromRequestData);
 
 export const tagRoutes = Router();
 tagRoutes.get('/:tagId', displayTagById);

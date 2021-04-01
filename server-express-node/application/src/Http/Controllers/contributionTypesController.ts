@@ -2,9 +2,9 @@ import { Request, Router } from 'express';
 import { FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import {
+    validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
-    validationResponse,
     looksLikeAnId,
     isNonEmptyString,
     respondWith400,
@@ -12,12 +12,17 @@ import {
     respondWithResourceList,
     respondWithResourceNotFound,
     respondInvalidResourceId,
+    addWhereForeignIdClauseToResourceListQueryOptions,
     extractIntParameterValueFromRequestData,
     extractStringParameterValueFromRequestData,
+    provideFindOptionsUnmodified,
+    provideFindOptionsModified,
     findAllAndRespond,
     findByPKAndRespond,
     createAndRespond
 } from '../helpers';
+import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from './authorsController';
+import { respondInvalidBookId, extractBookIdFromRequestData } from './booksController';
 
 // Types
 interface ContributionTypeObject {
@@ -26,11 +31,33 @@ interface ContributionTypeObject {
 };
 
 // Initialize Database Models
+const BookAuthors = sequelizeInstance.models.BookAuthors;
 const ContributionTypes = sequelizeInstance.models.ContributionTypes;
 
 // Prepare Resource-Specific Variables
-const listContributionTypesWithAuthorAndBookCountsQueryOptions: FindOptions = {};
+const listContributionTypesWithAuthorAndBookCountsQueryOptions: FindOptions = {
+    order: [['name', 'ASC']],    
+};
 const displayContributionTypeQueryOptions: FindOptions = {};
+const listContributionTypesByAuthorIdQueryOptions: FindOptions = {
+    order: [['name', 'ASC']],
+    include: [{
+        model: BookAuthors,
+        required: true,
+    }],
+};
+const listContributionTypesByBookIdQueryOptions: FindOptions = {
+    order: [['name', 'ASC']],
+    include: [{
+        model: BookAuthors,
+        required: true,
+    }],
+};
+
+// Prepare Resource-Specific Response Handler Methods
+export const respondWithContributionTypesPayload = respondWithResourceList('ContributionTypes');
+export const respondWithContributionTypeNotFound = respondWithResourceNotFound('Contribution Type');
+export const respondInvalidContributionTypeId = respondInvalidResourceId('Contribution Type');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractContributionTypeIdFromRequestData = extractIntParameterValueFromRequestData('contributionTypeId');
@@ -41,11 +68,18 @@ export const validateExtractedContributionType = (extractedObject: ContributionT
     } // End of Verify Title (required) Parameter Is Set
     return validationResponseBaseSuccess();
 };
-
-// Prepare Resource-Specific Response Handler Methods
-export const respondWithContributionTypesPayload = respondWithResourceList('ContributionTypes');
-export const respondWithContributionTypeNotFound = respondWithResourceNotFound('Contribution Type');
-export const respondInvalidContributionTypeId = respondInvalidResourceId('Contribution Type');
+const addWhereAuthorIdClauseToContributionTypesListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
+    BookAuthors,
+    extractAuthorIdFromRequestData,
+    respondInvalidAuthorId,
+    'author_id' // BookAuthors.author_id
+);
+const addWhereBookIdClauseToContributionTypesListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
+    BookAuthors,
+    extractBookIdFromRequestData,
+    respondInvalidBookId,
+    'book_id' // BookAuthors.book_id
+);
 
 // Prepare Resource-Specific ORM Methods
 const fetchAllContributionTypes = findAllAndRespond(ContributionTypes, respondWithContributionTypesPayload);
@@ -61,13 +95,17 @@ export const createContributionTypeRecord = createAndRespond(
 const createContributionTypeRecordFromRequestData = createContributionTypeRecord(extractNewContributionTypeFromRequestData);
 
 // Define Endpoint Handlers
-const listAllContributionTypes = fetchAllContributionTypes(listContributionTypesWithAuthorAndBookCountsQueryOptions);
+const listAllContributionTypes = fetchAllContributionTypes(provideFindOptionsUnmodified(listContributionTypesWithAuthorAndBookCountsQueryOptions));
 const displayContributionTypeById = fetchContributionTypeByIdFromRequestData(displayContributionTypeQueryOptions);
+const listContributionTypesByAuthorIdFromRequestData = fetchAllContributionTypes(provideFindOptionsModified(listContributionTypesByAuthorIdQueryOptions, addWhereAuthorIdClauseToContributionTypesListQueryOptions));
+const listContributionTypesByBookIdFromRequestData = fetchAllContributionTypes(provideFindOptionsModified(listContributionTypesByBookIdQueryOptions, addWhereBookIdClauseToContributionTypesListQueryOptions));
 
 // Register Resource Routes
 export const contributionTypesRoutes = Router();
 contributionTypesRoutes.get('/', listAllContributionTypes);
 contributionTypesRoutes.post('/', createContributionTypeRecordFromRequestData);
+contributionTypesRoutes.get('/author/:authorId', listContributionTypesByAuthorIdFromRequestData);
+contributionTypesRoutes.get('/book/:bookId', listContributionTypesByBookIdFromRequestData);
 
 export const contributionTypeRoutes = Router();
 contributionTypeRoutes.get('/:contributionTypeId', displayContributionTypeById);

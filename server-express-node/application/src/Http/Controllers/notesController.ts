@@ -1,10 +1,10 @@
-import { Request, Response, Router } from 'express';
+import { Request, Router } from 'express';
 import { FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
 import {
+    validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
-    validationResponse,
     looksLikeAnId,
     isNonEmptyString,
     respondWith400,
@@ -14,8 +14,9 @@ import {
     respondInvalidResourceId,
     extractIntParameterValueFromRequestData,
     extractStringParameterValueFromRequestData,
+    provideFindOptionsModified,
     findByPKAndRespond,
-    FindAllByFKAndRespond,
+    // FindAllByFKAndRespond,
     createAndRespond
 } from '../helpers';
 import { respondInvalidBookId, extractBookIdFromRequestData } from './booksController';
@@ -27,12 +28,17 @@ interface NoteObject {
 };
 
 // Initialize Database Models
-const Books = sequelizeInstance.models.Books;
 const Notes = sequelizeInstance.models.Notes;
 
 // Prepare Resource-Specific Variables
 const listNotesQueryOptions: FindOptions = {};
 const displayNoteQueryOptions: FindOptions = {};
+
+// Prepare Resource-Specific Response Handler Methods
+export const respondWithNotesPayload = respondWithResourceList('Notes');
+export const respondWithNoteNotFound = respondWithResourceNotFound('Note');
+export const respondWithNotesNotFound = respondWithResourceNotFound('Notes');
+export const respondWithInvalidNoteId = respondInvalidResourceId('Note');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractNoteIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('note_id', request) || extractIntParameterValueFromRequestData('noteId', request);
@@ -44,17 +50,12 @@ export const validateExtractedNote = (extractedNote: NoteObject): validationResp
     return validationResponseBaseSuccess();
 };
 
-// Prepare Resource-Specific Response Handler Methods
-export const respondWithNotesPayload = respondWithResourceList('Notes');
-export const respondWithNoteNotFound = respondWithResourceNotFound('Note');
-export const respondWithNotesNotFound = respondWithResourceNotFound('Notes');
-export const respondWithInvalidNoteId = respondInvalidResourceId('Note');
-
 // Prepare Resource-Specific ORM Methods
 export const fetchNoteById = findByPKAndRespond(Notes, respondWithNotesPayload, respondWithNoteNotFound, respondWithInvalidNoteId, looksLikeAnId);
 const fetchNoteByIdFromRequestData = fetchNoteById(extractNoteIdFromRequestData);
-export const fetchNotesByBookId = FindAllByFKAndRespond(Notes, respondWithNotesPayload, respondInvalidBookId, 'book_id', looksLikeAnId);
-const fetchNotesByBookIdFromRequestData = fetchNotesByBookId(extractBookIdFromRequestData);
+// TODO: Replace fetchNotesByBookId() => fetchAllNotes = fetchAllAndRespond(Notes, respondWithNotesPayload); fetchAllNotes(listNotesQueryOptions, provideFindOptionsModified(addWhereBookIdClauseToNoteListQueryOptions));
+// export const fetchNotesByBookId = FindAllByFKAndRespond(Notes, respondWithNotesPayload, respondInvalidBookId, 'book_id', looksLikeAnId);
+// const fetchNotesByBookIdFromRequestData = fetchNotesByBookId(extractBookIdFromRequestData);
 export const createNoteRecord = createAndRespond(
     Notes,
     respondWith400,
@@ -66,11 +67,11 @@ const createNoteRecordFromRequestData = createNoteRecord(extractNewNoteFromReque
 
 // Define Endpoint Handlers
 const displayNoteById = fetchNoteByIdFromRequestData(displayNoteQueryOptions);
-const listAllNotesByBookId = fetchNotesByBookIdFromRequestData(listNotesQueryOptions);
+// const listAllNotesByBookId = fetchNotesByBookIdFromRequestData(listNotesQueryOptions);
 
 // Register Resource Routes
 export const notesRoutes = Router();
-notesRoutes.get('/book/:bookId', listAllNotesByBookId);
+// notesRoutes.get('/book/:bookId', listAllNotesByBookId);
 notesRoutes.post('/book/:bookId', createNoteRecordFromRequestData);
 
 export const noteRoutes = Router();

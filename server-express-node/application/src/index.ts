@@ -10,9 +10,9 @@ import { notesRoutes, noteRoutes } from './Http/Controllers/notesController';
 import { tagsRoutes, tagRoutes } from './Http/Controllers/tagsController';
 
 const expressServerInstance = express();
-const port = process.env.APP_PORT || 5000;
 
 // Server Settings
+const port = process.env.APP_PORT || 5000;
 expressServerInstance.disable('x-powered-by');
 
 // Server Middleware

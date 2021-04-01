@@ -1,10 +1,11 @@
-import { Request, Response, Router } from 'express';
+import { Request, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../database';
+import { logger } from '../../logger';
 import {
+    validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
-    validationResponse,
     looksLikeAnId,
     isNonEmptyString,
     respondWith400,
@@ -12,13 +13,17 @@ import {
     respondWithResourceList,
     respondWithResourceNotFound,
     respondInvalidResourceId,
+    addWhereForeignIdClauseToResourceListQueryOptions,
     extractIntParameterValueFromRequestData,
     extractStringParameterValueFromRequestData,
+    provideFindOptionsUnmodified,
+    provideFindOptionsModified,
     findAllAndRespond,
     findByPKAndRespond,
     createAndRespond
 } from '../helpers';
 import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from './authorsController';
+import { respondInvalidTagId, extractTagIdFromRequestData } from './tagsController';
 
 // Types
 interface BookObject {
@@ -85,6 +90,32 @@ const displayBookQueryOptions: FindOptions = {
         required: false,
     }],
 };
+const listBooksByAuthorIdQueryOptions: FindOptions = {
+    order: [['title', 'ASC']],
+    paranoid: false,
+    include: [{
+        model: BookAuthors,
+        required: true,
+        include: [{
+            model: ContributionTypes,
+            required: false,
+        }]
+    }],
+};
+const listBooksByTagIdQueryOptions: FindOptions = {
+    order: [['title', 'ASC']],
+    paranoid: false,
+    include: [{
+        model: Tags,
+        required: true,
+    }],
+};
+
+// Prepare Resource-Specific Response Handler Methods
+export const respondWithBooksPayload = respondWithResourceList('Books');
+export const respondWithBookNotFound = respondWithResourceNotFound('Book');
+export const respondWithBooksNotFound = respondWithResourceNotFound('Books');
+export const respondInvalidBookId = respondInvalidResourceId('Book');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractBookIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('book_id', request) || extractIntParameterValueFromRequestData('bookId', request);
@@ -96,17 +127,30 @@ export const validateExtractedBook = (extractedBook: BookObject): validationResp
     return validationResponseBaseSuccess();
 };
 
-// Prepare Resource-Specific Response Handler Methods
-export const respondWithBooksPayload = respondWithResourceList('Books');
-export const respondWithBookNotFound = respondWithResourceNotFound('Book');
-export const respondWithBooksNotFound = respondWithResourceNotFound('Books');
-export const respondInvalidBookId = respondInvalidResourceId('Book');
+logger.info({
+    extractAuthorIdFromRequestData: typeof extractAuthorIdFromRequestData,
+    extractBookIdFromRequestData: typeof extractBookIdFromRequestData,
+    extractTagIdFromRequestData: typeof extractTagIdFromRequestData,
+    respondInvalidAuthorId: typeof respondInvalidAuthorId,
+}, 'Books'); // TODO: Delete This
+
+const addWhereAuthorIdClauseToBookListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
+    BookAuthors,
+    extractAuthorIdFromRequestData,
+    respondInvalidAuthorId,
+    'author_id' // BookAuthors.author_id
+);
+const addWhereTagIdClauseToBookListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
+    Tags,
+    extractTagIdFromRequestData,
+    respondInvalidTagId,
+    'id' // Tags.id
+);
 
 // Prepare Resource-Specific ORM Methods
-const fetchAllBooks = findAllAndRespond(Books, respondWithBooksPayload);
+export const fetchAllBooks = findAllAndRespond(Books, respondWithBooksPayload);
 export const fetchBookById = findByPKAndRespond(Books, respondWithBooksPayload, respondWithBookNotFound, respondInvalidBookId, looksLikeAnId);
 const fetchBookByIdFromRequestData = fetchBookById(extractBookIdFromRequestData);
-// const fetchBooksByAuthorIdAndRespond = fetchResourceByForeignIdAsManyAndRespond();
 export const createBookRecord = createAndRespond(
     Books,
     respondWith400,
@@ -117,19 +161,17 @@ export const createBookRecord = createAndRespond(
 const createBookRecordFromRequestData = createBookRecord(extractNewBookFromRequestData);
 
 // Define Endpoint Handlers
-const listAllBooks = fetchAllBooks(listBooksWithNoteCountQueryOptions);
-const listAllBooksByAuthorId = (request: Request, response: Response): Response => {
-    const authorId = request.params.authorId;
-    response.send({coming:'soon',authorId:authorId});
-    return response;
-};
+const listAllBooks = fetchAllBooks(provideFindOptionsUnmodified(listBooksWithNoteCountQueryOptions));
 const displayBookById = fetchBookByIdFromRequestData(displayBookQueryOptions);
+const listBooksByAuthorIdFromRequestData = fetchAllBooks(provideFindOptionsModified(listBooksByAuthorIdQueryOptions, addWhereAuthorIdClauseToBookListQueryOptions));
+const listBooksByTagIdFromRequestData = fetchAllBooks(provideFindOptionsModified(listBooksByTagIdQueryOptions, addWhereTagIdClauseToBookListQueryOptions));
 
 // Register Resource Routes
 export const booksRoutes = Router();
 booksRoutes.get('/', listAllBooks);
 booksRoutes.post('/', createBookRecordFromRequestData);
-booksRoutes.get('/author/:authorId', listAllBooksByAuthorId);
+booksRoutes.get('/author/:authorId', listBooksByAuthorIdFromRequestData);
+booksRoutes.get('/tag/:tagId', listBooksByTagIdFromRequestData);
 
 export const bookRoutes = Router();
 bookRoutes.get('/:bookId', displayBookById);

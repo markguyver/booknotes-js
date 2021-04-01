@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
 import { Map } from 'immutable';
-import { curry } from 'ramda';
-import { Model, ModelCtor, FindOptions } from 'sequelize';
+import { allPass, curry, has, is, propEq } from 'ramda';
+import { Model, ModelCtor, FindOptions, Includeable } from 'sequelize';
 import { insertWhereEqualsToQueryOptions } from '../database';
 import { logger } from '../logger';
 
 // Data Types
+export interface queryOptionsProviderError {
+    message: string;
+    handler: (response: Response) => Response;
+};
 export interface validationResponse {
     boolean:    boolean;
     type:       string;
@@ -13,6 +17,8 @@ export interface validationResponse {
 };
 
 // Prepare General Helpers (like validation)
+export const getQueryOptionsProviderError = (handler: (response:Response) => Response, message: string = '') => ({ message: message, handler: handler });
+const isQueryOptionsProviderError = (errorToTest: any): errorToTest is queryOptionsProviderError => ('function' == typeof errorToTest.handler);
 export const validationResponseBaseFail = (message: string = ''): validationResponse => ({ boolean: false, type: 'failure', message: message });
 export const validationResponseBaseSuccess = (): validationResponse => ({ boolean: true, type: 'success' });
 export const looksLikeAnId = (idSuspect: number): validationResponse => (!isNaN(idSuspect) && idSuspect > 0) ? validationResponseBaseSuccess() : validationResponseBaseFail();
@@ -21,6 +27,8 @@ export const isNonEmptyString = (value: string | undefined): validationResponse 
 // Prepare Data Handler Methods
 export const extractIntParameterValueFromRequestData = curry((parameterName: string, request: Request): number => parseInt(request.body[parameterName]) || parseInt(request.params[parameterName]) || NaN);
 export const extractStringParameterValueFromRequestData = curry((parameterName: string, request: Request): string => String(request.body[parameterName]).toString() || String(request.params[parameterName]).toString());
+export const provideFindOptionsUnmodified = curry((findOptions: FindOptions, request: Request): FindOptions => findOptions);
+export const provideFindOptionsModified = curry((findOptions: FindOptions, findOptionsModifier: (findOptions: FindOptions, request: Request) => FindOptions, request: Request): FindOptions => findOptionsModifier(findOptions, request));
 
 // Prepare HTTP Response Error Helpers
 export const respondWith400 = (response: Response, message: string = 'Bad Request'): Response => response.status(400).send(message);
@@ -36,27 +44,77 @@ export const respondWithResourceList = curry((resourceName: string, response: Re
 );
 export const respondWithResourceNotFound = curry((resourceName: string, response: Response): Response => respondWith404(response, resourceName + ' not found'));
 export const respondInvalidResourceId = curry((resourceName: string, response: Response): Response => respondWith400(response, 'Invalid ' + resourceName + ' ID'));
+export const addWhereForeignIdClauseToResourceListQueryOptions = curry((
+    sequelizeModelToAddForeignIdWhereClauseTo: ModelCtor<Model<any, any>>,
+    foreignIdExtrator: (request: Request) => number,
+    invalidForeignIdResponseHandler: (response: Response) => Response,
+    foreignKeyName: string,
+    queryOptions: FindOptions | { include: Includeable[] },
+    request: Request
+): FindOptions => {
+
+    logger.info({ application: {
+        sequelizeModelToAddForeignIdWhereClauseTo: sequelizeModelToAddForeignIdWhereClauseTo,
+        foreignIdExtrator: foreignIdExtrator,
+        foreignIdExtratorType: typeof foreignIdExtrator,
+        foreignKeyName: foreignKeyName,
+        queryOptions: queryOptions,
+        requestParams: request.params,
+        requestBody: request.body,
+    } }, 'addWhereForeignIdClauseToResourceListQueryOptions() Parameter Check'); // TODO: Delete This
+
+    const foreignId = foreignIdExtrator(request);
+    if (looksLikeAnId(foreignId).boolean) { // Validate Extracted Foreign ID
+        const clonedQueryOptions = Object.assign({}, queryOptions);
+        if (clonedQueryOptions.include && 'object' == typeof clonedQueryOptions.include && Array.isArray(clonedQueryOptions.include)) { // Check for Include Array
+            const isThisTheModelWereLookingFor = allPass([
+                is(Object),
+                has('model'),
+                propEq('model', sequelizeModelToAddForeignIdWhereClauseTo),
+            ]);
+            clonedQueryOptions.include = clonedQueryOptions.include.map(item => isThisTheModelWereLookingFor(item) ? insertWhereEqualsToQueryOptions(foreignKeyName, foreignId, item) : item);
+        } // End of Check for Include Array
+        return clonedQueryOptions;
+    } else { // Middle of Validate Extracted Foreign ID
+        throw getQueryOptionsProviderError(invalidForeignIdResponseHandler);
+    } // End of Validate Extracted Foreign ID
+});
 
 // Prepare HTTP Resource ORM Helpers
 export const findAllAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
     queryResultsHandler:            Function,
-    queryOptions:                   FindOptions,
+    queryOptionsProvider:           (request: Request) => FindOptions,
     request:                        Request,
     response:                       Response
 ): Response => {
-    sequelizeModel.findAll(queryOptions)
-        // TODO: Use Not Found handler
-        .then(results => queryResultsHandler(response, results))
-        .catch(error => {
+    try { // Call Query Options Provider Then Perform Query
+        const queryOptionsFromProvider = queryOptionsProvider(request);
+        sequelizeModel.findAll(queryOptionsFromProvider)
+            // TODO: Use Not Found handler
+            .then(results => queryResultsHandler(response, results))
+            .catch(error => {
+                logger.error({ application: {
+                    sequelizeModel: sequelizeModel,
+                    queryOptions: queryOptionsFromProvider,
+                    request: request,
+                    error: error,
+                } }, 'findAllAndRespond() Query Failure');
+                respondWith500(response);
+            });
+    } catch (error) { // Middle of Call Query Options Provider Then Perform Query
+        if (isQueryOptionsProviderError(error)) { // Check Query Options Provider Error to Handle
+            error.handler(response);
+        } else { // Middle of Check Query Options Provider Error to Handle
             logger.error({ application: {
                 sequelizeModel: sequelizeModel,
-                queryOptions: queryOptions,
+                queryOptions: queryOptionsProvider(request),
                 request: request,
                 error: error,
-            } }, 'findAllAndRespond() Query Failure');
+            } }, 'findAllAndRespond() Query Options Provider Failure');
             respondWith500(response);
-        });
+        } // End of Check Query Options Provider Error to Handle
+    } // End of Call Query Options Provider Then Perform Query
     return response;
 });
 export const findByPKAndRespond = curry((
@@ -93,32 +151,35 @@ export const findByPKAndRespond = curry((
     } // End of Validate ID Parameter
     return response;
 });
-export const FindAllByFKAndRespond = curry((
-    sequelizeModel:                 ModelCtor<Model<any, any>>,
-    queryResultsHandler:            Function,
-    invalidIdHandler:               Function,
-    foreignKeyName:                 string,
-    extractedForeignIdValidator:    (extractedId: number) => validationResponse,
-    foreignIdExtractor:             (request: Request) => number,
-    queryOptions:                   FindOptions,
-    request:                        Request,
-    response:                       Response
-): Response => {
-    const foreignId = foreignIdExtractor(request);
-    if (extractedForeignIdValidator(foreignId).boolean) { // Validate Foreign ID Parameter
-        findAllAndRespond(
-            sequelizeModel,
-            queryResultsHandler,
-            // TODO: Add Not Found Handler
-            insertWhereEqualsToQueryOptions(foreignKeyName, foreignId, queryOptions),
-            request,
-            response
-        );
-    } else { // Middle of Validate Foreign ID Parameter
-        invalidIdHandler(response);
-    } // End of Validate Foreign ID Parameter
-    return response;
-});
+// TODO: Update NotesController and remove FindAllByFKAndRespond()
+// export const FindAllByFKAndRespond = curry((
+//     sequelizeModel:                 ModelCtor<Model<any, any>>,
+//     queryResultsHandler:            Function,
+//     invalidIdHandler:               Function,
+//     foreignKeyName:                 string,
+//     extractedForeignIdValidator:    (extractedId: number) => validationResponse,
+//     foreignIdProvider:              (request: Request) => number,
+//     queryOptions:                   FindOptions,
+//     request:                        Request,
+//     response:                       Response
+// ): Response => {
+//     const foreignId = foreignIdProvider(request);
+//     const queryOptionsProvider = (request: Request): FindOptions => insertWhereEqualsToQueryOptions(foreignKeyName, foreignId, queryOptions);
+//     if (extractedForeignIdValidator(foreignId).boolean) { // Validate Foreign ID Parameter
+//         findAllAndRespond(
+//             sequelizeModel,
+//             queryResultsHandler,
+//             // TODO: Add Not Found Handler
+//             queryOptionsProvider,
+//             request,
+//             response
+//         );
+//         // No logging or error-handling necessary, taken care of by findAllAndRespond()
+//     } else { // Middle of Validate Foreign ID Parameter
+//         invalidIdHandler(response);
+//     } // End of Validate Foreign ID Parameter
+//     return response;
+// });
 export const createAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
     validationFailureHandler:       Function,
