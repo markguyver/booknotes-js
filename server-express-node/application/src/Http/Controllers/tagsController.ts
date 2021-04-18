@@ -106,66 +106,6 @@ const createTagRecordFromRequestData = createTagRecord(extractNewTagFromRequestD
 // Define Endpoint Handlers
 const listAllTags = fetchAllTags(provideFindOptionsUnmodified(listTagsWithAuthorBookAndNoteCountsQueryOptions));
 const displayTagById = fetchTagByIdFromRequestData(displayTagWithAuthorsBooksAndNotes);
-const listTagsByBookId = (request: Request, response: Response): Response => {
-
-    // TODO Refactor This
-
-    const bookId = parseInt(request.params.bookId);
-    // const bookId = validateIdParameter(request.params.bookId, response);
-    if (bookId) { // Check Passed ID Parameter Validation
-        Tags.findAll({
-            attributes: ['id', 'tag'],
-            paranoid: false,
-            include: [{
-                model: Books,
-                paranoid: false,
-                required: true,
-                attributes: [],
-                where: { id: bookId },
-            }],
-        }).then(result => {
-            if (result) { // Check for Results
-                response.type('json');
-                response.send({ Tags: result });
-            } else { // Middle of Check for Results
-                response.status(404).send();
-            } // End of Check for Results
-        }).catch(error => {
-            response.status(500).send();
-        });
-    } // End of Check Passed ID Parameter Validation
-    return response;
-};
-const listTagsByAuthorId = (request: Request, response: Response): Response => {
-
-    // TODO Refactor This
-
-    const authorId = parseInt(request.params.authorId);
-    // const authorId = validateIdParameter(request.params.authorId, response);
-    if (authorId) { // Check Passed ID Parameter Validation
-        Tags.findAll({
-            attributes: ['id', 'tag'],
-            paranoid: false,
-            include: [{
-                model: Authors,
-                paranoid: false,
-                required: true,
-                attributes: [],
-                where: { id: authorId },
-            }],
-        }).then(result => {
-            if (result) { // Check for Results
-                response.type('json');
-                response.send({ Tags: result });
-            } else { // Middle of Check for Results
-                response.status(404).send();
-            } // End of Check for Results
-        }).catch(error => {
-            response.status(500).send();
-        });
-    } // End of Check Passed ID Parameter Validation
-    return response;
-};
 const listTagsByAuthorIdFromRequestData = fetchAllTags(provideFindOptionsModified(listTagsByAuthorIdQueryOptions, addWhereAuthorIdClauseToTagListQueryOptions));
 const listTagsByBookIdFromRequestData = fetchAllTags(provideFindOptionsModified(listTagsByBookIdQueryOptions, addWhereBookIdClauseToTagListQueryOptions));
 
