@@ -1,6 +1,6 @@
 import { Request, Router } from 'express';
 import { FindOptions } from 'sequelize';
-import { sequelizeInstance } from '../../database';
+import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
 import {
     addWhereForeignIdClauseToResourceListQueryOptions,
     extractStringParameterValueFromRequestData,

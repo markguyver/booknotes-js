@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Map } from 'immutable';
 import { allPass, curry, has, is, propEq } from 'ramda';
 import { Model, ModelCtor, FindOptions, Includeable } from 'sequelize';
-import { insertWhereEqualsToQueryOptions } from '../database';
+import { insertWhereEqualsToQueryOptions } from '../Database/Relational/database-sequelize';
 import { logger } from '../logger';
 
 // Data Types

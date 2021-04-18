@@ -1,5 +1,5 @@
 import { Sequelize, Model, DataTypes, Includeable, WhereOptions } from 'sequelize';
-import { logger } from './logger';
+import { logger } from '../../logger';
 
 // Prepare General Helpers
 export const insertWhereEqualsToQueryOptions = (

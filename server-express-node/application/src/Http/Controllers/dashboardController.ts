@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
-import { sequelizeInstance } from '../../database';
+import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
 import { provideFindOptionsUnmodified } from '../helpers';
 import { fetchAllAuthors } from '../Models/authorsModel';
 import { fetchAllBooks } from '../Models/booksModel';

@@ -1,4 +1,4 @@
-import { sequelizeInstance } from '../../database';
+import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
 import {
     validationResponse,
     validationResponseBaseFail,
