@@ -15,7 +15,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",
-    "ckeditor4": "^4.16.0",
+    "ckeditor4": "^4.16.1",
     "ckeditor4-vue": "^0.1.0",
     "core-js": "^3.10.1",
     "immutable": "^4.0.0-rc.12",
