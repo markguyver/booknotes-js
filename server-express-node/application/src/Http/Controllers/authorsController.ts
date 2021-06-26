@@ -109,10 +109,10 @@ const listAuthorsByTagIdQueryOptions: FindOptions = {
 
 // Prepare Resource-Specific Data Handler Methods
 const extractNewAuthorFromRequestData = (request: Request): AuthorObject => ({
-    first_name:         extractStringParameterValueFromRequestData('first_name', request) || undefined,
-    middle_name:        extractStringParameterValueFromRequestData('middle_name', request) || undefined,
+    first_name:         extractStringParameterValueFromRequestData('first_name', request) || null,
+    middle_name:        extractStringParameterValueFromRequestData('middle_name', request) || null,
     last_name:          extractStringParameterValueFromRequestData('last_name', request),
-    parent_author_id:   extractIntParameterValueFromRequestData('parent_author_id', request) || undefined,
+    parent_author_id:   extractIntParameterValueFromRequestData('parent_author_id', request) || null,
 });
 const addWhereBookIdClauseToAuthorListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
     BookAuthors,

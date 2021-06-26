@@ -19,11 +19,11 @@ import {
 
 // Types
 export interface AuthorObject {
-    id?:                number | undefined;
-    first_name?:        string | undefined;
-    middle_name?:       string | undefined;
+    id?:                number | null;
+    first_name?:        string | null;
+    middle_name?:       string | null;
     last_name?:         string;
-    parent_author_id?:  number | undefined;
+    parent_author_id?:  number | null;
 };
 
 // Initialize Database Models
