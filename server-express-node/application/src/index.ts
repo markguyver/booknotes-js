@@ -1,5 +1,6 @@
-import bodyParser from 'body-parser';
+import { json as bodyParserJson, urlencoded as bodyParserUrlEncoded } from 'body-parser';
 import express from 'express';
+import { corsConfiguration } from './cors';
 import { logger, expressLogger } from './logger';
 
 import { authorsRoutes, authorRoutes } from './Http/Controllers/authorsController';
@@ -17,8 +18,9 @@ expressServerInstance.disable('x-powered-by');
 
 // Server Middleware
 expressServerInstance.use(expressLogger);
-expressServerInstance.use(bodyParser.json());
-expressServerInstance.use(bodyParser.urlencoded({ extended: true }));
+expressServerInstance.use(bodyParserJson());
+expressServerInstance.use(bodyParserUrlEncoded({ extended: true }));
+expressServerInstance.use(corsConfiguration);
 
 // Root-Level Requests
 expressServerInstance.get('/', (request: express.Request, response: express.Response): express.Response => response.type('json').send({ status: 'alive' }));
