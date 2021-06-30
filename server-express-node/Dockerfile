@@ -8,4 +8,6 @@ CMD ["npm", "start"]
 
 # Application Provisioning
 COPY application /var/node
-RUN npm install --omit=dev && npm run compile
+RUN npm install --omit=dev && \
+    npm run compile && \
+    rm -r src
