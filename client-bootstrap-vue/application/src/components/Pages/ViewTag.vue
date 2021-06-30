@@ -44,13 +44,13 @@ export default {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getTagBrowseBreadcrumb(),this.getTagViewBreadcrumb()]);
         const tagId = this.validateIdValue(this.tagId);
         if (false !== tagId) { // Check Tag ID Validation
-            this.getBookById(tagId).then(tagMap => {
+            this.getTagById(tagId).then(tagMap => {
 
                 // this.tag = tagMap;
                 this.tag = tagMap.toJSON(); // TODO: Temporarily Convert ImmutableObjects to JS
-                    this.tagAuthors = this.tag.Authors;
-                    this.tagBooks = this.tag.Books;
-                    this.tagNotes = this.tag.Notes;
+                this.tagAuthors = this.tag.Authors;
+                this.tagBooks = this.tag.Books;
+                this.tagNotes = this.tag.Notes;
                 this.transitionFromLoadingToPage();
 
             }).catch(() => this.transitionFromLoadingToError('Error retrieving tag.'));
