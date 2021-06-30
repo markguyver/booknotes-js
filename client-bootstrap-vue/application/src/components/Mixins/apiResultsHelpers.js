@@ -39,6 +39,17 @@ const getImmutableFirstTagResult = compose(getFirstResult, getImmutableTagResult
 const getAllTags = () => axios.get('/tags').then(getImmutableTagResults);
 const getTagById = tagId => axios.get('/tag/' + tagId).then(getImmutableFirstTagResult);
 
+// Validation Helpers
+const validateIdValue = idValueToValidate => {
+    const idValueAsInteger = parseInt(idValueToValidate);
+    if (!isNaN(idValueAsInteger)) { // Verify ID is Integer
+        if (idValueAsInteger > 0) { // Verify ID is Greater-Than Zero
+            return idValueAsInteger;
+        } // End of Verify ID is Greater-Than Zero
+    } // End of Verify ID is Integer
+    return false;
+};
+
 // Browse Resource Sidebar Helpers
 const filterDeleted = item => !item.get('deleted_at');
 const filterNull = item => null != item;
@@ -61,5 +72,7 @@ export default {
 
         filterDeleted,
         filterNull,
+
+        validateIdValue,
     },
 };

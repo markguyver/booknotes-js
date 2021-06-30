@@ -26,7 +26,7 @@
 </div></template>
 
 <script>
-import axios from 'axios';
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 import AuthorSubList from '../PageElements/AuthorSubList.vue';
 import BookSubList from '../PageElements/BookSubList.vue';
@@ -39,39 +39,24 @@ export default {
         tagBooks: [],
         tagNotes: [],
     };},
-	mixins: [pageHelpers],
+	mixins: [pageHelpers, apiResultsHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getTagBrowseBreadcrumb(),this.getTagViewBreadcrumb()]);
+        const tagId = this.validateIdValue(this.tagId);
+        if (false !== tagId) { // Check Tag ID Validation
+            this.getBookById(tagId).then(tagMap => {
 
-
-        /* eslint no-console: ["error", { allow: ["log"] }] */
-        console.log('View Tag:', this); // TODO Delete This
-
-
-        const tagId = parseInt(this.tagId);
-        if (!isNaN(tagId)) { // Check for Numeric Book ID Parameter
-            if (tagId > 0) { // Validate Author ID Parameter (Positive Integer Greater Than Zero)
-                axios.get('/tag/' + tagId).then(response => {
-                    this.tag = response.data.Tags[0];
+                // this.tag = tagMap;
+                this.tag = tagMap.toJSON(); // TODO: Temporarily Convert ImmutableObjects to JS
                     this.tagAuthors = this.tag.Authors;
                     this.tagBooks = this.tag.Books;
                     this.tagNotes = this.tag.Notes;
-                    this.transitionFromLoadingToPage();
-                }).catch(error => {
-                    if (404 == error.response.status) { // Check Response Code for Recognized Errors (i.e. 404)
+                this.transitionFromLoadingToPage();
 
-                        // TODO Handle Book Detail 404
-
-                    } else { // Middle of Check Response Code for Recognized Errors (i.e. 404)
-                        this.transitionFromLoadingToError('Error retrieving tag.'); // Non-404 Error
-                    } // End of Check Response Code for Recognized Errors (i.e. 404)
-                });
-            } else { // Middle of Validate Author ID Parameter (Positive Integer Greater Than Zero)
-                this.transitionFromLoadingToError('Bad Tag ID.'); // Tag ID Parameter is Not a Positive Integer Greater Than Zero
-            } // End of Validate Author ID Parameter (Positive Integer Greater Than Zero)
-        } else { // Middle of Check for Numeric Author ID Parameter
-            this.transitionFromLoadingToError('Bad Tag ID.'); // Tag ID Parameter is Not a Number
-        } // End of Check for Numeric Author ID Parameter
+            }).catch(() => this.transitionFromLoadingToError('Error retrieving tag.'));
+        } else { // Middle of Check Tag ID Validation
+            this.transitionFromLoadingToError('Bad Tag ID');
+        } // End of Check Tag ID Validation
     },
     props: ['tagId'],
 }

@@ -35,8 +35,8 @@
 
 <script>
 import authorHelpers from '../Mixins/authorHelpers';
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
-import axios from 'axios';
 import NoteCreate from '../PageElements/Books/NoteCreate.vue';
 import NotesList from '../PageElements/Books/NotesList.vue';
 import AuthorSubList from '../PageElements/AuthorSubList.vue';
@@ -60,8 +60,9 @@ export default {
     };},
     methods: {
         fetchBookNotes: function() {
-            axios.get('/notes/book/' + this.book.id).then(response => {
-                this.bookNotes = response.data.Notes;
+            this.getNotesByBookId(this.book.id).then(noteList => {
+                // this.bookNotes = noteList;
+                this.bookNotes = noteList.map(currentNote => currentNote.toJSON()).toJSON(); // TODO: Temporarily Convert ImmutableObjects to JS
             }).catch(() => {
                 this.bookNotes = [];
                 this.popError('Could not retrieve notes.');
@@ -82,43 +83,24 @@ export default {
             window.addEventListener('mouseup', changeIconBack);
         },
     },
-	mixins: [authorHelpers, pageHelpers],
+	mixins: [authorHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getBookBrowseBreadcrumb(),this.getBookViewBreadcrumb()]);
+        const bookId = this.validateIdValue(this.bookId);
+        if (false !== bookId) { // Check Book ID Validation
+            this.getBookById(bookId).then(bookMap => {
 
+                // this.book = bookMap;
+                this.book = bookMap.toJSON(); // TODO: Temporarily Convert ImmutableObjects to JS
+                this.bookAuthors = this.book.BookAuthors;
+                this.bookNotes = this.book.Notes;
+                this.bookTags = this.book.Tags;
+                this.transitionFromLoadingToPage();
 
-        /* eslint no-console: ["error", { allow: ["log"] }] */
-        console.log('View Book:', this); // TODO Delete This
-
-
-        const bookId = parseInt(this.bookId);
-        if (!isNaN(bookId)) { // Check for Numeric Book ID Parameter
-            if (bookId > 0) { // Validate Author ID Parameter (Positive Integer Greater Than Zero)
-                axios.get('/book/' + bookId).then(response => {
-                    this.book = response.data.Books[0];
-                    this.bookAuthors = this.book.BookAuthors;
-                    this.bookNotes = this.book.Notes;
-                    this.bookTags = this.book.Tags;
-                    this.transitionFromLoadingToPage();
-
-                    console.log('Book Authors:', this.bookAuthors); // TODO Delete This
-                    console.log('Authors from Book Authors:', this.convertBookAuthorsToAuthorsList(this.bookAuthors)); // TODO Delete This
-
-                }).catch(error => {
-                    if (404 == error.response.status) { // Check Response Code for Recognized Errors (i.e. 404)
-
-                        // TODO Handle Book Detail 404
-
-                    } else { // Middle of Check Response Code for Recognized Errors (i.e. 404)
-                        this.transitionFromLoadingToError('Error retrieving book.'); // Non-404 Get Book Request Failure
-                    } // End of Check Response Code for Recognized Errors (i.e. 404)
-                });
-            } else { // Middle of Validate Author ID Parameter (Positive Integer Greater Than Zero)
-                this.transitionFromLoadingToError('Bad Book ID'); // Book ID Parameter is Not a Positive Integer Greater Than Zero
-            } // End of Validate Author ID Parameter (Positive Integer Greater Than Zero)
-        } else { // Middle of Check for Numeric Author ID Parameter
-            this.transitionFromLoadingToError('Bad Book ID'); // Book ID Parameter is Not a Number
-        } // End of Check for Numeric Author ID Parameter
+            }).catch(() => this.transitionFromLoadingToError('Error retrieving book.'));
+        } else { // Middle of Check Book ID Validation
+            this.transitionFromLoadingToError('Bad Book ID');
+        } // End of Check Book ID Validation
     },
     props: ['bookId'],
 }

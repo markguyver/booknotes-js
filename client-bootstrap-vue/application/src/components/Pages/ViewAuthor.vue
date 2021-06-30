@@ -34,9 +34,9 @@
 </div></template>
 
 <script>
-import axios from 'axios';
 import authorhelpers from '../Mixins/authorHelpers';
 import bookHelpers from '../Mixins/bookHelpers';
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 import AuthorSubList from '../PageElements/AuthorSubList.vue';
 import BookSubList from '../PageElements/BookSubList.vue';
@@ -47,35 +47,22 @@ export default {
     data: function() {return {
         author: {},
     };},
-    mixins: [authorhelpers, bookHelpers, pageHelpers],
+    mixins: [authorhelpers, bookHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getAuthorBrowseBreadcrumb(),this.getAuthorViewBreadcrumb()]);
-        const authorId = parseInt(this.authorId);
-        if (!isNaN(authorId)) { // Check for Numeric Author ID Parameter
-            if (authorId > 0) { // Validate Author ID Parameter (Positive Integer Greater Than Zero)
-                axios.get('/author/' + authorId).then(response => {
+        const authorId = this.validateIdValue(this.authorId);
+        if (false !== authorId) { // Check Author ID Validation
+            this.getAuthorById(authorId).then(authorMap => {
 
-                    /* eslint no-console: ["error", { allow: ["log"] }] */
-                    console.log('Author View:', response.data.Authors[0]); // TODO Delete This
+                // this.author = authorMap;
+                this.author = authorMap.toJSON(); // TODO: Temporarily Convert ImmutableObjects to JS
+                this.authorTags = this.author.Tags;
+                this.transitionFromLoadingToPage();
 
-                    this.author = response.data.Authors[0];
-                    this.authorTags = this.author.Tags;
-                    this.transitionFromLoadingToPage();
-                }).catch(error => {
-                    if (404 == error.response.status) { // Check Response Code for Recognized Errors (i.e. 404)
-
-                        // TODO Handle Author Detail 404
-
-                    } else { // Middle of Check Response Code for Recognized Errors (i.e. 404)
-                        this.transitionFromLoadingToError('Error retrieving author.'); // Non-404 Get Author Request Failure
-                    } // End of Check Response Code for Recognized Errors (i.e. 404)
-                });
-            } else { // Middle of Validate Author ID Parameter (Positive Integer Greater Than Zero)
-                this.transitionFromLoadingToError('Bad Author ID'); // Author ID Parameter is Not a Positive Integer Greater Than Zero
-            } // End of Validate Author ID Parameter (Positive Integer Greater Than Zero)
-        } else { // Middle of Check for Numeric Author ID Parameter
-            this.transitionFromLoadingToError('Bad Author ID'); // Author ID Parameter is Not a Number
-        } // End of Check for Numeric Author ID Parameter
+            }).catch(() => this.transitionFromLoadingToError('Error retrieving author.'));
+        } else { // Middle of Check Author ID Validation
+            this.transitionFromLoadingToError('Bad Author ID');
+        } // End of Check Author ID Validation
     },
     props: ['authorId'],
 };
