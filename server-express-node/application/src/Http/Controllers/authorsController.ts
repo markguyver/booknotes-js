@@ -1,4 +1,5 @@
 import { Request, Router } from 'express';
+import { Map } from 'immutable';
 import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
 import {
@@ -108,12 +109,12 @@ const listAuthorsByTagIdQueryOptions: FindOptions = {
 };
 
 // Prepare Resource-Specific Data Handler Methods
-const extractNewAuthorFromRequestData = (request: Request): AuthorObject => ({
-    first_name:         extractStringParameterValueFromRequestData('first_name', request) || null,
-    middle_name:        extractStringParameterValueFromRequestData('middle_name', request) || null,
+const extractNewAuthorFromRequestData = (request: Request): AuthorObject => Map({
+    first_name:         extractStringParameterValueFromRequestData('first_name', request),
+    middle_name:        extractStringParameterValueFromRequestData('middle_name', request),
     last_name:          extractStringParameterValueFromRequestData('last_name', request),
-    parent_author_id:   extractIntParameterValueFromRequestData('parent_author_id', request) || null,
-});
+    parent_author_id:   extractIntParameterValueFromRequestData('parent_author_id', request),
+}).filter(value => -1 == ['', 'null', 'NaN'].indexOf(String(value).toString())).toJSON();
 const addWhereBookIdClauseToAuthorListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
     BookAuthors,
     extractBookIdFromRequestData,
