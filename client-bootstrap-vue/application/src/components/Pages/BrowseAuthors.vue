@@ -30,8 +30,8 @@
 <script>
 import authorHelpers from '../Mixins/authorHelpers';
 import facetHelpers from '../Mixins/facetHelpers';
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
-import axios from 'axios';
 import SidebarFacetsPanel from '../PageElements/SidebarFacetsPanel.vue';
 export default {
     name: "BrowseAuthors",
@@ -49,15 +49,14 @@ export default {
             this.authorsOnPage = authorsToShow;
         },
     },
-	mixins: [authorHelpers, facetHelpers, pageHelpers],
+	mixins: [authorHelpers, facetHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getAuthorBrowseBreadcrumb(true)]);
-        axios.get('/authors').then(response => {
-            this.authors = response.data.Authors;
+        this.getAllAuthors().then(authorList => {
+            // this.authors = authorList;
+            this.authors = authorList.map(currentAuthor => currentAuthor.toJSON()).toJSON(); // TODO: Temporarily Convert ImmutableObjects to JS
             this.transitionFromLoadingToPage();
-        }).catch(() => {
-            this.transitionFromLoadingToError('Could not retrieve authors.');
-        });
+        }).catch(() => this.transitionFromLoadingToError('Could not retrieve authors.'));
     },
 };
 </script>

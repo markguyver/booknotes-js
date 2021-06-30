@@ -28,9 +28,9 @@
 
 <script>
 import facetHelpers from '../Mixins/facetHelpers';
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 import tagHelpers from '../Mixins/tagHelpers';
-import axios from 'axios';
 import SidebarFacetsPanel from '../PageElements/SidebarFacetsPanel.vue';
 export default {
     name: "BrowseTags",
@@ -49,15 +49,14 @@ export default {
             this.tagsOnPage = tagsToShow;
         },
     },
-	mixins: [facetHelpers, pageHelpers, tagHelpers],
+	mixins: [facetHelpers, apiResultsHelpers, pageHelpers, tagHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getTagBrowseBreadcrumb(true)]);
-        axios.get('/tags').then(response => {
-            this.tags = response.data.Tags;
+        this.getAllTags().then(tagList => {
+            // this.tags = tagList;
+            this.tags = tagList.map(currentTag => currentTag.toJSON()).toJSON();
             this.transitionFromLoadingToPage();
-        }).catch(() => {
-            this.transitionFromLoadingToError('Could not retrieve tags.');
-        });
+        }).catch(() => this.transitionFromLoadingToError('Could not retrieve tags.'));
     },
 }
 </script>

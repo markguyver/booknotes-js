@@ -28,8 +28,8 @@
 <script>
 import bookHelpers from '../Mixins/bookHelpers';
 import facetHelpers from '../Mixins/facetHelpers';
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
-import axios from 'axios';
 import SidebarFacetsPanel from '../PageElements/SidebarFacetsPanel.vue';
 export default {
     name: "BrowseBooks",
@@ -46,15 +46,14 @@ export default {
             this.booksOnPage = booksToShow;
         },
     },
-	mixins: [bookHelpers, facetHelpers, pageHelpers],
+	mixins: [bookHelpers, facetHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getBookBrowseBreadcrumb(true)]);
-        axios.get('/books').then(response => {
-            this.books = response.data.Books;
+        this.getAllBooks().then(bookList => {
+            // this.books = bookList;
+            this.books = bookList.map(currentBook => currentBook.toJSON()).toJSON(); // TODO: Temporarily Convert ImmutableObjects to JS
             this.transitionFromLoadingToPage();
-        }).catch(() => {
-            this.transitionFromLoadingToError('Could not retrieve books.');
-        });
+        }).catch(() => this.transitionFromLoadingToError('Could not retrieve books.'));
     },
 }
 </script>
