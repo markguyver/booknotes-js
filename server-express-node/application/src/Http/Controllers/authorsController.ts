@@ -4,6 +4,7 @@ import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
 import {
     addWhereForeignIdClauseToResourceListQueryOptions,
+    removeEmptyValuesAsStrings,
     extractIntParameterValueFromRequestData,
     extractStringParameterValueFromRequestData,
     provideFindOptionsUnmodified,
@@ -114,7 +115,7 @@ const extractNewAuthorFromRequestData = (request: Request): AuthorObject => Map(
     middle_name:        extractStringParameterValueFromRequestData('middle_name', request),
     last_name:          extractStringParameterValueFromRequestData('last_name', request),
     parent_author_id:   extractIntParameterValueFromRequestData('parent_author_id', request),
-}).filter(value => -1 == ['', 'null', 'NaN'].indexOf(String(value).toString())).toJSON();
+}).filter(removeEmptyValuesAsStrings).toJSON();
 const addWhereBookIdClauseToAuthorListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
     BookAuthors,
     extractBookIdFromRequestData,

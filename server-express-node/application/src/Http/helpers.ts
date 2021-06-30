@@ -23,6 +23,8 @@ export const validationResponseBaseFail = (message: string = ''): validationResp
 export const validationResponseBaseSuccess = (): validationResponse => ({ boolean: true, type: 'success' });
 export const looksLikeAnId = (idSuspect: number): validationResponse => (!isNaN(idSuspect) && idSuspect > 0) ? validationResponseBaseSuccess() : validationResponseBaseFail();
 export const isNonEmptyString = (value: string | undefined): validationResponse => ('string' == typeof value && value.length > 0) ? validationResponseBaseSuccess() : validationResponseBaseFail();
+const emptyValuesAsStrings = ['', 'NaN', 'null', 'undefined'];
+export const removeEmptyValuesAsStrings = (valueToCheck: any): boolean => -1 == emptyValuesAsStrings.indexOf(String(valueToCheck).toString());
 
 // Prepare Data Handler Methods
 export const extractIntParameterValueFromRequestData = curry((parameterName: string, request: Request): number => parseInt(request.body[parameterName]) || parseInt(request.params[parameterName]) || NaN);
