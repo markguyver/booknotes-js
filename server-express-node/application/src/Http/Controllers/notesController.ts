@@ -6,6 +6,7 @@ import {
     NoteObject,
     extractNoteIdFromRequestData,
     fetchNoteById,
+    fetchNoteByBookId,
     createNoteRecord
 } from '../Models/notesModel';
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
@@ -29,18 +30,16 @@ const extractNewNoteFromRequestData = (request: Request): NoteObject => ({ note:
 
 // Prepare Resource-Specific ORM Methods
 const fetchNoteByIdFromRequestData = fetchNoteById(extractNoteIdFromRequestData);
-// TODO: Replace fetchNotesByBookId() => fetchAllNotes = fetchAllAndRespond(Notes, respondWithNotesPayload); fetchAllNotes(listNotesQueryOptions, provideFindOptionsModified(addWhereBookIdClauseToNoteListQueryOptions));
-// export const fetchNotesByBookId = FindAllByFKAndRespond(Notes, respondWithNotesPayload, respondInvalidBookId, 'book_id', looksLikeAnId);
-// const fetchNotesByBookIdFromRequestData = fetchNotesByBookId(extractBookIdFromRequestData);
+const fetchNotesByBookIdFromRequestData = fetchNoteByBookId(extractBookIdFromRequestData);
 const createNoteRecordFromRequestData = createNoteRecord(extractNewNoteFromRequestData);
 
 // Define Endpoint Handlers
 const displayNoteById = fetchNoteByIdFromRequestData(displayNoteQueryOptions);
-// const listAllNotesByBookId = fetchNotesByBookIdFromRequestData(listNotesQueryOptions);
+const listAllNotesByBookId = fetchNotesByBookIdFromRequestData(listNotesQueryOptions);
 
 // Register Resource Routes
 export const notesRoutes = Router();
-// notesRoutes.get('/book/:bookId', listAllNotesByBookId);
+notesRoutes.get('/book/:bookId', listAllNotesByBookId);
 notesRoutes.post('/book/:bookId', createNoteRecordFromRequestData);
 
 export const noteRoutes = Router();

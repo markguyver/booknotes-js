@@ -1,12 +1,21 @@
-import { Sequelize, Model, DataTypes, Includeable, WhereOptions } from 'sequelize';
+import { Sequelize, Model, DataTypes, Includeable, WhereOptions, FindOptions } from 'sequelize';
 import { logger } from '../../logger';
 
 // Prepare General Helpers
-export const insertWhereEqualsToQueryOptions = (
+export const insertWhereEqualsToQueryOptionsAsIncludeable = (
     columnName: string,
     columnValue: number|string,
     queryOptions: Includeable
 ): Includeable => {
+    const whereClause: WhereOptions = {};
+    whereClause[columnName] = columnValue;
+    return Object.assign({ where: whereClause }, queryOptions);
+};
+export const insertWhereEqualsToQueryOptionsAsFindOptions = (
+    columnName: string,
+    columnValue: number|string,
+    queryOptions: FindOptions
+): FindOptions => {
     const whereClause: WhereOptions = {};
     whereClause[columnName] = columnValue;
     return Object.assign({ where: whereClause }, queryOptions);

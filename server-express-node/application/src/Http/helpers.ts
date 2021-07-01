@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Map } from 'immutable';
 import { allPass, curry, has, is, propEq } from 'ramda';
 import { Model, ModelCtor, FindOptions, Includeable } from 'sequelize';
-import { insertWhereEqualsToQueryOptions } from '../Database/Relational/database-sequelize';
+import { insertWhereEqualsToQueryOptionsAsFindOptions, insertWhereEqualsToQueryOptionsAsIncludeable } from '../Database/Relational/database-sequelize';
 import { logger } from '../logger';
 
 // Data Types
@@ -63,7 +63,7 @@ export const addWhereForeignIdClauseToResourceListQueryOptions = curry((
                 has('model'),
                 propEq('model', sequelizeModelToAddForeignIdWhereClauseTo),
             ]);
-            clonedQueryOptions.include = clonedQueryOptions.include.map(item => isThisTheModelWereLookingFor(item) ? insertWhereEqualsToQueryOptions(foreignKeyName, foreignId, item) : item);
+            clonedQueryOptions.include = clonedQueryOptions.include.map(item => isThisTheModelWereLookingFor(item) ? insertWhereEqualsToQueryOptionsAsIncludeable(foreignKeyName, foreignId, item) : item);
         } // End of Check for Include Array
         return clonedQueryOptions;
     } else { // Middle of Validate Extracted Foreign ID
@@ -142,35 +142,33 @@ export const findByPKAndRespond = curry((
     } // End of Validate ID Parameter
     return response;
 });
-// TODO: Update NotesController and remove FindAllByFKAndRespond()
-// export const FindAllByFKAndRespond = curry((
-//     sequelizeModel:                 ModelCtor<Model<any, any>>,
-//     queryResultsHandler:            Function,
-//     invalidIdHandler:               Function,
-//     foreignKeyName:                 string,
-//     extractedForeignIdValidator:    (extractedId: number) => validationResponse,
-//     foreignIdProvider:              (request: Request) => number,
-//     queryOptions:                   FindOptions,
-//     request:                        Request,
-//     response:                       Response
-// ): Response => {
-//     const foreignId = foreignIdProvider(request);
-//     const queryOptionsProvider = (request: Request): FindOptions => insertWhereEqualsToQueryOptions(foreignKeyName, foreignId, queryOptions);
-//     if (extractedForeignIdValidator(foreignId).boolean) { // Validate Foreign ID Parameter
-//         findAllAndRespond(
-//             sequelizeModel,
-//             queryResultsHandler,
-//             // TODO: Add Not Found Handler
-//             queryOptionsProvider,
-//             request,
-//             response
-//         );
-//         // No logging or error-handling necessary, taken care of by findAllAndRespond()
-//     } else { // Middle of Validate Foreign ID Parameter
-//         invalidIdHandler(response);
-//     } // End of Validate Foreign ID Parameter
-//     return response;
-// });
+export const findByFKAndRespond = curry((
+    sequelizeModel:                 ModelCtor<Model<any, any>>,
+    queryResultsHandler:            Function,
+    invalidIdHandler:               Function,
+    foreignKeyName:                 string,
+    extractedForeignIdValidator:    (extractedId: number) => validationResponse,
+    foreignIdProvider:              (request: Request) => number,
+    queryOptions:                   FindOptions,
+    request:                        Request,
+    response:                       Response
+): Response => {
+    const foreignId = foreignIdProvider(request);
+    const queryOptionsProvider = (request: Request): FindOptions => insertWhereEqualsToQueryOptionsAsFindOptions(foreignKeyName, foreignId, queryOptions);
+    if (extractedForeignIdValidator(foreignId).boolean) { // Validate Foreign ID Parameter
+        findAllAndRespond(
+            sequelizeModel,
+            queryResultsHandler,
+            // TODO: Add Not Found Handler
+            queryOptionsProvider,
+            request,
+            response
+        );
+    } else { // Middle of Validate Foreign ID Parameter
+        invalidIdHandler(response);
+    } // End of Validate Foreign ID Parameter
+    return response;
+});
 export const createAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
     validationFailureHandler:       Function,

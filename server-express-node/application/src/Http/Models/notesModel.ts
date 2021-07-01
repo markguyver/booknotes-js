@@ -13,6 +13,7 @@ import {
     respondInvalidResourceId,
     extractIntParameterValueFromRequestData,
     findByPKAndRespond,
+    findByFKAndRespond,
     createAndRespond
 } from '../helpers';
 
@@ -42,6 +43,7 @@ export const validateExtractedNote = (extractedNote: NoteObject): validationResp
 
 // Prepare Resource-Specific ORM Methods
 export const fetchNoteById = findByPKAndRespond(Notes, respondWithNotesPayload, respondWithNoteNotFound, respondWithInvalidNoteId, looksLikeAnId);
+export const fetchNoteByBookId = findByFKAndRespond(Notes, respondWithNotesPayload, respondWithInvalidNoteId, 'book_id', looksLikeAnId);
 export const createNoteRecord = createAndRespond(
     Notes,
     respondWith400,
