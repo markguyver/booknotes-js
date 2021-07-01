@@ -38,10 +38,10 @@
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "eslint": "^6.8.0",
-    "nodemon": "^2.0.7",
+    "nodemon": "^2.0.9",
     "redoc": "^2.0.0-rc.54",
     "sequelize-cli": "^5.5.1",
     "typescript": "^3.9.10",
-    "uglify-js": "^3.13.9"
+    "uglify-js": "^3.13.10"
   }
 }
