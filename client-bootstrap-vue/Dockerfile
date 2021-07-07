@@ -1,5 +1,5 @@
 # Image Configuration
-FROM node:14.17.1-alpine3.13
+FROM node:14.17.2-alpine3.13
 
 # Environment Provisioning
 EXPOSE 3000/tcp
@@ -8,5 +8,7 @@ RUN npm install -g @vue/cli serve
 
 # Application Provisioning
 COPY ./application /var/node
-RUN npm install --omit=dev && npm run build
+RUN npm install --omit=dev && \
+    npm run build && \
+    rm -r src
 CMD ["serve", "/var/node/dist", "-l", "3000"]
