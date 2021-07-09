@@ -1,6 +1,6 @@
 {
   "name": "booknotes-js-client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The client-side application for my Booknotes application.",
   "author": "Mark Chavez <mark.chavez@startmail.com>",
   "license": "GPL-3.0-or-later",
