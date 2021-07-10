@@ -25,3 +25,7 @@
 Before you can use the database migration scripts via NPM (see section above), you will need to initialize and setup your environments in a config file. Luckily, Sequelize CLI provides a handy method for that.
 
 [Insert step-by-step directions here]
+
+## Application Architecture
+
+Read more about the application architecture [here](architecture.md).
