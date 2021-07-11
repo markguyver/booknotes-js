@@ -14,7 +14,8 @@ import {
     extractIntParameterValueFromRequestData,
     findByPKAndRespond,
     findByFKAndRespond,
-    createAndRespond
+    createAndRespond,
+    deleteAndRespond
 } from '../helpers';
 
 // Types
@@ -42,7 +43,13 @@ export const validateExtractedNote = (extractedNote: NoteObject): validationResp
 };
 
 // Prepare Resource-Specific ORM Methods
-export const fetchNoteById = findByPKAndRespond(Notes, respondWithNotesPayload, respondWithNoteNotFound, respondWithInvalidNoteId, looksLikeAnId);
+export const fetchNoteById = findByPKAndRespond(
+    Notes,
+    respondWithNotesPayload,
+    respondWithNoteNotFound,
+    respondWithInvalidNoteId,
+    looksLikeAnId
+);
 export const fetchNoteByBookId = findByFKAndRespond(Notes, respondWithNotesPayload, respondWithInvalidNoteId, 'book_id', looksLikeAnId);
 export const createNoteRecord = createAndRespond(
     Notes,
@@ -50,4 +57,10 @@ export const createNoteRecord = createAndRespond(
     respondWith500,
     respondWithNotesPayload,
     validateExtractedNote
+);
+export const deleteNoteRecord = deleteAndRespond(
+    Notes,
+    respondWithNoteNotFound,
+    respondWithInvalidNoteId,
+    looksLikeAnId
 );

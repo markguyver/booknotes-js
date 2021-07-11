@@ -1,15 +1,16 @@
 import { Request, Router } from 'express';
 import { FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
-import { extractStringParameterValueFromRequestData } from '../helpers';
+import { extractStringParameterValueFromRequestData, provideDestroyOptions } from '../helpers';
 import {
     NoteObject,
     extractNoteIdFromRequestData,
     fetchNoteById,
     fetchNoteByBookId,
-    createNoteRecord
+    createNoteRecord,
+    deleteNoteRecord
 } from '../Models/notesModel';
-import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
+import { extractBookIdFromRequestData } from '../Models/booksModel';
 
 // Initialize Database Models
 const Books = sequelizeInstance.models.Books;
@@ -32,6 +33,7 @@ const extractNewNoteFromRequestData = (request: Request): NoteObject => ({ note:
 const fetchNoteByIdFromRequestData = fetchNoteById(extractNoteIdFromRequestData);
 const fetchNotesByBookIdFromRequestData = fetchNoteByBookId(extractBookIdFromRequestData);
 const createNoteRecordFromRequestData = createNoteRecord(extractNewNoteFromRequestData);
+const deleteNoteRecordFromRequestData = deleteNoteRecord(extractNoteIdFromRequestData, provideDestroyOptions('id', false));
 
 // Define Endpoint Handlers
 const displayNoteById = fetchNoteByIdFromRequestData(displayNoteQueryOptions);
@@ -44,3 +46,4 @@ notesRoutes.post('/book/:bookId', createNoteRecordFromRequestData);
 
 export const noteRoutes = Router();
 noteRoutes.get('/:noteId', displayNoteById);
+noteRoutes.delete('/:noteId', deleteNoteRecordFromRequestData);

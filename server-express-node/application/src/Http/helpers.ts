@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Map } from 'immutable';
 import { allPass, curry, has, is, propEq } from 'ramda';
-import { Model, ModelCtor, FindOptions, Includeable } from 'sequelize';
+import { Model, ModelCtor, FindOptions, Includeable, WhereOptions, WhereAttributeHash } from 'sequelize';
 import { insertWhereEqualsToQueryOptionsAsFindOptions, insertWhereEqualsToQueryOptionsAsIncludeable } from '../Database/Relational/database-sequelize';
 import { logger } from '../logger';
 
@@ -14,6 +14,10 @@ export interface validationResponse {
     boolean:    boolean;
     type:       string;
     message?:   string;
+};
+type deleteModelOptions = {
+    force: boolean;
+    where: WhereAttributeHash;
 };
 
 // Prepare General Helpers (like validation)
@@ -31,8 +35,17 @@ export const extractIntParameterValueFromRequestData = curry((parameterName: str
 export const extractStringParameterValueFromRequestData = curry((parameterName: string, request: Request): string => String(request.body[parameterName]).toString() || String(request.params[parameterName]).toString());
 export const provideFindOptionsUnmodified = curry((findOptions: FindOptions, request: Request): FindOptions => findOptions);
 export const provideFindOptionsModified = curry((findOptions: FindOptions, findOptionsModifier: (findOptions: FindOptions, request: Request) => FindOptions, request: Request): FindOptions => findOptionsModifier(findOptions, request));
+export const provideDestroyOptions = curry((primaryKeyName: string, usesHardDeletes: boolean, primaryKeyValue: number): deleteModelOptions => {
+    const whereClause: WhereOptions = {};
+    whereClause[primaryKeyName] = primaryKeyValue;
+    return {
+        force: usesHardDeletes,
+        where: whereClause,
+    };
+});
 
 // Prepare HTTP Response Error Helpers
+export const respondWith204 = (response: Response): Response => response.status(204).send();
 export const respondWith400 = (response: Response, message: string = 'Bad Request'): Response => response.status(400).send(message);
 export const respondWith404 = (response: Response, message: string = 'Not found'): Response => response.status(404).send(message);
 export const respondWith500 = (response: Response, message: string = 'Internal Server Error'): Response => response.status(500).send(message);
@@ -111,8 +124,8 @@ export const findAllAndRespond = curry((
 export const findByPKAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
     queryResultsHandler:            Function,
-    notFoundHandler:                Function,
-    invalidIdHandler:               Function,
+    notFoundHandler:                (response: Response) => Response,
+    invalidIdHandler:               (response: Response) => Response,
     extractedIdValidator:           (extractedId: number) => validationResponse,
     idExtractor:                    (request: Request) => number,
     queryOptions:                   FindOptions,
@@ -145,7 +158,7 @@ export const findByPKAndRespond = curry((
 export const findByFKAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
     queryResultsHandler:            Function,
-    invalidIdHandler:               Function,
+    invalidIdHandler:               (response: Response) => Response,
     foreignKeyName:                 string,
     extractedForeignIdValidator:    (extractedId: number) => validationResponse,
     foreignIdProvider:              (request: Request) => number,
@@ -171,8 +184,8 @@ export const findByFKAndRespond = curry((
 });
 export const createAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
-    validationFailureHandler:       Function,
-    insertFailureHandler:           Function,
+    validationFailureHandler:       (response: Response, message: string | undefined) => Response,
+    insertFailureHandler:           (response: Response, message: string) => Response,
     insertSuccessHandler:           Function,
     validateExtractedValues:        (extractedObject: object) => validationResponse,
     extractValuesFromRequest:       (request: Request) => object,
@@ -197,5 +210,39 @@ export const createAndRespond = curry((
     } else { // Middle of Validate Extracted Values
         validationFailureHandler(response, newRecordValidation.message);
     } // End of Validate Extracted Values
+    return response;
+});
+export const deleteAndRespond = curry((
+    sequelizeModel:                 ModelCtor<Model<any, any>>,
+    notFoundHandler:                (response: Response) => Response,
+    invalidIdHandler:               (response: Response) => Response,
+    extractedIdValidator:           (extractedId: number) => validationResponse,
+    idExtractor:                    (request: Request) => number,
+    queryOptionsProvider:           (primaryKeyValue: number) => deleteModelOptions,
+    request:                        Request,
+    response:                       Response
+) => {
+    const id = idExtractor(request);
+    if (extractedIdValidator(id).boolean) { // Validate ID Parameter
+        const destroyOptions = queryOptionsProvider(id);
+        sequelizeModel.destroy(destroyOptions).then(result => {
+            if (result) { // Check for Results
+                respondWith204(response);
+            } else { // Middle of Check for Results
+                notFoundHandler(response);
+            } // End of Check for Results
+        }).catch(error => {
+            logger.error({ application: {
+                sequelizeModel: sequelizeModel,
+                queryOptions: destroyOptions,
+                id: id,
+                request: request,
+                error: error,
+            } }, 'deleteAndRespond() Query Failure');
+            respondWith500(response);
+        });
+    } else { // Middle of Validate ID Parameter
+        invalidIdHandler(response);
+    } // End of Validate ID Parameter
     return response;
 });
