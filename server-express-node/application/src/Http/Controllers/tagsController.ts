@@ -5,14 +5,16 @@ import {
     addWhereForeignIdClauseToResourceListQueryOptions,
     extractStringParameterValueFromRequestData,
     provideFindOptionsUnmodified,
-    provideFindOptionsModified
+    provideFindOptionsModified,
+    provideDestroyOptions
 } from '../helpers';
 import {
     TagObject,
     extractTagIdFromRequestData,
     fetchAllTags,
     fetchTagById,
-    createTagRecord
+    createTagRecord,
+    deleteTagRecord
 } from '../Models/tagsModel';
 import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from '../Models/authorsModel';
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
@@ -54,10 +56,12 @@ const displayTagWithAuthorsBooksAndNotes: FindOptions = {
     paranoid: false,
     include: [{
         model: Authors,
-        required: false,
+        required: true,
+        paranoid: true,
     },{
         model: Books,
-        required: false,
+        required: true,
+        paranoid: true,
     },{
         model: Notes,
         required: false,
@@ -102,6 +106,7 @@ const addWhereBookIdClauseToTagListQueryOptions = addWhereForeignIdClauseToResou
 // Prepare Resource-Specific ORM Methods
 const fetchTagByIdFromRequestData = fetchTagById(extractTagIdFromRequestData);
 const createTagRecordFromRequestData = createTagRecord(extractNewTagFromRequestData);
+const deleteTagRecordFromRequestData = deleteTagRecord(extractTagIdFromRequestData, provideDestroyOptions('id', false));
 
 // Define Endpoint Handlers
 const listAllTags = fetchAllTags(provideFindOptionsUnmodified(listTagsWithAuthorBookAndNoteCountsQueryOptions));
@@ -118,3 +123,4 @@ tagsRoutes.get('/book/:bookId', listTagsByBookIdFromRequestData);
 
 export const tagRoutes = Router();
 tagRoutes.get('/:tagId', displayTagById);
+tagRoutes.delete('/:tagId', deleteTagRecordFromRequestData);

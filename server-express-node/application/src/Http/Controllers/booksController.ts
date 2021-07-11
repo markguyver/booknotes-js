@@ -52,7 +52,7 @@ const listBooksWithNoteCountQueryOptions: FindOptions = {
     }, {
         model: Tags,
         required: false,
-        paranoid: false,
+        paranoid: true,
         attributes: ['id', 'tag', 'deleted_at'],
     }],
 };
@@ -75,6 +75,7 @@ const displayBookQueryOptions: FindOptions = {
     },{
         model: Tags,
         required: false,
+        paranoid: true,
     }],
 };
 const listBooksByAuthorIdQueryOptions: FindOptions = {

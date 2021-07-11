@@ -59,6 +59,7 @@ const listAuthorsWithBookCountQueryOptions: FindOptions = {
     },{
         model: Tags,
         required: false,
+        paranoid: true,
     }],
 };
 const displayAuthorQueryOptions: FindOptions = {
@@ -87,7 +88,7 @@ const displayAuthorQueryOptions: FindOptions = {
     },{
         model: Tags,
         required: false,
-        paranoid: false,
+        paranoid: true,
     }],
 };
 const listAuthorsByBookIdQueryOptions: FindOptions = {

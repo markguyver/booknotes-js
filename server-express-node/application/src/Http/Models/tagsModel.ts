@@ -14,7 +14,8 @@ import {
     extractIntParameterValueFromRequestData,
     findAllAndRespond,
     findByPKAndRespond,
-    createAndRespond
+    createAndRespond,
+    deleteAndRespond
 } from '../helpers';
 
 // Types
@@ -53,4 +54,10 @@ export const createTagRecord = createAndRespond(
     respondWith500,
     respondWithTagsPayload,
     validateExtractedTag
+);
+export const deleteTagRecord = deleteAndRespond(
+    Tags,
+    respondWithTagNotFound,
+    respondInvalidTagId,
+    looksLikeAnId
 );
