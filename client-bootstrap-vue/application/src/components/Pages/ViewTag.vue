@@ -7,7 +7,13 @@
     </b-row>
     <b-card-group deck v-if="displayPage">
         <b-card body-class="px-2 py-2">
-            <b-card-title>{{ tag.tag }}</b-card-title>
+            <b-card-title>
+                {{ tag.tag }}
+                <b-badge id="tag-deleted-at" variant="danger" v-if="tag.deletedAt" class="ml-3" style="font-size: 0.8rem; vertical-align: middle;">
+                    Deleted
+                    <b-tooltip target="tag-deleted-at" placement="right" variant="primary">{{ prettyDateTime(tag.deletedAt) }}</b-tooltip>
+                </b-badge>
+            </b-card-title>
             <b-list-group flush>
                 <b-list-group-item>
                     <div class="h6">Authors <span class="muted">({{ tagAuthors.length }})</span></div>
