@@ -14,7 +14,8 @@ import {
     extractIntParameterValueFromRequestData,
     findAllAndRespond,
     findByPKAndRespond,
-    createAndRespond
+    createAndRespond,
+    deleteAndRespond
 } from '../helpers';
 
 // Types
@@ -56,4 +57,10 @@ export const createAuthorRecord = createAndRespond(
     respondWith500,
     respondWithAuthorsPayload,
     validateExtractedAuthor
+);
+export const deleteAuthorRecord = deleteAndRespond(
+    Authors,
+    respondWithAuthorNotFound,
+    respondInvalidAuthorId,
+    looksLikeAnId
 );

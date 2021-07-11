@@ -14,7 +14,8 @@ import {
     extractIntParameterValueFromRequestData,
     findAllAndRespond,
     findByPKAndRespond,
-    createAndRespond
+    createAndRespond,
+    deleteAndRespond
 } from '../helpers';
 
 // Types
@@ -50,4 +51,10 @@ export const createBookRecord = createAndRespond(
     respondWith500,
     respondWithBooksPayload,
     validateExtractedBook
+);
+export const deleteBookRecord = deleteAndRespond(
+    Books,
+    respondWithBookNotFound,
+    respondInvalidBookId,
+    looksLikeAnId
 );

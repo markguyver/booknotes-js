@@ -5,14 +5,16 @@ import {
     addWhereForeignIdClauseToResourceListQueryOptions,
     extractStringParameterValueFromRequestData,
     provideFindOptionsUnmodified,
-    provideFindOptionsModified
+    provideFindOptionsModified,
+    provideDestroyOptions
 } from '../helpers';
 import {
     BookObject,
     extractBookIdFromRequestData,
     fetchAllBooks,
     fetchBookById,
-    createBookRecord
+    createBookRecord,
+    deleteBookRecord
 } from '../Models/booksModel';
 import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from '../Models/authorsModel';
 import { respondInvalidTagId, extractTagIdFromRequestData } from '../Models/tagsModel';
@@ -64,8 +66,8 @@ const displayBookQueryOptions: FindOptions = {
         required: false,
         include: [{
             model: Authors,
-            required: false,
-            paranoid: false,
+            required: true,
+            paranoid: true,
         },{
             model: ContributionTypes,
             required: false,
@@ -114,6 +116,7 @@ const addWhereTagIdClauseToBookListQueryOptions = addWhereForeignIdClauseToResou
 // Prepare Resource-Specific ORM Methods
 const fetchBookByIdFromRequestData = fetchBookById(extractBookIdFromRequestData);
 const createBookRecordFromRequestData = createBookRecord(extractNewBookFromRequestData);
+const deleteBookRecordFromRequestData = deleteBookRecord(extractBookIdFromRequestData, provideDestroyOptions('id', false));
 
 // Define Endpoint Handlers
 const listAllBooks = fetchAllBooks(provideFindOptionsUnmodified(listBooksWithNoteCountQueryOptions));
@@ -130,3 +133,4 @@ booksRoutes.get('/tag/:tagId', listBooksByTagIdFromRequestData);
 
 export const bookRoutes = Router();
 bookRoutes.get('/:bookId', displayBookById);
+bookRoutes.delete('/:bookId', deleteBookRecordFromRequestData);

@@ -8,14 +8,16 @@ import {
     extractIntParameterValueFromRequestData,
     extractStringParameterValueFromRequestData,
     provideFindOptionsUnmodified,
-    provideFindOptionsModified
+    provideFindOptionsModified,
+    provideDestroyOptions
 } from '../helpers';
 import {
     AuthorObject,
     extractAuthorIdFromRequestData,
     fetchAllAuthors,
     fetchAuthorById,
-    createAuthorRecord
+    createAuthorRecord,
+    deleteAuthorRecord
 } from '../Models/authorsModel';
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
 import { respondInvalidTagId, extractTagIdFromRequestData } from '../Models/tagsModel';
@@ -76,8 +78,8 @@ const displayAuthorQueryOptions: FindOptions = {
         required: false,
         include: [{
             model: Books,
-            required: false,
-            paranoid: false,
+            required: true,
+            paranoid: true,
         },{
             model: ContributionTypes,
             required: false,
@@ -132,6 +134,7 @@ const addWhereTagIdClauseToAuthorListQueryOptions = addWhereForeignIdClauseToRes
 // Prepare Resource-Specific ORM Methods
 const fetchAuthorByIdFromRequestData = fetchAuthorById(extractAuthorIdFromRequestData);
 const createAuthorRecordFromRequestData = createAuthorRecord(extractNewAuthorFromRequestData);
+const deleteAuthorRecordFromRequestData = deleteAuthorRecord(extractAuthorIdFromRequestData, provideDestroyOptions('id', false));
 
 // Define Endpoint Handlers
 const listAllAuthors = fetchAllAuthors(provideFindOptionsUnmodified(listAuthorsWithBookCountQueryOptions));
@@ -148,3 +151,4 @@ authorsRoutes.get('/tag/:tagId', listAuthorsByTagIdFromRequestData);
 
 export const authorRoutes = Router();
 authorRoutes.get('/:authorId', displayAuthorById);
+authorRoutes.delete('/:authorId', deleteAuthorRecordFromRequestData);
