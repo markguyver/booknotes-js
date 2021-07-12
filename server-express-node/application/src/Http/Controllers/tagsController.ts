@@ -56,18 +56,19 @@ const displayTagWithAuthorsBooksAndNotes: FindOptions = {
     paranoid: false,
     include: [{
         model: Authors,
-        required: true,
+        required: false,
         paranoid: true,
     },{
         model: Books,
-        required: true,
+        required: false,
         paranoid: true,
     },{
         model: Notes,
         required: false,
         include: [{
             model: Books,
-            required: false,
+            required: true,
+            paranoid: true,
         }],
     }],
 };

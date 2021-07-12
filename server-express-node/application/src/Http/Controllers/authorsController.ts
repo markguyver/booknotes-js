@@ -83,7 +83,7 @@ const displayAuthorQueryOptions: FindOptions = {
             paranoid: true,
         },{
             model: ContributionTypes,
-            required: false,
+            required: true,
         }],
     },{
         model: Tags,
