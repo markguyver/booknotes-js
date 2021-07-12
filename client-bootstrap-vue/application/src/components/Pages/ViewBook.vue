@@ -16,14 +16,14 @@
             </b-card-title>
             <b-list-group flush>
                 <b-list-group-item id="book-tags">
-                    <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span></div>
+                    <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span> <IconButton v-on:button-push="addTagsToBook()" /></div>
                     <TagSubList :tags="bookTags" />
 
                     <!-- Adding a Tag to this Book Should be a Page Element Component -->
 
                 </b-list-group-item>
                 <b-list-group-item id="book-authors">
-                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <b-icon :icon="addAuthorIcon" :variant="addAuthorIconVariant" v-b-hover="handleIconHover" @mousedown="handleIconClick"></b-icon></div>
+                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <IconButton v-on:button-push="addAuthorsToBook()" /></div>
                     <AuthorSubList :authors="convertBookAuthorsToAuthorsList(bookAuthors)" />
 
                     <!-- Adding an Author to this Book Should Be a Page Element Component -->
@@ -43,6 +43,7 @@
 import authorHelpers from '../Mixins/authorHelpers';
 import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
+import IconButton from '../PageElements/IconButton.vue';
 import NoteCreate from '../PageElements/Books/NoteCreate.vue';
 import NotesList from '../PageElements/Books/NotesList.vue';
 import AuthorSubList from '../PageElements/AuthorSubList.vue';
@@ -50,6 +51,7 @@ import TagSubList from '../PageElements/TagSubList.vue';
 export default {
     name: "ViewBook",
     components: {
+        IconButton,
         NotesList,
         NoteCreate,
         AuthorSubList,
@@ -60,9 +62,6 @@ export default {
         bookAuthors: [],
         bookNotes: [],
         bookTags: [],
-        addAuthorIcon: 'plus-circle',
-        addAuthorIconVariant: 'primary',
-        addAuthorIconClicked: false,
     };},
     methods: {
         fetchBookNotes: function() {
@@ -74,19 +73,13 @@ export default {
                 this.popError('Could not retrieve notes.');
             });
         },
-        handleIconHover: function(isHovered) {
-            this.addAuthorIcon = isHovered || this.addAuthorIconClicked ? 'plus-circle-fill' : 'plus-circle';
+        addTagsToBook: function() {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Add Tags to Book Button Pushed');
         },
-        handleIconClick: function() {
-            this.addAuthorIconClicked = true;
-            this.addAuthorIconVariant = 'secondary';
-            const changeIconBack = () => {
-                this.addAuthorIconVariant = 'primary';
-                this.addAuthorIconClicked = false;
-                this.addAuthorIcon = 'plus-circle';
-                window.removeEventListener('mouseup', changeIconBack);
-            };
-            window.addEventListener('mouseup', changeIconBack);
+        addAuthorsToBook: function() {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Add Authors to Book Button Pushed');
         },
     },
 	mixins: [authorHelpers, apiResultsHelpers, pageHelpers],
@@ -118,8 +111,5 @@ export default {
 }
 #book-view .list-group .list-group-item .list-group .list-group-item span {
     font-size: 0.7rem;
-}
-#book-view .list-group .list-group-item div.h6 svg:hover {
-
 }
 </style>

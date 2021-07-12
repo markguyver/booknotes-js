@@ -16,11 +16,11 @@
             </b-card-title>
             <b-list-group flush>
                 <b-list-group-item>
-                    <div class="h6">Authors <span class="muted">({{ tagAuthors.length }})</span></div>
+                    <div class="h6">Authors <span class="muted">({{ tagAuthors.length }})</span> <IconButton v-on:button-push="addAuthorsToTag()" /></div>
                     <AuthorSubList :authors="tagAuthors" />
                 </b-list-group-item>
                 <b-list-group-item>
-                    <div class="h6">Books <span class="muted">({{ tagBooks.length }})</span></div>
+                    <div class="h6">Books <span class="muted">({{ tagBooks.length }})</span> <IconButton v-on:button-push="addBooksToTag()" /></div>
                     <BookSubList :books="tagBooks" />
                 </b-list-group-item>
                 <b-list-group-item>
@@ -34,17 +34,28 @@
 <script>
 import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
+import IconButton from '../PageElements/IconButton.vue';
 import AuthorSubList from '../PageElements/AuthorSubList.vue';
 import BookSubList from '../PageElements/BookSubList.vue';
 export default {
     name: "ViewTag",
-    components: { AuthorSubList, BookSubList },
+    components: { AuthorSubList, BookSubList, IconButton },
     data: function() {return {
         tag: {},
         tagAuthors: [],
         tagBooks: [],
         tagNotes: [],
     };},
+    methods: {
+        addAuthorsToTag: function() {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Add Authors to Tag Button Pushed');
+        },
+        addBooksToTag: function() {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Add Books to Tag Button Pushed');
+        },
+    },
 	mixins: [pageHelpers, apiResultsHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getTagBrowseBreadcrumb(),this.getTagViewBreadcrumb()]);

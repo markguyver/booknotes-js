@@ -17,11 +17,11 @@
             <div v-if="author.ActualAuthor" class="text-muted actual-author">Real Name: <b-link v-bind:to="'/author/' + author.ActualAuthor.id">{{ getAuthorFullName(author.ActualAuthor) }}</b-link></div>
             <b-list-group flush>
                 <b-list-group-item>
-                    <div class="h6">Tags <span class="muted">({{ author.Tags.length }})</span></div>
+                    <div class="h6">Tags <span class="muted">({{ author.Tags.length }})</span> <IconButton v-on:button-push="addTagstoAuthor()" /></div>
                     <TagSubList :tags="author.Tags" />
                 </b-list-group-item>
                 <b-list-group-item>
-                    <div class="h6">Books <span class="muted">({{ author.BookAuthors.length }})</span></div>
+                    <div class="h6">Books <span class="muted">({{ author.BookAuthors.length }})</span> <IconButton v-on:button-push="addBookstoAuthor()" /></div>
                     <BookSubList :books="convertBookAuthorsToBooksList(author.BookAuthors)" />
                 </b-list-group-item>
                 <b-list-group-item>
@@ -38,15 +38,26 @@ import authorhelpers from '../Mixins/authorHelpers';
 import bookHelpers from '../Mixins/bookHelpers';
 import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
+import IconButton from '../PageElements/IconButton.vue';
 import AuthorSubList from '../PageElements/AuthorSubList.vue';
 import BookSubList from '../PageElements/BookSubList.vue';
 import TagSubList from '../PageElements/TagSubList.vue';
 export default {
     name: "ViewAuthor",
-    components: { AuthorSubList, BookSubList, TagSubList },
+    components: { AuthorSubList, BookSubList, TagSubList, IconButton },
     data: function() {return {
         author: {},
     };},
+    methods: {
+        addTagstoAuthor: function() {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Add Tags to Author Button Pushed');
+        },
+        addBookstoAuthor: function() {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Add Books to Author Button Pushed');
+        },
+    },
     mixins: [authorhelpers, bookHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getAuthorBrowseBreadcrumb(),this.getAuthorViewBreadcrumb()]);
