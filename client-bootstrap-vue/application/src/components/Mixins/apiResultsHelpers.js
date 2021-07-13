@@ -37,6 +37,7 @@ const getImmutableFirstNoteResult = compose(getFirstResult, getImmutableNoteResu
 const getNotesByBookId = bookId => axios.get(getFullApiUrl('/notes/book/' + bookId)).then(getImmutableNoteResults);
 const getNoteById = noteId => axios.get(getFullApiUrl('/note/' + noteId)).then(getImmutableFirstNoteResult);
 const deleteNoteById = noteId => axios.delete(getFullApiUrl('/note/' + noteId));
+const postNoteByBookId = (bookId, note) => axios.post(getFullApiUrl('/notes/book/' + bookId), { note, bookId });
 
 // Tags API Helpers
 const getImmutableTagResults = getImmutableApiResults('Tags');
@@ -76,6 +77,7 @@ export default {
         getNotesByBookId,
         getNoteById,
         deleteNoteById,
+        postNoteByBookId,
 
         getAllTags,
         getTagById,

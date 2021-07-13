@@ -6,8 +6,8 @@
 </div></template>
 
 <script>
-import axios from 'axios';
 import CKEditor from 'ckeditor4-vue';
+import apiResultsHelpers from '../../Mixins/apiResultsHelpers';
 import pageHelpers from '../../Mixins/pageHelpers';
 const notePlaceholder = '<p>Put your note here</p>';
 export default {
@@ -34,19 +34,10 @@ export default {
         saveNote: function() {
             if (this.editorData) { // Check for Note Content
                 if (this.editorData.trim() != notePlaceholder) { // Verify Note Content is Not Placeholder Text
-                    axios.post('/notes/book/' + this.bookId, {
-                        note: this.editorData.trim(),
-                        book_id: this.bookId,
-                    }).then(() => {
+                    this.postNoteByBookId(this.bookId, this.editorData.trim()).then(() => {
                         this.editorData = notePlaceholder;
                         this.$emit('noteCreated');
-                    }).catch(() => {
-                        this.$bvToast.toast('Note could not be saved.', {
-                            title: 'Saving Error',
-                            variant: 'danger',
-                            solid: true,
-                        });
-                    });
+                    }).catch(() => this.popError('Note could not be saved.', 'Saving Error'));
                 } else { // Middle of Verify Note Content is Not Placeholder Text
                     this.popError('Cannot create note using placeholder text.', 'Create Note Error');
                 } // End of Verify Note Content is Not Placeholder Text
@@ -55,7 +46,7 @@ export default {
             } // End of Check for Note Content
         },
     },
-    mixins: [pageHelpers],
+    mixins: [apiResultsHelpers, pageHelpers],
     name: "NoteCreate",
     props: {
         bookId: Number,
