@@ -78,6 +78,7 @@ const displayBookQueryOptions: FindOptions = {
         required: false,
         paranoid: true,
     }],
+    order: [[Notes, 'id', 'desc'], [BookAuthors, Authors, 'id', 'asc'], [BookAuthors, ContributionTypes, 'name', 'asc']],
 };
 const listBooksByAuthorIdQueryOptions: FindOptions = {
     order: [['title', 'ASC']],

@@ -17,7 +17,7 @@ const Books = sequelizeInstance.models.Books;
 const Notes = sequelizeInstance.models.Notes;
 
 // Prepare Resource-Specific Variables
-const listNotesQueryOptions: FindOptions = {};
+const listNotesQueryOptions: FindOptions = { order: [['id', 'desc']] };
 const displayNoteQueryOptions: FindOptions = {
     include: [{
         model: Books,
