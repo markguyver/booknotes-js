@@ -19,9 +19,10 @@ import {
 } from '../helpers';
 
 // Types
-export interface NoteObject {
-    id?:    number | undefined;
-    note?:   string;
+export interface SubmittedNoteCandidate {
+    id?:        number;
+    note?:      string;
+    book_id?:   number;
 };
 
 // Initialize Database Models
@@ -35,10 +36,13 @@ export const respondWithInvalidNoteId = respondInvalidResourceId('Note');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractNoteIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('note_id', request) || extractIntParameterValueFromRequestData('noteId', request);
-export const validateExtractedNote = (extractedNote: NoteObject): validationResponse => {
+export const validateExtractedNote = (extractedNote: SubmittedNoteCandidate): validationResponse => {
     if (false == isNonEmptyString(extractedNote.note).boolean) { // Verify Note (required) Parameter Is Set
         return validationResponseBaseFail('Missing (required) note');
     } // End of Verify Note (required) Parameter Is Set
+    if (false == looksLikeAnId(extractedNote.book_id || NaN).boolean) { // Verify Book ID (required) Parameter Is Set
+        return validationResponseBaseFail('Missing (required) book ID');
+    } // End of Verify Book ID (required) Parameter Is Set
     return validationResponseBaseSuccess();
 };
 

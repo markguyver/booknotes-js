@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
 import {
     validationResponse,
@@ -17,12 +18,11 @@ import {
 
 // Types
 export interface ContributionTypeObject {
-    id?:    number | undefined;
+    id?:    number;
     name?:  string;
 };
 
 // Initialize Database Models
-const BookAuthors = sequelizeInstance.models.BookAuthors;
 const ContributionTypes = sequelizeInstance.models.ContributionTypes;
 
 // Prepare Resource-Specific Response Handler Methods
@@ -31,7 +31,7 @@ export const respondWithContributionTypeNotFound = respondWithResourceNotFound('
 export const respondInvalidContributionTypeId = respondInvalidResourceId('Contribution Type');
 
 // Prepare Resource-Specific Data Handler Methods
-export const extractContributionTypeIdFromRequestData = extractIntParameterValueFromRequestData('contributionTypeId');
+export const extractContributionTypeIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('contribution_type_id', request) || extractIntParameterValueFromRequestData('contributionTypeId', request);
 export const validateExtractedContributionType = (extractedObject: ContributionTypeObject): validationResponse => {
     if (false == isNonEmptyString(extractedObject.name).boolean) { // Verify Name (required) Parameter Is Set
         return validationResponseBaseFail('Missing (required) contribution type name');

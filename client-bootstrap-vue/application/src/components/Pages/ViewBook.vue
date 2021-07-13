@@ -16,23 +16,28 @@
             </b-card-title>
             <b-list-group flush>
                 <b-list-group-item id="book-tags">
-                    <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span> <IconButton v-on:button-push="addTagsToBook()" /></div>
-                    <TagSubList :tags="bookTags" />
+                    <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span> <IconButton id="add-tag-to-book-button" @button-push="addTagsToBook()" class="float-right" /></div>
+                    <b-tooltip target="add-tag-to-book-button" placement="left" variant="secondary">Add Tag(s) to Book</b-tooltip>
+                    <TagSubList :tags="bookTags" @remove-tag="removeTagFromBook" />
 
                     <!-- Adding a Tag to this Book Should be a Page Element Component -->
 
                 </b-list-group-item>
                 <b-list-group-item id="book-authors">
-                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <IconButton v-on:button-push="addAuthorsToBook()" /></div>
-                    <AuthorSubList :authors="convertBookAuthorsToAuthorsList(bookAuthors)" />
+                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <IconButton id="add-author-to-book-button" @button-push="addAuthorsToBook()" class="float-right" /></div>
+                    <b-tooltip target="add-author-to-book-button" placement="left" variant="secondary">Add Author(s) to Book</b-tooltip>
+                    <AuthorSubList :authors="convertBookAuthorsToAuthorsList(bookAuthors)" @remove-author="removeAuthorFromBook" />
 
                     <!-- Adding an Author to this Book Should Be a Page Element Component -->
 
                 </b-list-group-item>
                 <b-list-group-item id="book-notes">
-                    <div class="h6">Notes <span class="muted">({{ bookNotes.length }})</span></div>
-                    <NotesList :notes="bookNotes" />
-                    <b-row class="mt-3"><b-col /><b-col cols="12"><NoteCreate v-on:noteCreated="fetchBookNotes" :bookId="book.id" /></b-col><b-col /></b-row>
+                    <div class="h6">Notes <span class="muted">({{ bookNotes.length }})</span> <IconButton id="add-note-to-book-button" @button-push="collapseNoteCreateButtonPushed" :activeIconName="collapseNoteCreateActiveButton" :inactiveIconName="collapseNoteCreateInactiveButton" class="float-right" /></div>
+                    <b-tooltip target="add-note-to-book-button" placement="left" variant="secondary">{{ noteCreateButtonTooltipText }}</b-tooltip>
+                    <b-collapse v-model="collapseNoteCreateVisible">
+                        <CreateNoteElement v-on:noteCreated="fetchBookNotes" :bookId="book.id" />
+                    </b-collapse>
+                    <NotesSubList :notes="bookNotes" :key="noteListKey" @note-deleted="removeNoteFromList" />
                 </b-list-group-item>
             </b-list-group>
         </b-card>
@@ -44,16 +49,16 @@ import authorHelpers from '../Mixins/authorHelpers';
 import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 import IconButton from '../PageElements/IconButton.vue';
-import NoteCreate from '../PageElements/Books/NoteCreate.vue';
-import NotesList from '../PageElements/Books/NotesList.vue';
+import CreateNoteElement from '../PageElements/CreateNoteElement.vue';
+import NotesSubList from '../PageElements/NotesSubList.vue';
 import AuthorSubList from '../PageElements/AuthorSubList.vue';
 import TagSubList from '../PageElements/TagSubList.vue';
 export default {
     name: "ViewBook",
     components: {
         IconButton,
-        NotesList,
-        NoteCreate,
+        NotesSubList,
+        CreateNoteElement,
         AuthorSubList,
         TagSubList,
     },
@@ -62,12 +67,21 @@ export default {
         bookAuthors: [],
         bookNotes: [],
         bookTags: [],
+        noteListKey: '',
+        collapseNoteCreateVisible: false,
+        collapseNoteCreateActiveButton: '',
+        collapseNoteCreateInactiveButton: '',
+        noteCreateButtonTooltipText: '',
     };},
     methods: {
+        setNoteListKey: function() {
+            this.noteListKey = this.bookNotes.map(currentNote => currentNote.id).join(',');
+        },
         fetchBookNotes: function() {
             this.getNotesByBookId(this.book.id).then(noteList => {
                 // this.bookNotes = noteList;
                 this.bookNotes = noteList.map(currentNote => currentNote.toJSON()).toJSON(); // TODO: Temporarily Convert ImmutableObjects to JS
+                this.setNoteListKey();
             }).catch(() => {
                 this.bookNotes = [];
                 this.popError('Could not retrieve notes.');
@@ -81,6 +95,40 @@ export default {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
             console.log('Add Authors to Book Button Pushed');
         },
+        removeAuthorFromBook: function(author) {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Remove Author From Book, Author:', author);
+        },
+        removeTagFromBook: function(tagId) {
+            this.deleteBookTagById(this.book.id, tagId).then(() => {
+                this.popInfo('The tag has been removed from the book.');
+                this.author.Tags = this.bookTags.filter(currentTag => currentTag.id !== tagId);
+            }).catch(() => this.popError('Failed to remove the tag from the book.', 'Deletion Error'));
+        },
+        removeNoteFromList: function(noteId) {
+            // TODO: Update the Note Count Without Forcing a Complete Reload
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Update Note Count Because Note Was Removed, Note ID:', noteId);
+        },
+        collapseNoteCreateButtonPushed: function() {
+            if (this.collapseNoteCreateVisible) { // Check Create Note Button State and Toggle
+                this.setCreateNoteButtonToCollapsedState();
+            } else { // Middle of Check Create Note Button State and Toggle
+                this.setCreateNoteButtonToExpandedState();
+            } // End of Check Create Note Button State and Toggle
+        },
+        setCreateNoteButtonToCollapsedState: function() {
+            this.collapseNoteCreateInactiveButton = 'plus-circle';
+            this.collapseNoteCreateActiveButton = 'plus-circle-fill';
+            this.noteCreateButtonTooltipText = 'Show Create Note';
+            this.collapseNoteCreateVisible = false;
+        },
+        setCreateNoteButtonToExpandedState: function() {
+            this.collapseNoteCreateInactiveButton = 'arrow-up-circle';
+            this.collapseNoteCreateActiveButton = 'arrow-up-circle-fill';
+            this.noteCreateButtonTooltipText = 'Hide Create Note';
+            this.collapseNoteCreateVisible = true;
+        },
     },
 	mixins: [authorHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {
@@ -93,7 +141,9 @@ export default {
                 this.book = bookMap.toJSON(); // TODO: Temporarily Convert ImmutableObjects to JS
                 this.bookAuthors = this.book.BookAuthors;
                 this.bookNotes = this.book.Notes;
+                this.setNoteListKey();
                 this.bookTags = this.book.Tags;
+                this.setCreateNoteButtonToCollapsedState();
                 this.transitionFromLoadingToPage();
 
             }).catch(() => this.transitionFromLoadingToError('Error retrieving book.'));

@@ -19,15 +19,12 @@ import {
 } from '../helpers';
 
 // Types
-export interface TagObject {
-    id?:    number | undefined;
+export interface SubmittedTagCandidate {
+    id?:    number;
     tag?:   string;
 };
 
 // Initialize Database Models
-const Authors = sequelizeInstance.models.Authors;
-const Books = sequelizeInstance.models.Books;
-const Notes = sequelizeInstance.models.Notes;
 const Tags = sequelizeInstance.models.Tags;
 
 // Prepare Resource-Specific Response Handler Methods
@@ -38,7 +35,7 @@ export const respondInvalidTagId = respondInvalidResourceId('Tag');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractTagIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('tag_id', request) || extractIntParameterValueFromRequestData('tagId', request);
-export const validateExtractedTag = (extractedBook: TagObject): validationResponse => {
+export const validateExtractedTag = (extractedBook: SubmittedTagCandidate): validationResponse => {
     if (false == isNonEmptyString(extractedBook.tag).boolean) { // Verify Tag (required) Parameter Is Set
         return validationResponseBaseFail('Missing (required) tag');
     } // End of Verify Tag (required) Parameter Is Set

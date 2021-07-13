@@ -3,7 +3,7 @@ import { FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
 import { extractStringParameterValueFromRequestData, provideDestroyOptions } from '../helpers';
 import {
-    NoteObject,
+    SubmittedNoteCandidate,
     extractNoteIdFromRequestData,
     fetchNoteById,
     fetchNoteByBookId,
@@ -27,7 +27,10 @@ const displayNoteQueryOptions: FindOptions = {
 };
 
 // Prepare Resource-Specific Data Handler Methods
-const extractNewNoteFromRequestData = (request: Request): NoteObject => ({ note: extractStringParameterValueFromRequestData('note', request) });
+const extractNewNoteFromRequestData = (request: Request): SubmittedNoteCandidate => ({
+    note: extractStringParameterValueFromRequestData('note', request),
+    book_id: extractBookIdFromRequestData(request),
+});
 
 // Prepare Resource-Specific ORM Methods
 const fetchNoteByIdFromRequestData = fetchNoteById(extractNoteIdFromRequestData);

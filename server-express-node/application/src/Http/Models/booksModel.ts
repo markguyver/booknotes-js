@@ -19,8 +19,8 @@ import {
 } from '../helpers';
 
 // Types
-export interface BookObject {
-    id?:        number | undefined;
+export interface SubmittedBookCandidate {
+    id?:        number;
     title?:     string;
 };
 
@@ -35,7 +35,7 @@ export const respondInvalidBookId = respondInvalidResourceId('Book');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractBookIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('book_id', request) || extractIntParameterValueFromRequestData('bookId', request);
-export const validateExtractedBook = (extractedBook: BookObject): validationResponse => {
+export const validateExtractedBook = (extractedBook: SubmittedBookCandidate): validationResponse => {
     if (!isNonEmptyString(extractedBook.title)) { // Verify Title (required) Parameter Is Set
         return validationResponseBaseFail('Missing (required) book title');
     } // End of Verify Title (required) Parameter Is Set

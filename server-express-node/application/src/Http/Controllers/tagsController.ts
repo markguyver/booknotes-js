@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express';
+import { Request,  Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
 import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
 import {
@@ -9,7 +9,7 @@ import {
     provideDestroyOptions
 } from '../helpers';
 import {
-    TagObject,
+    SubmittedTagCandidate,
     extractTagIdFromRequestData,
     fetchAllTags,
     fetchTagById,
@@ -90,7 +90,7 @@ const listTagsByBookIdQueryOptions: FindOptions = {
 };
 
 // Prepare Resource-Specific Data Handler Methods
-const extractNewTagFromRequestData = (request: Request): TagObject => ({ tag: extractStringParameterValueFromRequestData('tag', request) });
+const extractNewTagFromRequestData = (request: Request): SubmittedTagCandidate => ({ tag: extractStringParameterValueFromRequestData('tag', request) });
 const addWhereAuthorIdClauseToTagListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
     Authors,
     extractAuthorIdFromRequestData,
@@ -125,3 +125,7 @@ tagsRoutes.get('/book/:bookId', listTagsByBookIdFromRequestData);
 export const tagRoutes = Router();
 tagRoutes.get('/:tagId', displayTagById);
 tagRoutes.delete('/:tagId', deleteTagRecordFromRequestData);
+// TODO: Remove Author From Tag Endpoint
+// TODO: Add Author To Tag Endpoint
+// TODO: Remove Book From Tag Endpoint
+// TODO: Add Book To Tag Endpoint

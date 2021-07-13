@@ -16,16 +16,20 @@
             </b-card-title>
             <b-list-group flush>
                 <b-list-group-item>
-                    <div class="h6">Authors <span class="muted">({{ tagAuthors.length }})</span> <IconButton v-on:button-push="addAuthorsToTag()" /></div>
-                    <AuthorSubList :authors="tagAuthors" />
+                    <div class="h6">Authors <span class="muted">({{ tagAuthors.length }})</span> <IconButton id="add-author-to-tag-button" @button-push="addAuthorsToTag" class="float-right" /></div>
+                    <b-tooltip target="add-author-to-tag-button" placement="left" variant="secondary">Add Author(s) to Tag</b-tooltip>
+                    <AuthorSubList :authors="tagAuthors" @remove-author="removeAuthorFromTag" />
                 </b-list-group-item>
                 <b-list-group-item>
-                    <div class="h6">Books <span class="muted">({{ tagBooks.length }})</span> <IconButton v-on:button-push="addBooksToTag()" /></div>
-                    <BookSubList :books="tagBooks" />
+                    <div class="h6">Books <span class="muted">({{ tagBooks.length }})</span> <IconButton id="add-book-to-tag-button" @button-push="addBooksToTag" class="float-right" /></div>
+                    <b-tooltip target="add-book-to-tag-button" placement="left" variant="secondary">Add Book(s) to Tag</b-tooltip>
+                    <BookSubList :books="tagBooks" @remove-book="removeBookFromTag" />
                 </b-list-group-item>
+                <!--
                 <b-list-group-item>
                     <div class="h6">Notes <span class="muted">({{ tagNotes.length }})</span></div>
                 </b-list-group-item>
+                -->
             </b-list-group>
         </b-card>
     </b-card-group>
@@ -51,9 +55,17 @@ export default {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
             console.log('Add Authors to Tag Button Pushed');
         },
+        removeAuthorFromTag: function(author) {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Remove Author From Tag, Author:', author);
+        },
         addBooksToTag: function() {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
             console.log('Add Books to Tag Button Pushed');
+        },
+        removeBookFromTag: function(book) {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Remove Book From Tag, Book:', book);
         },
     },
 	mixins: [pageHelpers, apiResultsHelpers],

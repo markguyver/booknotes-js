@@ -12,7 +12,7 @@ import {
     provideDestroyOptions
 } from '../helpers';
 import {
-    AuthorObject,
+    SubmittedCandidate,
     extractAuthorIdFromRequestData,
     fetchAllAuthors,
     fetchAuthorById,
@@ -20,6 +20,7 @@ import {
     deleteAuthorRecord
 } from '../Models/authorsModel';
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
+import { createBookAuthorContributionAndRespond } from '../Models/bookAuthorsModel';
 import { respondInvalidTagId, extractTagIdFromRequestData } from '../Models/tagsModel';
 
 // Initialize Database Models
@@ -38,6 +39,7 @@ const listAuthorsWithBookCountQueryOptions: FindOptions = {
         'last_name',
         'parent_author_id',
         'deleted_at',
+        // TODO: Fix Book Count to Not Include Deleted Books
         [Sequelize.fn('COUNT', Sequelize.col('BookAuthors.author_id')), 'bookCount'],
     ],
     group: [
@@ -113,7 +115,7 @@ const listAuthorsByTagIdQueryOptions: FindOptions = {
 };
 
 // Prepare Resource-Specific Data Handler Methods
-const extractNewAuthorFromRequestData = (request: Request): AuthorObject => Map({
+const extractNewAuthorFromRequestData = (request: Request): SubmittedCandidate => Map({
     first_name:         extractStringParameterValueFromRequestData('first_name', request),
     middle_name:        extractStringParameterValueFromRequestData('middle_name', request),
     last_name:          extractStringParameterValueFromRequestData('last_name', request),
@@ -153,3 +155,7 @@ authorsRoutes.get('/tag/:tagId', listAuthorsByTagIdFromRequestData);
 export const authorRoutes = Router();
 authorRoutes.get('/:authorId', displayAuthorById);
 authorRoutes.delete('/:authorId', deleteAuthorRecordFromRequestData);
+authorRoutes.put('/:authorId/book/:bookId', createBookAuthorContributionAndRespond);
+// TODO: Remove Tag From Author Endpoint
+// TODO: Add Tag To Author Endpoint
+// TODO: Remove Book (and ContributionType) From Author Endpoint

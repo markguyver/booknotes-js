@@ -1,9 +1,10 @@
 <template><div id="book-sub-list">
     <b-list-group v-if="books.length" flush>
-        <b-list-group-item v-for="book in books" v-bind:key="book.id" v-bind:to="'/book/' + book.id">
+        <b-list-group-item v-for="book in books" :key="book.id" :to="'/book/' + book.id">
             {{ book.title }}
             <span class="text-muted" v-if="book.ContributionType">(as {{ book.ContributionType }})</span>
-            <span href="#" class="book-delete-button"><IconButton href="#" v-on:button-push="deleteBook(book.id)" activeIconName="dash-circle-fill" inactiveIconName="dash-circle" /></span>
+            <span href="#" class="book-delete-button"><IconButton :id="'delete-book-button-' + book.id" href="#" @button-push="deleteBook(book)" activeIconName="dash-circle-fill" inactiveIconName="dash-circle" class="float-right" /></span>
+            <b-tooltip :target="'delete-book-button-' + book.id" placement="left" variant="secondary">Remove Book</b-tooltip>
         </b-list-group-item>
     </b-list-group>
 </div></template>
@@ -13,9 +14,11 @@ import IconButton from './IconButton.vue';
 export default {
     components: { IconButton },
     methods: {
-        deleteBook: function(bookId) {
+        deleteBook: function(book) {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('Delete Book Button Pushed, Book ID:', bookId);
+            console.log('Delete Book Button Pushed, Book ID:', book); // TODO: Delete This
+
+            this.$emit('remove-book', book);
         },
     },
     name: "BookSubList",

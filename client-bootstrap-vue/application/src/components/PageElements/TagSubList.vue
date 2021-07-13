@@ -15,8 +15,7 @@ export default {
     components: { IconButton },
     methods: {
         deleteTag: function(tagId) {
-            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('Delete Tag Button Pushed, Tag ID:', tagId);
+            this.$emit('remove-tag', tagId);
         },
     },
     name: "TagSubList",

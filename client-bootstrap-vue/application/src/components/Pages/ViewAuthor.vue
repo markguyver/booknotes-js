@@ -9,24 +9,29 @@
         <b-card body-class="px-2 py-2">
             <b-card-title>
                 {{ getAuthorFullName(author) }}
-                <b-badge id="author-deleted-at" variant="danger" v-if="author.deletedAt" class="ml-3" style="font-size: 0.8rem; vertical-align: middle;">
+                <b-badge id="author-deleted-at" variant="danger" v-if="author.deletedAt" class="ml-3">
                     Deleted
                     <b-tooltip target="author-deleted-at" placement="right" variant="primary">{{ prettyDateTime(author.deletedAt) }}</b-tooltip>
                 </b-badge>
+                <b-badge id="author-is-pseudonym" variant="pseudonym" v-if="author.ActualAuthor" class="ml-3">
+                    Pseudonym
+                    <b-tooltip target="author-is-pseudonym" placement="right" variant="primary dark">Real Name:<br /><b-link :to="'/author/' + author.ActualAuthor.id" class="text-reset">{{ getAuthorFullName(author.ActualAuthor) }}</b-link></b-tooltip>
+                </b-badge>
             </b-card-title>
-            <div v-if="author.ActualAuthor" class="text-muted actual-author">Real Name: <b-link v-bind:to="'/author/' + author.ActualAuthor.id">{{ getAuthorFullName(author.ActualAuthor) }}</b-link></div>
             <b-list-group flush>
                 <b-list-group-item>
-                    <div class="h6">Tags <span class="muted">({{ author.Tags.length }})</span> <IconButton v-on:button-push="addTagstoAuthor()" /></div>
-                    <TagSubList :tags="author.Tags" />
+                    <div class="h6">Tags <span class="muted">({{ author.Tags.length }})</span> <IconButton id="add-tag-to-author-button" @button-push="addTagstoAuthor()" class="float-right" /></div>
+                    <b-tooltip target="add-tag-to-author-button" placement="left" variant="secondary">Add Tag(s) to Author</b-tooltip>
+                    <TagSubList :tags="author.Tags" @remove-tag="removeTagFromAuthor" />
                 </b-list-group-item>
                 <b-list-group-item>
-                    <div class="h6">Books <span class="muted">({{ author.BookAuthors.length }})</span> <IconButton v-on:button-push="addBookstoAuthor()" /></div>
-                    <BookSubList :books="convertBookAuthorsToBooksList(author.BookAuthors)" />
+                    <div class="h6">Books <span class="muted">({{ author.BookAuthors.length }})</span> <IconButton id="add-book-to-author-button" @button-push="addBookstoAuthor()" class="float-right" /></div>
+                    <b-tooltip target="add-book-to-author-button" placement="left" variant="secondary">Add Book(s) to Author</b-tooltip>
+                    <BookSubList :books="convertBookAuthorsToBooksList(author.BookAuthors)" @remove-book="removeBookFromAuthor" />
                 </b-list-group-item>
                 <b-list-group-item>
                     <div class="h6">Pseudonyms <span class="muted">({{ author.Pseudonyms.length }})</span></div>
-                    <AuthorSubList :authors="author.Pseudonyms" />
+                    <AuthorSubList :authors="author.Pseudonyms" :pseudonyms=true />
                 </b-list-group-item>
             </b-list-group>
         </b-card>
@@ -57,6 +62,16 @@ export default {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
             console.log('Add Books to Author Button Pushed');
         },
+        removeBookFromAuthor: function(book) {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Remove Book From Author, Book:', book);
+        },
+        removeTagFromAuthor: function(tagId) {
+            this.deleteAuthorTagById(this.author.id, tagId).then(() => {
+                this.popInfo('The tag has been removed from the author.');
+                this.author.Tags = this.author.Tags.filter(currentTag => currentTag.id !== tagId);
+            }).catch(() => this.popError('Failed to remove the tag from the author.', 'Deletion Error'));
+        },
     },
     mixins: [authorhelpers, bookHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {
@@ -80,8 +95,9 @@ export default {
 </script>
 
 <style>
-#author-view .author-name {
-    text-align: center;
+#author-view .card-title .badge {
+    font-size: 0.8rem;
+    vertical-align: middle;
 }
 #author-view .list-group {
     font-size: 0.85rem;

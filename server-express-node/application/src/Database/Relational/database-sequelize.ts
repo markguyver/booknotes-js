@@ -1,5 +1,11 @@
-import { Sequelize, Model, DataTypes, Includeable, WhereOptions, FindOptions } from 'sequelize';
+import { Sequelize, Model, DataTypes, Includeable, WhereOptions, WhereAttributeHash, FindOptions } from 'sequelize';
 import { logger } from '../../logger';
+
+// Declare Types
+type SequelizeDeleteQueryOptions = {
+    force: boolean;
+    where: WhereAttributeHash;
+};
 
 // Prepare General Helpers
 export const insertWhereEqualsToQueryOptionsAsIncludeable = (

@@ -1,14 +1,16 @@
-<template><div class="note-create">
-    <b-form>
-        <ckeditor v-model="editorData" :config="editorConfig"></ckeditor>
-        <b-button class="mt-3" v-on:click="saveNote" variant="primary">Save Note</b-button>
-    </b-form>
-</div></template>
+<template><b-container class="create-note mt-3">
+    <b-overlay :show="showOverlay"><div class="note-create-form">
+        <b-form>
+            <ckeditor v-model="editorData" :config="editorConfig"></ckeditor>
+            <b-button class="mt-3" v-on:click="saveNote" variant="primary">Save Note</b-button>
+        </b-form>
+    </div></b-overlay>
+</b-container></template>
 
 <script>
 import CKEditor from 'ckeditor4-vue';
-import apiResultsHelpers from '../../Mixins/apiResultsHelpers';
-import pageHelpers from '../../Mixins/pageHelpers';
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
+import pageHelpers from '../Mixins/pageHelpers';
 const notePlaceholder = '<p>Put your note here</p>';
 export default {
     components: { 'ckeditor': CKEditor.component },
@@ -29,15 +31,18 @@ export default {
             ],
             removeButtons: 'Image,Table,Source',
         },
+        showOverlay: false,
     }; },
     methods: {
         saveNote: function() {
             if (this.editorData) { // Check for Note Content
                 if (this.editorData.trim() != notePlaceholder) { // Verify Note Content is Not Placeholder Text
+                    this.showOverlay = true;
                     this.postNoteByBookId(this.bookId, this.editorData.trim()).then(() => {
                         this.editorData = notePlaceholder;
                         this.$emit('noteCreated');
-                    }).catch(() => this.popError('Note could not be saved.', 'Saving Error'));
+                    }).catch(() => this.popError('Note could not be saved.', 'Saving Error'))
+                    .finally(() => this.showOverlay = false);
                 } else { // Middle of Verify Note Content is Not Placeholder Text
                     this.popError('Cannot create note using placeholder text.', 'Create Note Error');
                 } // End of Verify Note Content is Not Placeholder Text
@@ -55,7 +60,11 @@ export default {
 </script>
 
 <style>
-div.note-create {
+div.create-note {
+    padding-left: 0;
+    padding-right: 0;
+}
+div.create-note div.note-create-form {
     padding: 1em;
     border: 1px solid #999999;
     background-color: #aeaeae;

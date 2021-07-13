@@ -1,9 +1,10 @@
 <template><div id="author-sub-list">
     <b-list-group v-if="authors.length" flush>
-        <b-list-group-item v-for="author in authors" v-bind:key="author.id" v-bind:to="'/author/' + author.id">
+        <b-list-group-item v-for="author in authors" :key="author.id" :to="'/author/' + author.id">
             {{ getAuthorFullName(author) }}
             <span class="text-muted" v-if="author.ContributionType">(As {{ author.ContributionType }})</span>
-            <span href="#" class="author-delete-button"><IconButton href="#" v-on:button-push="deleteAuthor(author.id)" activeIconName="dash-circle-fill" inactiveIconName="dash-circle" /></span>
+            <span href="#" class="author-delete-button"><IconButton :id="'delete-author-button-' + author.id" href="#" @button-push="deleteAuthor(author)" activeIconName="dash-circle-fill" inactiveIconName="dash-circle" class="float-right" /></span>
+            <b-tooltip :target="'delete-author-button-' + author.id" placement="left" variant="secondary">Remove {{ pseudonyms ? 'Pseudonym' : 'Author' }}</b-tooltip>
         </b-list-group-item>
     </b-list-group>
 </div></template>
@@ -14,9 +15,11 @@ import IconButton from './IconButton.vue';
 export default {
     components: { IconButton },
     methods: {
-        deleteAuthor: function(authorId) {
+        deleteAuthor: function(author) {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('Delete Author Button Pushed, Author ID:', authorId);
+            console.log('Delete Author Button Pushed, Author ID:', author); // TODO: Delete This
+
+            this.$emit('remove-author', author);
         },
     },
     mixins: [authorHelpers],
@@ -25,6 +28,10 @@ export default {
         authors: {
             required: true,
             type: Array,
+        },
+        pseudonyms: {
+            default: false,
+            type: Boolean,
         },
     },
 };

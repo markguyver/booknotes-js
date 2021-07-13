@@ -19,12 +19,12 @@ import {
 } from '../helpers';
 
 // Types
-export interface AuthorObject {
-    id?:                number | null;
-    first_name?:        string | null;
-    middle_name?:       string | null;
+export interface SubmittedCandidate {
+    id?:                number;
+    first_name?:        string;
+    middle_name?:       string;
     last_name?:         string;
-    parent_author_id?:  number | null;
+    parent_author_id?:  number;
 };
 
 // Initialize Database Models
@@ -38,7 +38,7 @@ export const respondInvalidAuthorId = respondInvalidResourceId('Author');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractAuthorIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('author_id', request) || extractIntParameterValueFromRequestData('authorId', request);
-export const validateExtractedAuthor = (extractedAuthor: AuthorObject): validationResponse => {
+export const validateExtractedAuthor = (extractedAuthor: SubmittedCandidate): validationResponse => {
     if (false == isNonEmptyString(extractedAuthor.last_name).boolean) { // Verify Last Name (required) Parameter Is Set
         return validationResponseBaseFail('Missing (required) author last name');
     } // End of Verify Last Name (required) Parameter Is Set
