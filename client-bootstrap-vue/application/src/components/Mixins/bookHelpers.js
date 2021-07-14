@@ -2,9 +2,9 @@ import { always } from 'ramda';
 
 const convertBookAuthorsToBooksList = bookAuthorsArray => bookAuthorsArray.map(currentBookAuthor => {
     const book = currentBookAuthor.Book;
-    if (currentBookAuthor.ContributionType.name) {
-        book.ContributionType = currentBookAuthor.ContributionType.name;
-    }
+    if (currentBookAuthor.ContributionType.name) { // Add Contribution Type (If Present)
+        book.ContributionType = currentBookAuthor.ContributionType;
+    } // End of Add Contribution Type (If Present)
     return book;
 });
 

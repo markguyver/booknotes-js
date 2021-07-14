@@ -9,9 +9,9 @@ const getAuthorNameLastFirstMiddle = authorObject => authorObject.last_name + (a
 
 const convertBookAuthorsToAuthorsList = bookAuthorsArray => bookAuthorsArray.map(currentBookAuthor => {
     const author = currentBookAuthor.Author;
-    if (currentBookAuthor.ContributionType.name) {
-        author.ContributionType = currentBookAuthor.ContributionType.name;
-    }
+    if (currentBookAuthor.ContributionType) {// Add Contribution Type (If Present)
+        author.ContributionType = currentBookAuthor.ContributionType;
+    } // End of Add Contribution Type (If Present)
     return author;
 });
 
