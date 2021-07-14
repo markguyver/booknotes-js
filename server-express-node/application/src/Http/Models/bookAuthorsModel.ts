@@ -27,7 +27,7 @@ export interface SubmittedBookAuthorContributionCandidate {
 };
 
 // Initialize Database Models
-const BookAuthors = sequelizeInstance.models.BookAuthors;
+const BookAuthor = sequelizeInstance.models.BookAuthor;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithAuthorsPayload = respondWithResourceList('BookAuthorContributions');
@@ -42,9 +42,6 @@ export const extractBookAuthorContributionFromRequestData = (request: Request): 
     order:                  extractIntParameterValueFromRequestData('order', request),
 }).filter(removeEmptyValuesAsStrings).toJSON();
 export const validateExtractedBookAuthorContribution = (extractedBookAuthorContribution: SubmittedBookAuthorContributionCandidate): validationResponse => {
-
-    console.log('Submitted Book Author Contribution:', extractedBookAuthorContribution);
-
     if (false === looksLikeAnId(extractedBookAuthorContribution.book_id || NaN).boolean) { // Verify Book ID (Required) Parameter Is Set
         return validationResponseBaseFail('Invalid book id');
     } // End of Verify Book ID (Required) Parameter Is Set
@@ -62,7 +59,7 @@ export const validateExtractedBookAuthorContribution = (extractedBookAuthorContr
 
 // Prepare Resource-Specific ORM Methods
 export const createBookAuthorContributionAndRespond = createAndRespond(
-    BookAuthors,
+    BookAuthor,
     respondWith400,
     respondWith500,
     respondWithAuthorsPayload,

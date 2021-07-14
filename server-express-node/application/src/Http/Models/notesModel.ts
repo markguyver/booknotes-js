@@ -26,7 +26,7 @@ export interface SubmittedNoteCandidate {
 };
 
 // Initialize Database Models
-const Notes = sequelizeInstance.models.Notes;
+const Note = sequelizeInstance.models.Note;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithNotesPayload = respondWithResourceList('Notes');
@@ -48,22 +48,28 @@ export const validateExtractedNote = (extractedNote: SubmittedNoteCandidate): va
 
 // Prepare Resource-Specific ORM Methods
 export const fetchNoteById = findByPKAndRespond(
-    Notes,
+    Note,
     respondWithNotesPayload,
     respondWithNoteNotFound,
     respondWithInvalidNoteId,
     looksLikeAnId
 );
-export const fetchNoteByBookId = findByFKAndRespond(Notes, respondWithNotesPayload, respondWithInvalidNoteId, 'book_id', looksLikeAnId);
+export const fetchNoteByBookId = findByFKAndRespond(
+    Note,
+    respondWithNotesPayload,
+    respondWithInvalidNoteId,
+    'book_id', // Note.book_id
+    looksLikeAnId
+);
 export const createNoteRecord = createAndRespond(
-    Notes,
+    Note,
     respondWith400,
     respondWith500,
     respondWithNotesPayload,
     validateExtractedNote
 );
 export const deleteNoteRecord = deleteAndRespond(
-    Notes,
+    Note,
     respondWithNoteNotFound,
     respondWithInvalidNoteId,
     looksLikeAnId

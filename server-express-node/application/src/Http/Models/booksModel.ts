@@ -25,7 +25,7 @@ export interface SubmittedBookCandidate {
 };
 
 // Initialize Database Models
-const Books = sequelizeInstance.models.Books;
+const Book = sequelizeInstance.models.Book;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithBooksPayload = respondWithResourceList('Books');
@@ -43,17 +43,26 @@ export const validateExtractedBook = (extractedBook: SubmittedBookCandidate): va
 };
 
 // Prepare Resource-Specific ORM Methods
-export const fetchAllBooks = findAllAndRespond(Books, respondWithBooksPayload);
-export const fetchBookById = findByPKAndRespond(Books, respondWithBooksPayload, respondWithBookNotFound, respondInvalidBookId, looksLikeAnId);
+export const fetchAllBooks = findAllAndRespond(
+    Book,
+    respondWithBooksPayload
+);
+export const fetchBookById = findByPKAndRespond(
+    Book,
+    respondWithBooksPayload,
+    respondWithBookNotFound,
+    respondInvalidBookId,
+    looksLikeAnId
+);
 export const createBookRecord = createAndRespond(
-    Books,
+    Book,
     respondWith400,
     respondWith500,
     respondWithBooksPayload,
     validateExtractedBook
 );
 export const deleteBookRecord = deleteAndRespond(
-    Books,
+    Book,
     respondWithBookNotFound,
     respondInvalidBookId,
     looksLikeAnId

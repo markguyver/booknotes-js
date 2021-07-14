@@ -25,7 +25,7 @@ export interface SubmittedTagCandidate {
 };
 
 // Initialize Database Models
-const Tags = sequelizeInstance.models.Tags;
+const Tag = sequelizeInstance.models.Tag;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithTagsPayload = respondWithResourceList('Tags');
@@ -43,17 +43,26 @@ export const validateExtractedTag = (extractedBook: SubmittedTagCandidate): vali
 };
 
 // Prepare Resource-Specific ORM Methods
-export const fetchAllTags = findAllAndRespond(Tags, respondWithTagsPayload);
-export const fetchTagById = findByPKAndRespond(Tags, respondWithTagsPayload, respondWithTagNotFound, respondInvalidTagId, looksLikeAnId);
+export const fetchAllTags = findAllAndRespond(
+    Tag,
+    respondWithTagsPayload
+);
+export const fetchTagById = findByPKAndRespond(
+    Tag,
+    respondWithTagsPayload,
+    respondWithTagNotFound,
+    respondInvalidTagId,
+    looksLikeAnId
+);
 export const createTagRecord = createAndRespond(
-    Tags,
+    Tag,
     respondWith400,
     respondWith500,
     respondWithTagsPayload,
     validateExtractedTag
 );
 export const deleteTagRecord = deleteAndRespond(
-    Tags,
+    Tag,
     respondWithTagNotFound,
     respondInvalidTagId,
     looksLikeAnId

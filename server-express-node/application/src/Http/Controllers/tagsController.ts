@@ -20,10 +20,9 @@ import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from '../Model
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
 
 // Initialize Database Models
-const Authors = sequelizeInstance.models.Authors;
-const Books = sequelizeInstance.models.Books;
-const Notes = sequelizeInstance.models.Notes;
-const Tags = sequelizeInstance.models.Tags;
+const Author = sequelizeInstance.models.Author;
+const Book = sequelizeInstance.models.Book;
+const Note = sequelizeInstance.models.Note;
 
 // Prepare Resource-Specific Variables
 const listTagsWithAuthorBookAndNoteCountsQueryOptions: FindOptions = {
@@ -31,23 +30,23 @@ const listTagsWithAuthorBookAndNoteCountsQueryOptions: FindOptions = {
         'id',
         'tag',
         'deleted_at',
-        [Sequelize.fn('COUNT', Sequelize.col('Authors.id')), 'authorCount'],
-        [Sequelize.fn('COUNT', Sequelize.col('Books.id')), 'bookCount'],
-        [Sequelize.fn('COUNT', Sequelize.col('Notes.id')), 'noteCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('Author.id')), 'authorCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('Book.id')), 'bookCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('Note.id')), 'noteCount'],
     ],
     group: ['id', 'tag', 'deleted_at'],
     order: [['tag', 'ASC']],
     paranoid: false,
     include: [{
-        model: Authors,
+        model: Author,
         required: false,
         attributes: [],
     },{
-        model: Books,
+        model: Book,
         required: false,
         attributes: [],
     },{
-        model: Notes,
+        model: Note,
         required: false,
         attributes: [],
     }],
@@ -55,18 +54,18 @@ const listTagsWithAuthorBookAndNoteCountsQueryOptions: FindOptions = {
 const displayTagWithAuthorsBooksAndNotes: FindOptions = {
     paranoid: false,
     include: [{
-        model: Authors,
+        model: Author,
         required: false,
         paranoid: true,
     },{
-        model: Books,
+        model: Book,
         required: false,
         paranoid: true,
     },{
-        model: Notes,
+        model: Note,
         required: false,
         include: [{
-            model: Books,
+            model: Book,
             required: true,
             paranoid: true,
         }],
@@ -75,7 +74,7 @@ const displayTagWithAuthorsBooksAndNotes: FindOptions = {
 const listTagsByAuthorIdQueryOptions: FindOptions = {
     order: [['tag', 'ASC']],
     include: [{
-        model: Authors,
+        model: Author,
         required: true,
         paranoid: false,
     }],
@@ -83,7 +82,7 @@ const listTagsByAuthorIdQueryOptions: FindOptions = {
 const listTagsByBookIdQueryOptions: FindOptions = {
     order: [['tag', 'ASC']],
     include: [{
-        model: Books,
+        model: Book,
         required: true,
         paranoid: false,
     }],
@@ -92,16 +91,16 @@ const listTagsByBookIdQueryOptions: FindOptions = {
 // Prepare Resource-Specific Data Handler Methods
 const extractNewTagFromRequestData = (request: Request): SubmittedTagCandidate => ({ tag: extractStringParameterValueFromRequestData('tag', request) });
 const addWhereAuthorIdClauseToTagListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
-    Authors,
+    Author,
     extractAuthorIdFromRequestData,
     respondInvalidAuthorId,
-    'id' // Authors.id
+    'id' // Author.id
 );
 const addWhereBookIdClauseToTagListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
-    Books,
+    Book,
     extractBookIdFromRequestData,
     respondInvalidBookId,
-    'id' // Books.id
+    'id' // Book.id
 );
 
 // Prepare Resource-Specific ORM Methods
@@ -110,10 +109,22 @@ const createTagRecordFromRequestData = createTagRecord(extractNewTagFromRequestD
 const deleteTagRecordFromRequestData = deleteTagRecord(extractTagIdFromRequestData, provideDestroyOptions('id', false));
 
 // Define Endpoint Handlers
-const listAllTags = fetchAllTags(provideFindOptionsUnmodified(listTagsWithAuthorBookAndNoteCountsQueryOptions));
+const listAllTags = fetchAllTags(
+    provideFindOptionsUnmodified(listTagsWithAuthorBookAndNoteCountsQueryOptions)
+);
 const displayTagById = fetchTagByIdFromRequestData(displayTagWithAuthorsBooksAndNotes);
-const listTagsByAuthorIdFromRequestData = fetchAllTags(provideFindOptionsModified(listTagsByAuthorIdQueryOptions, addWhereAuthorIdClauseToTagListQueryOptions));
-const listTagsByBookIdFromRequestData = fetchAllTags(provideFindOptionsModified(listTagsByBookIdQueryOptions, addWhereBookIdClauseToTagListQueryOptions));
+const listTagsByAuthorIdFromRequestData = fetchAllTags(
+    provideFindOptionsModified(
+        listTagsByAuthorIdQueryOptions,
+        addWhereAuthorIdClauseToTagListQueryOptions
+    )
+);
+const listTagsByBookIdFromRequestData = fetchAllTags(
+    provideFindOptionsModified(
+        listTagsByBookIdQueryOptions,
+        addWhereBookIdClauseToTagListQueryOptions
+    )
+);
 
 // Register Resource Routes
 export const tagsRoutes = Router();

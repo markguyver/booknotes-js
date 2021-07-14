@@ -23,7 +23,7 @@ export interface ContributionTypeObject {
 };
 
 // Initialize Database Models
-const ContributionTypes = sequelizeInstance.models.ContributionTypes;
+const ContributionType = sequelizeInstance.models.ContributionType;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithContributionTypesPayload = respondWithResourceList('ContributionTypes');
@@ -40,9 +40,15 @@ export const validateExtractedContributionType = (extractedObject: ContributionT
 };
 
 // Prepare Resource-Specific ORM Methods
-export const fetchContributionTypeById = findByPKAndRespond(ContributionTypes, respondWithContributionTypesPayload, respondWithContributionTypeNotFound, respondInvalidContributionTypeId, looksLikeAnId);
+export const fetchContributionTypeById = findByPKAndRespond(
+    ContributionType,
+    respondWithContributionTypesPayload,
+    respondWithContributionTypeNotFound,
+    respondInvalidContributionTypeId,
+    looksLikeAnId
+);
 export const createContributionTypeRecord = createAndRespond(
-    ContributionTypes,
+    ContributionType,
     respondWith400,
     respondWith500,
     respondWithContributionTypesPayload,

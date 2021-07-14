@@ -13,14 +13,13 @@ import {
 import { extractBookIdFromRequestData } from '../Models/booksModel';
 
 // Initialize Database Models
-const Books = sequelizeInstance.models.Books;
-const Notes = sequelizeInstance.models.Notes;
+const Book = sequelizeInstance.models.Book;
 
 // Prepare Resource-Specific Variables
 const listNotesQueryOptions: FindOptions = { order: [['id', 'desc']] };
 const displayNoteQueryOptions: FindOptions = {
     include: [{
-        model: Books,
+        model: Book,
         required: true,
         paranoid: false,
     }],
@@ -36,7 +35,10 @@ const extractNewNoteFromRequestData = (request: Request): SubmittedNoteCandidate
 const fetchNoteByIdFromRequestData = fetchNoteById(extractNoteIdFromRequestData);
 const fetchNotesByBookIdFromRequestData = fetchNoteByBookId(extractBookIdFromRequestData);
 const createNoteRecordFromRequestData = createNoteRecord(extractNewNoteFromRequestData);
-const deleteNoteRecordFromRequestData = deleteNoteRecord(extractNoteIdFromRequestData, provideDestroyOptions('id', false));
+const deleteNoteRecordFromRequestData = deleteNoteRecord(
+    extractNoteIdFromRequestData,
+    provideDestroyOptions('id', false)
+);
 
 // Define Endpoint Handlers
 const displayNoteById = fetchNoteByIdFromRequestData(displayNoteQueryOptions);

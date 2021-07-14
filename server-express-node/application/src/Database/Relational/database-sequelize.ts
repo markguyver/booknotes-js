@@ -2,7 +2,7 @@ import { Sequelize, Model, DataTypes, Includeable, WhereOptions, WhereAttributeH
 import { logger } from '../../logger';
 
 // Declare Types
-type SequelizeDeleteQueryOptions = {
+export type SequelizeDeleteQueryOptions = {
     force: boolean;
     where: WhereAttributeHash;
 };
@@ -44,20 +44,16 @@ export const sequelizeInstance = new Sequelize(databaseSchema, databaseUsername,
     logging: message => logger.info({source:"Sequelize"}, message),
 });
 
-// Create Base Model for All Tables
-class BookNotesModel extends Model {
-}
-
 // Create Individual Models for All Tables
 
-class Authors extends BookNotesModel {
+class Author extends Model {
     public id!: number;
     public first_name!: string | null;
     public middle_name!: string | null;
     public last_name!: string;
     public parent_author_id!: number | null;
 }
-Authors.init({
+Author.init({
     id: {
         primaryKey: true,
         type: DataTypes.INTEGER.UNSIGNED,
@@ -86,7 +82,7 @@ Authors.init({
 },{
     sequelize: sequelizeInstance,
     tableName: 'authors',
-    modelName: 'Authors',
+    modelName: 'Author',
     timestamps: true,
     paranoid: true,
     underscored: true,
@@ -107,11 +103,11 @@ Authors.init({
     ],
 });
 
-class Books extends BookNotesModel {
+class Book extends Model {
     public id!: number;
     public title!: string;
 }
-Books.init({
+Book.init({
     id: {
         primaryKey: true,
         type: DataTypes.INTEGER.UNSIGNED,
@@ -126,17 +122,17 @@ Books.init({
 },{
     sequelize: sequelizeInstance,
     tableName: 'books',
-    modelName: 'Books',
+    modelName: 'Book',
     timestamps: true,
     paranoid: true,
     underscored: true,
 });
 
-class ContributionTypes extends BookNotesModel {
+class ContributionType extends Model {
     public id!: number;
     public name!: string;
 }
-ContributionTypes.init({
+ContributionType.init({
     id: {
         primaryKey: true,
         type: DataTypes.INTEGER.UNSIGNED,
@@ -151,18 +147,18 @@ ContributionTypes.init({
 },{
     sequelize: sequelizeInstance,
     tableName: 'contribution_types',
-    modelName: 'ContributionTypes',
+    modelName: 'ContributionType',
     timestamps: false,
     underscored: true,
 });
 
-class BookAuthors extends BookNotesModel {
+class BookAuthor extends Model {
     public book_id!: number;
     public author_id!: number;
     public contribution_type_id!: number;
     public order!: number | null;
 }
-BookAuthors.init({
+BookAuthor.init({
     book_id: {
         primaryKey: true,
         type: DataTypes.INTEGER.UNSIGNED,
@@ -185,18 +181,18 @@ BookAuthors.init({
 },{
     sequelize: sequelizeInstance,
     tableName: 'book_authors',
-    modelName: 'BookAuthors',
+    modelName: 'BookAuthor',
     timestamps: false,
     underscored: true,
 });
 
-class Notes extends BookNotesModel {
+class Note extends Model {
     public id!: number;
     public note!: string;
     public title!: string;
     public book_id!: number;
 }
-Notes.init({
+Note.init({
     id: {
         primaryKey: true,
         type: DataTypes.INTEGER.UNSIGNED,
@@ -218,17 +214,17 @@ Notes.init({
 },{
     sequelize: sequelizeInstance,
     tableName: 'notes',
-    modelName: 'Notes',
+    modelName: 'Note',
     timestamps: true,
     paranoid: true,
     underscored: true,
 });
 
-class Tags extends BookNotesModel {
+class Tag extends Model {
     public id!: number;
     public tag!: string;
 }
-Tags.init({
+Tag.init({
     id: {
         primaryKey: true,
         type: DataTypes.INTEGER.UNSIGNED,
@@ -243,7 +239,7 @@ Tags.init({
 },{
     sequelize: sequelizeInstance,
     tableName: 'tags',
-    modelName: 'Tags',
+    modelName: 'Tag',
     timestamps: true,
     paranoid: true,
     underscored: true,
@@ -253,25 +249,25 @@ Tags.init({
 // Define Model Relationships
 
 // Authors <=> Authors
-Authors             .belongsTo(Authors, { foreignKey: 'parent_author_id', as: 'ActualAuthor' });
-Authors             .hasMany(Authors, { foreignKey: 'parent_author_id', as: 'Pseudonyms' });
+Author              .belongsTo(Author, { foreignKey: 'parent_author_id', as: 'ActualAuthor' });
+Author              .hasMany(Author, { foreignKey: 'parent_author_id', as: 'Pseudonym' });
 
 // Authors <=> Books <=> Contribution Types
-Authors             .hasMany(BookAuthors);
-Books               .hasMany(BookAuthors);
-ContributionTypes   .hasMany(BookAuthors);
-BookAuthors         .belongsTo(Authors);
-BookAuthors         .belongsTo(Books);
-BookAuthors         .belongsTo(ContributionTypes);
+Author              .hasMany(BookAuthor);
+Book                .hasMany(BookAuthor);
+ContributionType    .hasMany(BookAuthor);
+BookAuthor          .belongsTo(Author);
+BookAuthor          .belongsTo(Book);
+BookAuthor          .belongsTo(ContributionType);
 
 // Books <=> Notes
-Books               .hasMany(Notes);
-Notes               .belongsTo(Books);
+Book                .hasMany(Note);
+Note                .belongsTo(Book);
 
 // Tags <=> Authors , Tags <=> Books , Tags <=> Notes
-Tags                .belongsToMany(Authors, { through: 'author_tags', timestamps: false });
-Authors             .belongsToMany(Tags, { through: 'author_tags', timestamps: false });
-Tags                .belongsToMany(Books, { through: 'book_tags', timestamps: false });
-Books               .belongsToMany(Tags, { through: 'book_tags', timestamps: false });
-Tags                .belongsToMany(Notes, { through: 'note_tags', timestamps: false });
-Notes               .belongsToMany(Tags, { through: 'note_tags', timestamps: false });
+Tag                 .belongsToMany(Author, { through: 'author_tags', timestamps: false });
+Author              .belongsToMany(Tag, { through: 'author_tags', timestamps: false });
+Tag                 .belongsToMany(Book, { through: 'book_tags', timestamps: false });
+Book                .belongsToMany(Tag, { through: 'book_tags', timestamps: false });
+Tag                 .belongsToMany(Note, { through: 'note_tags', timestamps: false });
+Note                .belongsToMany(Tag, { through: 'note_tags', timestamps: false });

@@ -7,10 +7,10 @@ import { fetchAllBooks } from '../Models/booksModel';
 import { fetchAllTags } from '../Models/tagsModel';
 
 // Initialize Database Models
-const Authors = sequelizeInstance.models.Authors;
-const BookAuthors = sequelizeInstance.models.BookAuthors;
-const Books = sequelizeInstance.models.Books;
-const Notes = sequelizeInstance.models.Notes;
+const Author = sequelizeInstance.models.Author;
+const BookAuthor = sequelizeInstance.models.BookAuthor;
+const Book = sequelizeInstance.models.Book;
+const Note = sequelizeInstance.models.Note;
 
 // Prepare Resource-Specific Variables
 const authorListWithBookCountDescending: FindOptions = {
@@ -21,7 +21,7 @@ const authorListWithBookCountDescending: FindOptions = {
         'last_name',
         'parent_author_id',
         'deleted_at',
-        [Sequelize.fn('COUNT', Sequelize.col('BookAuthors.author_id')), 'bookCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('BookAuthor.author_id')), 'bookCount'],
     ],
     group: [
         'id',
@@ -34,7 +34,7 @@ const authorListWithBookCountDescending: FindOptions = {
     order: [[Sequelize.col('bookCount'), 'DESC'], ['last_name', 'ASC'], ['first_name', 'ASC'], ['middle_name', 'ASC']],
     paranoid: false,
     include: [{
-        model: BookAuthors,
+        model: BookAuthor,
         required: true,
         attributes: [],
     }],
@@ -44,7 +44,7 @@ const bookListWithNoteCountDescending: FindOptions = {
         'id',
         'title',
         'deleted_at',
-        [Sequelize.fn('COUNT', Sequelize.col('Notes.book_id')), 'noteCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('Note.book_id')), 'noteCount'],
     ],
     group: [
         'id',
@@ -54,7 +54,7 @@ const bookListWithNoteCountDescending: FindOptions = {
     order: [[Sequelize.col('noteCount'), 'DESC'], ['title', 'ASC']],
     paranoid: false,
     include: [{
-        model: Notes,
+        model: Note,
         required: true,
         attributes: [],
     }],
@@ -64,8 +64,8 @@ const tagListWithAuthorAndBookCountsInAlphabeticalOrder: FindOptions = {
         'id',
         'tag',
         'deleted_at',
-        [Sequelize.fn('COUNT', Sequelize.col('Authors.id')), 'authorCount'],
-        [Sequelize.fn('COUNT', Sequelize.col('Books.id')), 'bookCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('Author.id')), 'authorCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('Book.id')), 'bookCount'],
     ],
     group: [
         'id',
@@ -75,11 +75,11 @@ const tagListWithAuthorAndBookCountsInAlphabeticalOrder: FindOptions = {
     order: [['tag', 'ASC']],
     paranoid: false,
     include: [{
-        model: Authors,
+        model: Author,
         required: false,
         attributes: [],
     },{
-        model: Books,
+        model: Book,
         required: false,
         attributes: [],
     }],

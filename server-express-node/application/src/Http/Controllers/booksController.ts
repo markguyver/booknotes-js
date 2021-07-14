@@ -21,11 +21,11 @@ import { createBookAuthorContributionAndRespond } from '../Models/bookAuthorsMod
 import { respondInvalidTagId, extractTagIdFromRequestData } from '../Models/tagsModel';
 
 // Initialize Database Models
-const Authors = sequelizeInstance.models.Authors;
-const BookAuthors = sequelizeInstance.models.BookAuthors;
-const ContributionTypes = sequelizeInstance.models.ContributionTypes;
-const Notes = sequelizeInstance.models.Notes;
-const Tags = sequelizeInstance.models.Tags;
+const Author = sequelizeInstance.models.Author;
+const BookAuthor = sequelizeInstance.models.BookAuthor;
+const ContributionType = sequelizeInstance.models.ContributionType;
+const Note = sequelizeInstance.models.Note;
+const Tag = sequelizeInstance.models.Tag;
 
 // Prepare Resource-Specific Variables
 const listBooksWithNoteCountQueryOptions: FindOptions = {
@@ -33,25 +33,25 @@ const listBooksWithNoteCountQueryOptions: FindOptions = {
         'id',
         'title',
         'deleted_at',
-        [Sequelize.fn('COUNT', Sequelize.col('Notes.book_id')), 'noteCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('Note.book_id')), 'noteCount'],
     ],
     group: [
         'id',
         'title',
         'deleted_at',
-        'Tags.id',
-        'Tags.tag',
-        'Tags.deleted_at',
+        'Tag.id',
+        'Tag.tag',
+        'Tag.deleted_at',
     ],
     order: [['title', 'ASC']],
     paranoid: false,
     include: [{
-        model: Notes,
+        model: Note,
         required: false,
         paranoid: false,
         attributes: [],
     }, {
-        model: Tags,
+        model: Tag,
         required: false,
         paranoid: true,
         attributes: ['id', 'tag', 'deleted_at'],
@@ -60,34 +60,34 @@ const listBooksWithNoteCountQueryOptions: FindOptions = {
 const displayBookQueryOptions: FindOptions = {
     paranoid: false,
     include: [{
-        model: Notes,
+        model: Note,
         required: false,
     },{
-        model: BookAuthors,
+        model: BookAuthor,
         required: false,
         include: [{
-            model: Authors,
+            model: Author,
             required: true,
             paranoid: true,
         },{
-            model: ContributionTypes,
+            model: ContributionType,
             required: false,
         }],
     },{
-        model: Tags,
+        model: Tag,
         required: false,
         paranoid: true,
     }],
-    order: [[Notes, 'id', 'desc'], [BookAuthors, Authors, 'id', 'asc'], [BookAuthors, ContributionTypes, 'name', 'asc']],
+    order: [[Note, 'id', 'desc'], [BookAuthor, Author, 'id', 'asc'], [BookAuthor, ContributionType, 'name', 'asc']],
 };
 const listBooksByAuthorIdQueryOptions: FindOptions = {
     order: [['title', 'ASC']],
     paranoid: false,
     include: [{
-        model: BookAuthors,
+        model: BookAuthor,
         required: true,
         include: [{
-            model: ContributionTypes,
+            model: ContributionType,
             required: false,
         }]
     }],
@@ -96,7 +96,7 @@ const listBooksByTagIdQueryOptions: FindOptions = {
     order: [['title', 'ASC']],
     paranoid: false,
     include: [{
-        model: Tags,
+        model: Tag,
         required: true,
     }],
 };
@@ -104,13 +104,13 @@ const listBooksByTagIdQueryOptions: FindOptions = {
 // Prepare Resource-Specific Data Handler Methods
 const extractNewBookFromRequestData = (request: Request): SubmittedBookCandidate => ({ title: extractStringParameterValueFromRequestData('title', request) });
 const addWhereAuthorIdClauseToBookListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
-    BookAuthors,
+    BookAuthor,
     extractAuthorIdFromRequestData,
     respondInvalidAuthorId,
     'author_id' // BookAuthors.author_id
 );
 const addWhereTagIdClauseToBookListQueryOptions = addWhereForeignIdClauseToResourceListQueryOptions(
-    Tags,
+    Tag,
     extractTagIdFromRequestData,
     respondInvalidTagId,
     'id' // Tags.id
@@ -124,8 +124,18 @@ const deleteBookRecordFromRequestData = deleteBookRecord(extractBookIdFromReques
 // Define Endpoint Handlers
 const listAllBooks = fetchAllBooks(provideFindOptionsUnmodified(listBooksWithNoteCountQueryOptions));
 const displayBookById = fetchBookByIdFromRequestData(displayBookQueryOptions);
-const listBooksByAuthorIdFromRequestData = fetchAllBooks(provideFindOptionsModified(listBooksByAuthorIdQueryOptions, addWhereAuthorIdClauseToBookListQueryOptions));
-const listBooksByTagIdFromRequestData = fetchAllBooks(provideFindOptionsModified(listBooksByTagIdQueryOptions, addWhereTagIdClauseToBookListQueryOptions));
+const listBooksByAuthorIdFromRequestData = fetchAllBooks(
+    provideFindOptionsModified(
+        listBooksByAuthorIdQueryOptions,
+        addWhereAuthorIdClauseToBookListQueryOptions
+    )
+);
+const listBooksByTagIdFromRequestData = fetchAllBooks(
+    provideFindOptionsModified(
+        listBooksByTagIdQueryOptions,
+        addWhereTagIdClauseToBookListQueryOptions
+    )
+);
 
 // Register Resource Routes
 export const booksRoutes = Router();

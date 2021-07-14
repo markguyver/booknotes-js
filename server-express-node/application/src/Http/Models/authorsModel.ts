@@ -19,7 +19,7 @@ import {
 } from '../helpers';
 
 // Types
-export interface SubmittedCandidate {
+export interface SubmittedAuthorCandidate {
     id?:                number;
     first_name?:        string;
     middle_name?:       string;
@@ -28,7 +28,7 @@ export interface SubmittedCandidate {
 };
 
 // Initialize Database Models
-const Authors = sequelizeInstance.models.Authors;
+const Author = sequelizeInstance.models.Author;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithAuthorsPayload = respondWithResourceList('Authors');
@@ -38,7 +38,7 @@ export const respondInvalidAuthorId = respondInvalidResourceId('Author');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractAuthorIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('author_id', request) || extractIntParameterValueFromRequestData('authorId', request);
-export const validateExtractedAuthor = (extractedAuthor: SubmittedCandidate): validationResponse => {
+export const validateExtractedAuthor = (extractedAuthor: SubmittedAuthorCandidate): validationResponse => {
     if (false == isNonEmptyString(extractedAuthor.last_name).boolean) { // Verify Last Name (required) Parameter Is Set
         return validationResponseBaseFail('Missing (required) author last name');
     } // End of Verify Last Name (required) Parameter Is Set
@@ -49,17 +49,26 @@ export const validateExtractedAuthor = (extractedAuthor: SubmittedCandidate): va
 };
 
 // Prepare Resource-Specific ORM Methods
-export const fetchAllAuthors = findAllAndRespond(Authors, respondWithAuthorsPayload);
-export const fetchAuthorById = findByPKAndRespond(Authors, respondWithAuthorsPayload, respondWithAuthorNotFound, respondInvalidAuthorId, looksLikeAnId);
+export const fetchAllAuthors = findAllAndRespond(
+    Author,
+    respondWithAuthorsPayload
+);
+export const fetchAuthorById = findByPKAndRespond(
+    Author,
+    respondWithAuthorsPayload,
+    respondWithAuthorNotFound,
+    respondInvalidAuthorId,
+    looksLikeAnId
+);
 export const createAuthorRecord = createAndRespond(
-    Authors,
+    Author,
     respondWith400,
     respondWith500,
     respondWithAuthorsPayload,
     validateExtractedAuthor
 );
 export const deleteAuthorRecord = deleteAndRespond(
-    Authors,
+    Author,
     respondWithAuthorNotFound,
     respondInvalidAuthorId,
     looksLikeAnId
