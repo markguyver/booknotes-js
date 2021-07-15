@@ -25,13 +25,13 @@
                     <TagSubList :tags="author.Tags" @remove-tag="removeTagFromAuthor" />
                 </b-list-group-item>
                 <b-list-group-item>
-                    <div class="h6">Books <span class="muted">({{ author.BookAuthors.length }})</span> <IconButton id="add-book-to-author-button" @button-push="addBookstoAuthor()" class="float-right" /></div>
+                    <div class="h6">Book Contributions <span class="muted">({{ author.BookAuthors.length }})</span> <IconButton id="add-book-to-author-button" @button-push="addBookstoAuthor()" class="float-right" /></div>
                     <b-tooltip target="add-book-to-author-button" placement="left" variant="secondary">Add Book(s) to Author</b-tooltip>
                     <BookSubList :books="convertBookAuthorsToBooksList(author.BookAuthors)" @remove-book="removeBookFromAuthor" />
                 </b-list-group-item>
                 <b-list-group-item>
-                    <div class="h6">Pseudonyms <span class="muted">({{ author.Pseudonyms.length }})</span></div>
-                    <AuthorSubList :authors="author.Pseudonyms" :pseudonyms=true />
+                    <div class="h6">Pseudonyms <span class="muted">({{ author.Pseudonym.length }})</span></div>
+                    <AuthorSubList :authors="author.Pseudonym" :pseudonyms=true />
                 </b-list-group-item>
             </b-list-group>
         </b-card>

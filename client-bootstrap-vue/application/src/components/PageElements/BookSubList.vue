@@ -1,10 +1,10 @@
 <template><div id="book-sub-list">
     <b-list-group v-if="books.length" flush>
-        <b-list-group-item v-for="book in books" :key="book.id" :to="'/book/' + book.id">
+        <b-list-group-item v-for="book in books" :key="book.id + (book.ContributionType ? ',' + book.ContributionType.id : 0)" :to="'/book/' + book.id">
             {{ book.title }}
             <span class="text-muted" v-if="book.ContributionType">(as {{ book.ContributionType.name }})</span>
             <span href="#" class="book-delete-button"><IconButton :id="'delete-book-button-' + book.id" href="#" @button-push="deleteBook(book)" activeIconName="dash-circle-fill" inactiveIconName="dash-circle" class="float-right" /></span>
-            <b-tooltip :target="'delete-book-button-' + book.id" placement="left" variant="secondary">Remove Book</b-tooltip>
+            <b-tooltip :target="'delete-book-button-' + book.id" placement="left" variant="secondary">Remove Book Contribution</b-tooltip>
         </b-list-group-item>
     </b-list-group>
 </div></template>
