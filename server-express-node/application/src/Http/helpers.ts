@@ -14,16 +14,16 @@ export interface operationResult {
 export interface queryOptionsProviderError {
     message: string;
     handler: (response: Response) => Response;
-};
+}
 export interface validationResponse {
     boolean:    boolean;
     type:       string;
     message?:   string;
-};
+}
 type deleteModelOptions = {
     force: boolean;
     where: WhereAttributeHash;
-};
+}
 
 // Prepare General Helpers (like validation)
 export const getOperationResult = (boolean: boolean, statusCode: number, message: string): operationResult => ({ boolean, statusCode, message });
