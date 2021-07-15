@@ -42,8 +42,6 @@ import {
     HasManyCountAssociationsMixin
 
 } from 'sequelize';
-import {
-} from 'sequelize';
 import { logger } from '../../logger';
 
 // Declare Types
