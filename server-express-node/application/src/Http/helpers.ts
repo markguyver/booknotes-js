@@ -6,6 +6,11 @@ import { insertWhereEqualsToQueryOptionsAsFindOptions, insertWhereEqualsToQueryO
 import { logger } from '../logger';
 
 // Data Types
+export interface operationResult {
+    statusCode: number;
+    message: string;
+    boolean: boolean;
+}
 export interface queryOptionsProviderError {
     message: string;
     handler: (response: Response) => Response;
@@ -21,6 +26,7 @@ type deleteModelOptions = {
 };
 
 // Prepare General Helpers (like validation)
+export const getOperationResult = (boolean: boolean, statusCode: number, message: string): operationResult => ({ boolean, statusCode, message });
 export const getQueryOptionsProviderError = (handler: (response:Response) => Response, message: string = '') => ({ message: message, handler: handler });
 const isQueryOptionsProviderError = (errorToTest: any): errorToTest is queryOptionsProviderError => ('function' == typeof errorToTest.handler);
 export const validationResponseBaseFail = (message: string = ''): validationResponse => ({ boolean: false, type: 'failure', message: message });
