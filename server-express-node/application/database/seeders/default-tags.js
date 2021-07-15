@@ -3,22 +3,22 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => queryInterface.bulkInsert('tags', [{
     id: 1,
-    name: 'Non-Fiction',
+    tag: 'Non-Fiction',
   },{
     id: 2,
-    name: 'Fiction',
+    tag: 'Fiction',
   },{
     id: 3,
-    name: 'Essay',
+    tag: 'Essay',
   },{
     id: 4,
-    name: 'Treatise',
+    tag: 'Treatise',
   },{
     id: 5,
-    name: 'White Paper',
+    tag: 'White Paper',
   },{
-    id: 4,
-    name: 'Book',
+    id: 6,
+    tag: 'Book',
   }]),
 
   down: async (queryInterface, Sequelize) => queryInterface.bulkDelete('tags', null, {}),
