@@ -22,7 +22,7 @@ import {
 export interface SubmittedTagCandidate {
     id?:    number;
     tag?:   string;
-};
+}
 
 // Initialize Database Models
 const Tag = sequelizeInstance.models.Tag;

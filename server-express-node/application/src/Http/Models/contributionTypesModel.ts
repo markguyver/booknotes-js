@@ -20,7 +20,7 @@ import {
 export interface ContributionTypeObject {
     id?:    number;
     name?:  string;
-};
+}
 
 // Initialize Database Models
 const ContributionType = sequelizeInstance.models.ContributionType;

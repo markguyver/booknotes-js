@@ -22,7 +22,7 @@ import {
 export interface SubmittedBookCandidate {
     id?:        number;
     title?:     string;
-};
+}
 
 // Initialize Database Models
 const Book = sequelizeInstance.models.Book;

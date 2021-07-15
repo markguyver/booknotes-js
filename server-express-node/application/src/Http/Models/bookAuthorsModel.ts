@@ -24,7 +24,7 @@ export interface SubmittedBookAuthorContributionCandidate {
     author_id?:             number;
     contribution_type_id?:  number;
     order?:                 number;
-};
+}
 
 // Initialize Database Models
 const BookAuthor = sequelizeInstance.models.BookAuthor;

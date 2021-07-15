@@ -25,7 +25,7 @@ export interface SubmittedAuthorCandidate {
     middle_name?:       string;
     last_name?:         string;
     parent_author_id?:  number;
-};
+}
 
 // Initialize Database Models
 const Author = sequelizeInstance.models.Author;

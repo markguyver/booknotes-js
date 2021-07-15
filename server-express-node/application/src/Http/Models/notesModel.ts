@@ -23,7 +23,7 @@ export interface SubmittedNoteCandidate {
     id?:        number;
     note?:      string;
     book_id?:   number;
-};
+}
 
 // Initialize Database Models
 const Note = sequelizeInstance.models.Note;
