@@ -22,7 +22,7 @@
     "express-pino-logger": "^5.0.0",
     "immutable": "^4.0.0-rc.14",
     "mysql2": "^2.1.0",
-    "pino": "^6.11.3",
+    "pino": "^6.12.0",
     "ramda": "^0.27.1",
     "sequelize": "^5.22.3"
   },
@@ -39,7 +39,7 @@
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "eslint": "^6.8.0",
-    "nodemon": "^2.0.11",
+    "nodemon": "^2.0.12",
     "redoc": "^2.0.0-rc.54",
     "sequelize-cli": "^5.5.1",
     "typescript": "^3.9.10",
