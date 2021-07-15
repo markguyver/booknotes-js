@@ -1,4 +1,4 @@
-import { always, compose, filter, join, props } from 'ramda';
+import { allPass, always, compose, filter, join, props } from 'ramda';
 
 const getAuthorFullName = compose(
     join(' '),
@@ -22,6 +22,8 @@ const showDeletedAuthors = alwaysTrue;
 const filterPseudonymAuthors = currentAuthor => !currentAuthor.parent_author_id;
 const showPseudonymAuthors = alwaysTrue;
 
+const filterDeletedAndPseudonymAuthors = allPass([filterDeletedAuthors, filterPseudonymAuthors]);
+
 export default {
     methods: {
         getAuthorFullName,
@@ -31,5 +33,6 @@ export default {
         showDeletedAuthors,
         filterPseudonymAuthors,
         showPseudonymAuthors,
+        filterDeletedAndPseudonymAuthors,
     },
 };

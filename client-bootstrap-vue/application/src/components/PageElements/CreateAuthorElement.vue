@@ -20,6 +20,7 @@
 <script>
 import axios from 'axios';
 import authorHelpers from '../Mixins/authorHelpers';
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 export default {
     name: "CreateAuthorElement",
@@ -34,12 +35,11 @@ export default {
     };},
     methods: {
         populateParentAuthorSelect: function() {
-            axios.get('/authors').then(response => {
+            this.getAllAuthors().then(response => {
                 if (Array.isArray(response.data.Authors) && response.data.Authors.length) {
                     this.parentAuthorOptions = [{ value: null, text: 'Select an Author' }]
                         .concat(Array.from(response.data.Authors)
-                            .filter(this.filterPseudonymAuthors)
-                            .filter(this.filterDeletedAuthors)
+                            .filter(this.filterDeletedAndPseudonymAuthors)
                             .map(currentAuthor => ({
                                 value: currentAuthor.id,
                                 text: this.getAuthorNameLastFirstMiddle(currentAuthor),
@@ -69,7 +69,7 @@ export default {
             this.createAuthorFormData.parent_author_id = null;
         },
     },
-    mixins: [authorHelpers, pageHelpers],
+    mixins: [authorHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {
         this.populateParentAuthorSelect();
     },
