@@ -1,4 +1,49 @@
-import { Sequelize, Model, DataTypes, Includeable, WhereOptions, WhereAttributeHash, FindOptions } from 'sequelize';
+import {
+
+    // Main Service Objects
+    Sequelize,
+    Model,
+    DataTypes,
+
+    // Query Options Data Objects
+    Includeable,
+    WhereOptions,
+    WhereAttributeHash,
+    FindOptions,
+
+    // Relationship General
+    Association,
+
+    // Relationship Mixins (Belongs To)
+    BelongsToGetAssociationMixin,
+    BelongsToSetAssociationMixin,
+    BelongsToCreateAssociationMixin,
+
+    // Relationship Mixins (Belongs To Many)
+    BelongsToManyGetAssociationsMixin,
+    BelongsToManySetAssociationsMixin,
+    BelongsToManyAddAssociationsMixin,
+    BelongsToManyAddAssociationMixin,
+    BelongsToManyCreateAssociationMixin,
+    BelongsToManyRemoveAssociationMixin,
+    BelongsToManyRemoveAssociationsMixin,
+    BelongsToManyHasAssociationMixin,
+    BelongsToManyHasAssociationsMixin,
+    BelongsToManyCountAssociationsMixin,
+
+    // Relationship Mixins (Has Many)
+    HasManyGetAssociationsMixin,
+    HasManySetAssociationsMixin,
+    HasManyAddAssociationsMixin,
+    HasManyAddAssociationMixin,
+    HasManyCreateAssociationMixin,
+    HasManyRemoveAssociationMixin,
+    HasManyRemoveAssociationsMixin,
+    HasManyCountAssociationsMixin
+
+} from 'sequelize';
+import {
+} from 'sequelize';
 import { logger } from '../../logger';
 
 // Declare Types
@@ -52,6 +97,46 @@ class Author extends Model {
     public middle_name!: string | null;
     public last_name!: string;
     public parent_author_id!: number | null;
+
+    public static associations: {
+        ActualAuthor: Association<Author, Author>,
+        Pseudonym: Association<Author, Author>,
+        BookAuthor: Association<Author, BookAuthor>,
+        Tag: Association<Author, Tag>,
+    };
+
+    public getActualAuthor!: BelongsToGetAssociationMixin<Author>;
+    public setActualAuthor!: BelongsToSetAssociationMixin<Author, number>;
+    public createActualAuthor!: BelongsToCreateAssociationMixin<Author>;
+
+    public getPseudonyms!: HasManyGetAssociationsMixin<Author>;
+    public setPseudonyms!: HasManySetAssociationsMixin<Author, number>;
+    public addPseudonyms!: HasManyAddAssociationsMixin<Author, number>;
+    public addPseudonym!: HasManyAddAssociationMixin<Author, number>;
+    public createPseudonym!: HasManyCreateAssociationMixin<Author>;
+    public removePseudonym!: HasManyRemoveAssociationMixin<Author, number>;
+    public removePseudonyms!: HasManyRemoveAssociationsMixin<Author, number>;
+    public countPseudonyms!: HasManyCountAssociationsMixin;
+
+    public getBookAuthors!: HasManyGetAssociationsMixin<BookAuthor>;
+    public setBookAuthors!: HasManySetAssociationsMixin<BookAuthor, number>;
+    public addBookAuthors!: HasManyAddAssociationsMixin<BookAuthor, number>;
+    public addBookAuthor!: HasManyAddAssociationMixin<BookAuthor, number>;
+    public createBookAuthor!: HasManyCreateAssociationMixin<BookAuthor>;
+    public removeBookAuthor!: HasManyRemoveAssociationMixin<BookAuthor, number>;
+    public removeBookAuthors!: HasManyRemoveAssociationsMixin<BookAuthor, number>;
+    public countBookAuthors!: HasManyCountAssociationsMixin;
+
+    public getTags!: BelongsToManyGetAssociationsMixin<Tag>;
+    public setTags!: BelongsToManySetAssociationsMixin<Tag, number>;
+    public addTags!: BelongsToManyAddAssociationsMixin<Tag, number>;
+    public addTag!: BelongsToManyAddAssociationMixin<Tag, number>;
+    public createTag!: BelongsToManyCreateAssociationMixin<Tag>;
+    public removeTag!: BelongsToManyRemoveAssociationMixin<Tag, number>;
+    public removeTags!: BelongsToManyRemoveAssociationsMixin<Tag, number>;
+    public hasTag!: BelongsToManyHasAssociationMixin<Tag, number>;
+    public hasTags!: BelongsToManyHasAssociationsMixin<Tag, number>;
+    public countTags!: BelongsToManyCountAssociationsMixin;
 }
 Author.init({
     id: {
@@ -106,6 +191,41 @@ Author.init({
 class Book extends Model {
     public id!: number;
     public title!: string;
+
+    public static associations: {
+        BookAuthor: Association<Book, BookAuthor>,
+        Note: Association<Book, Note>,
+        Tag: Association<Book, Tag>,
+    };
+
+    public getBookAuthors!: HasManyGetAssociationsMixin<BookAuthor>;
+    public setBookAuthors!: HasManySetAssociationsMixin<BookAuthor, number>;
+    public addBookAuthors!: HasManyAddAssociationsMixin<BookAuthor, number>;
+    public addBookAuthor!: HasManyAddAssociationMixin<BookAuthor, number>;
+    public createBookAuthor!: HasManyCreateAssociationMixin<BookAuthor>;
+    public removeBookAuthor!: HasManyRemoveAssociationMixin<BookAuthor, number>;
+    public removeBookAuthors!: HasManyRemoveAssociationsMixin<BookAuthor, number>;
+    public countBookAuthors!: HasManyCountAssociationsMixin;
+
+    public getNotes!: HasManyGetAssociationsMixin<Note>;
+    public setNotes!: HasManySetAssociationsMixin<Note, number>;
+    public addNotes!: HasManyAddAssociationsMixin<Note, number>;
+    public addNote!: HasManyAddAssociationMixin<Note, number>;
+    public createNote!: HasManyCreateAssociationMixin<Note>;
+    public removeNote!: HasManyRemoveAssociationMixin<Note, number>;
+    public removeNotes!: HasManyRemoveAssociationsMixin<Note, number>;
+    public countNotes!: HasManyCountAssociationsMixin;
+
+    public getTags!: BelongsToManyGetAssociationsMixin<Tag>;
+    public setTags!: BelongsToManySetAssociationsMixin<Tag, number>;
+    public addTags!: BelongsToManyAddAssociationsMixin<Tag, number>;
+    public addTag!: BelongsToManyAddAssociationMixin<Tag, number>;
+    public createTag!: BelongsToManyCreateAssociationMixin<Tag>;
+    public removeTag!: BelongsToManyRemoveAssociationMixin<Tag, number>;
+    public removeTags!: BelongsToManyRemoveAssociationsMixin<Tag, number>;
+    public hasTag!: BelongsToManyHasAssociationMixin<Tag, number>;
+    public hasTags!: BelongsToManyHasAssociationsMixin<Tag, number>;
+    public countTags!: BelongsToManyCountAssociationsMixin;
 }
 Book.init({
     id: {
@@ -131,6 +251,19 @@ Book.init({
 class ContributionType extends Model {
     public id!: number;
     public name!: string;
+
+    public static associations: {
+        BookAuthor: Association<ContributionType, BookAuthor>,
+    };
+
+    public getBookAuthors!: HasManyGetAssociationsMixin<BookAuthor>;
+    public setBookAuthors!: HasManySetAssociationsMixin<BookAuthor, number>;
+    public addBookAuthors!: HasManyAddAssociationsMixin<BookAuthor, number>;
+    public addBookAuthor!: HasManyAddAssociationMixin<BookAuthor, number>;
+    public createBookAuthor!: HasManyCreateAssociationMixin<BookAuthor>;
+    public removeBookAuthor!: HasManyRemoveAssociationMixin<BookAuthor, number>;
+    public removeBookAuthors!: HasManyRemoveAssociationsMixin<BookAuthor, number>;
+    public countBookAuthors!: HasManyCountAssociationsMixin;
 }
 ContributionType.init({
     id: {
@@ -157,6 +290,24 @@ class BookAuthor extends Model {
     public author_id!: number;
     public contribution_type_id!: number;
     public order!: number | null;
+
+    public static associations: {
+        Author: Association<BookAuthor, Author>,
+        Book: Association<BookAuthor, Book>,
+        ContributionType: Association<BookAuthor, ContributionType>,
+    };
+
+    public getAuthor!: BelongsToGetAssociationMixin<Author>;
+    public setAuthor!: BelongsToSetAssociationMixin<Author, number>;
+    public createAuthor!: BelongsToCreateAssociationMixin<Author>;
+
+    public getBook!: BelongsToGetAssociationMixin<Book>;
+    public setBook!: BelongsToSetAssociationMixin<Book, number>;
+    public createBook!: BelongsToCreateAssociationMixin<Book>;
+
+    public getContributionType!: BelongsToGetAssociationMixin<ContributionType>;
+    public setContributionType!: BelongsToSetAssociationMixin<ContributionType, number>;
+    public createContributionType!: BelongsToCreateAssociationMixin<ContributionType>;
 }
 BookAuthor.init({
     book_id: {
@@ -191,6 +342,26 @@ class Note extends Model {
     public note!: string;
     public title!: string;
     public book_id!: number;
+
+    public static associations: {
+        Book: Association<Note, Book>,
+        Tag: Association<Note, Tag>,
+    };
+
+    public getBook!: BelongsToGetAssociationMixin<Book>;
+    public setBook!: BelongsToSetAssociationMixin<Book, number>;
+    public createBook!: BelongsToCreateAssociationMixin<Book>;
+
+    public getTags!: BelongsToManyGetAssociationsMixin<Tag>;
+    public setTags!: BelongsToManySetAssociationsMixin<Tag, number>;
+    public addTags!: BelongsToManyAddAssociationsMixin<Tag, number>;
+    public addTag!: BelongsToManyAddAssociationMixin<Tag, number>;
+    public createTag!: BelongsToManyCreateAssociationMixin<Tag>;
+    public removeTag!: BelongsToManyRemoveAssociationMixin<Tag, number>;
+    public removeTags!: BelongsToManyRemoveAssociationsMixin<Tag, number>;
+    public hasTag!: BelongsToManyHasAssociationMixin<Tag, number>;
+    public hasTags!: BelongsToManyHasAssociationsMixin<Tag, number>;
+    public countTags!: BelongsToManyCountAssociationsMixin;
 }
 Note.init({
     id: {
@@ -223,6 +394,45 @@ Note.init({
 class Tag extends Model {
     public id!: number;
     public tag!: string;
+
+    public static associations: {
+        Author: Association<Tag, Author>,
+        Book: Association<Tag, Book>,
+        Note: Association<Tag, Note>,
+    };
+
+    public getAuthors!: BelongsToManyGetAssociationsMixin<Author>;
+    public setAuthors!: BelongsToManySetAssociationsMixin<Author, number>;
+    public addAuthors!: BelongsToManyAddAssociationsMixin<Author, number>;
+    public addAuthor!: BelongsToManyAddAssociationMixin<Author, number>;
+    public createAuthor!: BelongsToManyCreateAssociationMixin<Author>;
+    public removeAuthor!: BelongsToManyRemoveAssociationMixin<Author, number>;
+    public removeAuthors!: BelongsToManyRemoveAssociationsMixin<Author, number>;
+    public hasAuthor!: BelongsToManyHasAssociationMixin<Author, number>;
+    public hasAuthors!: BelongsToManyHasAssociationsMixin<Author, number>;
+    public countAuthors!: BelongsToManyCountAssociationsMixin;
+
+    public getBooks!: BelongsToManyGetAssociationsMixin<Book>;
+    public setBooks!: BelongsToManySetAssociationsMixin<Book, number>;
+    public addBooks!: BelongsToManyAddAssociationsMixin<Book, number>;
+    public addBook!: BelongsToManyAddAssociationMixin<Book, number>;
+    public createBook!: BelongsToManyCreateAssociationMixin<Book>;
+    public removeBook!: BelongsToManyRemoveAssociationMixin<Book, number>;
+    public removeBooks!: BelongsToManyRemoveAssociationsMixin<Book, number>;
+    public hasBook!: BelongsToManyHasAssociationMixin<Book, number>;
+    public hasBooks!: BelongsToManyHasAssociationsMixin<Book, number>;
+    public countBooks!: BelongsToManyCountAssociationsMixin;
+
+    public getNotes!: BelongsToManyGetAssociationsMixin<Note>;
+    public setNotes!: BelongsToManySetAssociationsMixin<Note, number>;
+    public addNotes!: BelongsToManyAddAssociationsMixin<Note, number>;
+    public addNote!: BelongsToManyAddAssociationMixin<Note, number>;
+    public createNote!: BelongsToManyCreateAssociationMixin<Note>;
+    public removeNote!: BelongsToManyRemoveAssociationMixin<Note, number>;
+    public removeNotes!: BelongsToManyRemoveAssociationsMixin<Note, number>;
+    public hasNote!: BelongsToManyHasAssociationMixin<Note, number>;
+    public hasNotes!: BelongsToManyHasAssociationsMixin<Note, number>;
+    public countNotes!: BelongsToManyCountAssociationsMixin;
 }
 Tag.init({
     id: {
