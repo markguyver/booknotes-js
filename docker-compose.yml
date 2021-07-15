@@ -18,6 +18,8 @@ services:
     build: ./client-bootstrap-vue
     command: npm run serve -- --port 3000
     container_name: booknotes-js-client
+    environment:
+      - VUE_APP_API_HOST=localhost
     image: booknotes-js-client
     networks:
       - booknotes-network
