@@ -39,8 +39,7 @@ const listAuthorsWithBookCountQueryOptions: FindOptions = {
         'last_name',
         'parent_author_id',
         'deleted_at',
-        // TODO: Fix Book Count to Not Include Deleted Books
-        [Sequelize.fn('COUNT', Sequelize.col('BookAuthor.author_id')), 'bookCount'],
+        [Sequelize.fn('COUNT', Sequelize.col('BookAuthors.author_id')), 'bookCount'],
     ],
     group: [
         'id',
@@ -49,8 +48,8 @@ const listAuthorsWithBookCountQueryOptions: FindOptions = {
         'last_name',
         'parent_author_id',
         'deleted_at',
-        'Tag.id',
-        'Tag.tag',
+        'Tags.id',
+        'Tags.tag',
     ],
     order: [['last_name', 'ASC'], ['first_name', 'ASC'], ['middle_name', 'ASC']],
     paranoid: false,
@@ -58,6 +57,11 @@ const listAuthorsWithBookCountQueryOptions: FindOptions = {
         model: BookAuthor,
         required: false,
         attributes: [],
+        include: [{
+            model: Book,
+            required: true,
+            paranoid: true,
+        }],
     },{
         model: Tag,
         required: false,
