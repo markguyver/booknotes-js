@@ -35,7 +35,7 @@
                     <div class="h6">Notes <span class="muted">({{ bookNotes.length }})</span> <IconButton id="add-note-to-book-button" @button-push="collapseNoteCreateButtonPushed" :activeIconName="collapseNoteCreateActiveButton" :inactiveIconName="collapseNoteCreateInactiveButton" class="float-right" /></div>
                     <b-tooltip target="add-note-to-book-button" placement="left" variant="secondary">{{ noteCreateButtonTooltipText }}</b-tooltip>
                     <b-collapse v-model="collapseNoteCreateVisible">
-                        <CreateNoteElement v-on:noteCreated="fetchBookNotes" :bookId="book.id" />
+                        <CreateNoteElement @noteCreated="fetchBookNotes" :bookId="book.id" ref="createNoteComponent" />
                     </b-collapse>
                     <NotesSubList :notes="bookNotes" :key="noteListKey" @note-deleted="removeNoteFromList" />
                 </b-list-group-item>
@@ -113,6 +113,7 @@ export default {
         collapseNoteCreateButtonPushed: function() {
             if (this.collapseNoteCreateVisible) { // Check Create Note Button State and Toggle
                 this.setCreateNoteButtonToCollapsedState();
+                this.$refs.createNoteComponent.clearNoteContent();
             } else { // Middle of Check Create Note Button State and Toggle
                 this.setCreateNoteButtonToExpandedState();
             } // End of Check Create Note Button State and Toggle
