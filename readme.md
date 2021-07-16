@@ -6,6 +6,12 @@ A web-based tool for cataloging your library and keeping notes about books that 
 
 This project has not yet reached a functioning state and is in development.
 
+## Further Documentation
+
+There is more information for each application within that application's folder:
+* [Server Documentation](server-express-node/application/readme.md)
+* [Client Documentation](client-bootstrap-vue/application/readme.md)
+
 ## How to use it
 
 At present, I am working towards my first versioned release. This means that the primary way that this application has been used is through my development workflow (_more below_).
@@ -37,7 +43,7 @@ In the root directory, there is a `docker-compose.yml` file which can be used to
     **Server:**
 
     ```bash
-    docker exec -it --rm -v ~/Documents/Projects/booknotes-js/server/application:/var/node booknotesjs_server_1:latest sh -l
+    docker exec -it --rm -v ~/Documents/Projects/booknotes-js/server-express-node/application:/var/node booknotes-js-server sh -l
     ```
 
     ```bash
@@ -47,7 +53,7 @@ In the root directory, there is a `docker-compose.yml` file which can be used to
     **Client:**
 
     ```bash
-    docker exec -it --rm -v ~/Documents/Projects/booknotes-js/client/application:/var/node booknotesjs_client_1:latest sh -l
+    docker exec -it --rm -v ~/Documents/Projects/booknotes-js/client-bootstrap-vue/application:/var/node booknotes-js-client sh -l
     ```
 
     ```bash
@@ -59,7 +65,7 @@ In the root directory, there is a `docker-compose.yml` file which can be used to
     **Server:**
 
     ```bash
-    docker exec -it --rm --network booknotes-network -v ~/Documents/Projects/booknotes-js/server/application:/var/node booknotesjs_server_1:latest sh -l
+    docker exec -it --rm --network booknotes-network -v ~/Documents/Projects/booknotes-js/server-express-node/application:/var/node booknotes-js-server sh -l
     ```
 
     ```bash
