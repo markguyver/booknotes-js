@@ -8,7 +8,7 @@
 </div></template>
 
 <script>
-import axios from 'axios';
+import apiResultsHelper from '../Mixins/apiResultsHelper';
 import pageHelpers from '../Mixins/pageHelpers';
 export default {
     name: 'CreateTagElement',
@@ -19,7 +19,7 @@ export default {
     }; },
     methods: {
         handleSubmit: function() {
-            axios.post('/tags', this.createTagFormData).then(response => {
+            this.postNewTag(this.createTagFormData).then(response => {
                 if (201 == response.status) {
                     this.popInfo('A tag has been created: ' + response.data.Tags[0].tag);
                     this.handleReset();
@@ -32,7 +32,7 @@ export default {
             this.createTagFormData.tag = null;
         },
     },
-    mixins: [pageHelpers],
+    mixins: [apiResultsHelper, pageHelpers],
 };
 </script>
 

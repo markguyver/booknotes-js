@@ -28,6 +28,7 @@ const getImmutableBookResults = getImmutableApiResults('Books');
 const getImmutableFirstBookResult = compose(getFirstResult, getImmutableBookResults);
 const getAllBooks = () => axios.get(getFullApiUrl('/books')).then(getImmutableBookResults);
 const getBookById = bookId => axios.get(getFullApiUrl('/book/' + bookId)).then(getImmutableFirstBookResult);
+const postNewBook = newBookData => axios.post(getFullApiUrl('/books'), newBookData);
 const patchBookTagById = (bookId, tagId) => axios.patch(getFullApiUrl('/book/' + bookId + '/tag/' + tagId)).then(getImmutableFirstBookResult);
 const deleteBookTagById = (bookId, tagId) => axios.delete(getFullApiUrl('/book/' + bookId + '/tag/' + tagId)).then(getImmutableFirstBookResult);
 
@@ -37,13 +38,14 @@ const getImmutableFirstNoteResult = compose(getFirstResult, getImmutableNoteResu
 const getNotesByBookId = bookId => axios.get(getFullApiUrl('/notes/book/' + bookId)).then(getImmutableNoteResults);
 const getNoteById = noteId => axios.get(getFullApiUrl('/note/' + noteId)).then(getImmutableFirstNoteResult);
 const deleteNoteById = noteId => axios.delete(getFullApiUrl('/note/' + noteId));
-const postNoteByBookId = (bookId, note) => axios.post(getFullApiUrl('/notes/book/' + bookId), { note, bookId });
+const postNewNoteByBookId = (bookId, newNoteData) => axios.post(getFullApiUrl('/notes/book/' + bookId), { note: newNoteData, book_id: bookId });
 
 // Tags API Helpers
 const getImmutableTagResults = getImmutableApiResults('Tags');
 const getImmutableFirstTagResult = compose(getFirstResult, getImmutableTagResults);
 const getAllTags = () => axios.get(getFullApiUrl('/tags')).then(getImmutableTagResults);
 const getTagById = tagId => axios.get(getFullApiUrl('/tag/' + tagId)).then(getImmutableFirstTagResult);
+const postNewTag = newTagData => axios.post(getFullApiUrl('/tags'), newTagData);
 
 // Validation Helpers
 const validateIdValue = idValueToValidate => {
@@ -71,16 +73,18 @@ export default {
 
         getAllBooks,
         getBookById,
+        postNewBook,
         patchBookTagById,
         deleteBookTagById,
 
         getNotesByBookId,
         getNoteById,
         deleteNoteById,
-        postNoteByBookId,
+        postNewNoteByBookId,
 
         getAllTags,
         getTagById,
+        postNewTag,
 
         filterDeleted,
         filterNull,

@@ -39,7 +39,7 @@ export default {
         saveNote: function() {
             if (this.editorData) { // Check for Note Content
                 this.showOverlay = true;
-                this.postNoteByBookId(this.bookId, this.editorData.trim()).then(() => {
+                this.postNewNoteByBookId(this.bookId, this.editorData.trim()).then(() => {
                     this.clearNoteContent();
                     this.$emit('noteCreated');
                 }).catch(() => this.popError('Note could not be saved.', 'Saving Error'))

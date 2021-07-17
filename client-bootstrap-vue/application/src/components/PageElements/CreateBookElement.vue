@@ -8,7 +8,7 @@
 </div></template>
 
 <script>
-import axios from 'axios';
+import apiResultsHelper from '../Mixins/apiResultsHelper';
 import pageHelpers from '../Mixins/pageHelpers';
 export default {
     name: 'CreateBookElement',
@@ -19,7 +19,7 @@ export default {
     }; },
     methods: {
         handleSubmit: function() {
-            axios.post('/books', this.createBookFormData).then(response => {
+            this.postNewBook(this.createBookFormData).then(response => {
                 if (201 == response.status) {
                     this.popInfo('A book has been created: ' + response.data.Books[0].title); // TODO Add Link to View Book Page
                     this.handleReset();
@@ -32,7 +32,7 @@ export default {
             this.createBookFormData.title = null;
         },
     },
-    mixins: [pageHelpers],
+    mixins: [apiResultsHelper, pageHelpers],
 };
 </script>
 
