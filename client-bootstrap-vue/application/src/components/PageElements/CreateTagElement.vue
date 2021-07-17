@@ -8,7 +8,7 @@
 </div></template>
 
 <script>
-import apiResultsHelper from '../Mixins/apiResultsHelper';
+import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 export default {
     name: 'CreateTagElement',
@@ -32,7 +32,7 @@ export default {
             this.createTagFormData.tag = null;
         },
     },
-    mixins: [apiResultsHelper, pageHelpers],
+    mixins: [apiResultsHelpers, pageHelpers],
 };
 </script>
 
