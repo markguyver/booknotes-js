@@ -1,6 +1,6 @@
 import { Request, Router } from 'express';
 import { FindOptions } from 'sequelize';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import { Book } from '../../Database/Relational/database-sequelize';
 import { extractStringParameterValueFromRequestData, provideDestroyOptions } from '../helpers';
 import {
     SubmittedNoteCandidate,
@@ -11,9 +11,6 @@ import {
     deleteNoteRecord
 } from '../Models/notesModel';
 import { extractBookIdFromRequestData } from '../Models/booksModel';
-
-// Initialize Database Models
-const Book = sequelizeInstance.models.Book;
 
 // Prepare Resource-Specific Variables
 const listNotesQueryOptions: FindOptions = { order: [['id', 'desc']] };

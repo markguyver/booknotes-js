@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import { Note } from '../../Database/Relational/database-sequelize';
 import {
     validationResponse,
     validationResponseBaseFail,
@@ -24,9 +24,6 @@ export interface SubmittedNoteCandidate {
     note?:      string;
     book_id?:   number;
 }
-
-// Initialize Database Models
-const Note = sequelizeInstance.models.Note;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithNotesPayload = respondWithResourceList('Notes');

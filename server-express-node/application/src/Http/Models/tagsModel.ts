@@ -1,6 +1,8 @@
 import { Request } from 'express';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import { Tag } from '../../Database/Relational/database-sequelize';
 import {
+    operationResult,
+    getOperationResult,
     validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
@@ -23,9 +25,6 @@ export interface SubmittedTagCandidate {
     id?:    number;
     tag?:   string;
 }
-
-// Initialize Database Models
-const Tag = sequelizeInstance.models.Tag;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithTagsPayload = respondWithResourceList('Tags');

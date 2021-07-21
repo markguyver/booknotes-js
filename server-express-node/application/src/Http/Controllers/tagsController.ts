@@ -1,6 +1,10 @@
 import { Request,  Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import {
+    Author,
+    Book,
+    Note
+} from '../../Database/Relational/database-sequelize';
 import {
     addWhereForeignIdClauseToResourceListQueryOptions,
     extractStringParameterValueFromRequestData,
@@ -18,11 +22,6 @@ import {
 } from '../Models/tagsModel';
 import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from '../Models/authorsModel';
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
-
-// Initialize Database Models
-const Author = sequelizeInstance.models.Author;
-const Book = sequelizeInstance.models.Book;
-const Note = sequelizeInstance.models.Note;
 
 // Prepare Resource-Specific Variables
 const listTagsWithAuthorBookAndNoteCountsQueryOptions: FindOptions = {

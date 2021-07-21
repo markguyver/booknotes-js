@@ -89,7 +89,7 @@ export const sequelizeInstance = new Sequelize(databaseSchema, databaseUsername,
 
 // Create Individual Models for All Tables
 
-class Author extends Model {
+export class Author extends Model {
     public id!: number;
     public first_name!: string | null;
     public middle_name!: string | null;
@@ -186,7 +186,7 @@ Author.init({
     ],
 });
 
-class Book extends Model {
+export class Book extends Model {
     public id!: number;
     public title!: string;
 
@@ -246,7 +246,7 @@ Book.init({
     underscored: true,
 });
 
-class ContributionType extends Model {
+export class ContributionType extends Model {
     public id!: number;
     public name!: string;
 
@@ -283,7 +283,7 @@ ContributionType.init({
     underscored: true,
 });
 
-class BookAuthor extends Model {
+export class BookAuthor extends Model {
     public book_id!: number;
     public author_id!: number;
     public contribution_type_id!: number;
@@ -335,7 +335,7 @@ BookAuthor.init({
     underscored: true,
 });
 
-class Note extends Model {
+export class Note extends Model {
     public id!: number;
     public note!: string;
     public title!: string;
@@ -389,7 +389,7 @@ Note.init({
     underscored: true,
 });
 
-class Tag extends Model {
+export class Tag extends Model {
     public id!: number;
     public tag!: string;
 

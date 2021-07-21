@@ -1,7 +1,13 @@
 import { Request, Router } from 'express';
 import { Map } from 'immutable';
 import { Sequelize, FindOptions } from 'sequelize';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import {
+    Author,
+    BookAuthor,
+    Book,
+    ContributionType,
+    Tag
+} from '../../Database/Relational/database-sequelize';
 import {
     addWhereForeignIdClauseToResourceListQueryOptions,
     removeEmptyValuesAsStrings,
@@ -22,13 +28,6 @@ import {
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
 import { createBookAuthorContributionAndRespond } from '../Models/bookAuthorsModel';
 import { respondInvalidTagId, extractTagIdFromRequestData } from '../Models/tagsModel';
-
-// Initialize Database Models
-const Author = sequelizeInstance.models.Author;
-const BookAuthor = sequelizeInstance.models.BookAuthor;
-const Book = sequelizeInstance.models.Book;
-const ContributionType = sequelizeInstance.models.ContributionType;
-const Tag = sequelizeInstance.models.Tag;
 
 // Prepare Resource-Specific Variables
 const listAuthorsWithBookCountQueryOptions: FindOptions = {

@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import { ContributionType } from '../../Database/Relational/database-sequelize';
 import {
     validationResponse,
     validationResponseBaseFail,
@@ -21,9 +21,6 @@ export interface ContributionTypeObject {
     id?:    number;
     name?:  string;
 }
-
-// Initialize Database Models
-const ContributionType = sequelizeInstance.models.ContributionType;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithContributionTypesPayload = respondWithResourceList('ContributionTypes');

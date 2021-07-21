@@ -1,16 +1,15 @@
 import { Request, Response, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import {
+    Author,
+    BookAuthor,
+    Book,
+    Note
+} from '../../Database/Relational/database-sequelize';
 import { provideFindOptionsUnmodified } from '../helpers';
 import { fetchAllAuthors } from '../Models/authorsModel';
 import { fetchAllBooks } from '../Models/booksModel';
 import { fetchAllTags } from '../Models/tagsModel';
-
-// Initialize Database Models
-const Author = sequelizeInstance.models.Author;
-const BookAuthor = sequelizeInstance.models.BookAuthor;
-const Book = sequelizeInstance.models.Book;
-const Note = sequelizeInstance.models.Note;
 
 // Prepare Resource-Specific Variables
 const authorListWithBookCountDescending: FindOptions = {

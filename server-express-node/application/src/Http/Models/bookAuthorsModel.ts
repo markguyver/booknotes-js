@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { Map } from 'immutable';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import { BookAuthor } from '../../Database/Relational/database-sequelize';
 import {
     validationResponse,
     validationResponseBaseFail,
@@ -25,9 +25,6 @@ export interface SubmittedBookAuthorContributionCandidate {
     contribution_type_id?:  number;
     order?:                 number;
 }
-
-// Initialize Database Models
-const BookAuthor = sequelizeInstance.models.BookAuthor;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithAuthorsPayload = respondWithResourceList('BookAuthorContributions');

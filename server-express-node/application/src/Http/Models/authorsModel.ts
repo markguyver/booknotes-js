@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import { Author } from '../../Database/Relational/database-sequelize';
 import {
     validationResponse,
     validationResponseBaseFail,
@@ -26,9 +26,6 @@ export interface SubmittedAuthorCandidate {
     last_name?:         string;
     parent_author_id?:  number;
 }
-
-// Initialize Database Models
-const Author = sequelizeInstance.models.Author;
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithAuthorsPayload = respondWithResourceList('Authors');

@@ -1,6 +1,9 @@
 import { Request, Router } from 'express';
 import { FindOptions } from 'sequelize';
-import { sequelizeInstance } from '../../Database/Relational/database-sequelize';
+import {
+    BookAuthor,
+    ContributionType
+} from '../../Database/Relational/database-sequelize';
 import {
     addWhereForeignIdClauseToResourceListQueryOptions,
     extractStringParameterValueFromRequestData,
@@ -17,10 +20,6 @@ import {
 } from '../Models/contributionTypesModel';
 import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from '../Models/authorsModel';
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
-
-// Initialize Database Models
-const BookAuthor = sequelizeInstance.models.BookAuthor;
-const ContributionType = sequelizeInstance.models.ContributionType;
 
 // Prepare Resource-Specific Variables
 const listContributionTypesWithAuthorAndBookCountsQueryOptions: FindOptions = {
