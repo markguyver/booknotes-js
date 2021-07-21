@@ -73,7 +73,7 @@ export const addTagToResource = curry((
                 resourceResult.addTag(tagId).then(() => {
                     resolve(getOperationResult(true, 200, 'Tag added to ' + resourceName.toLowerCase()));
                 }).catch(tagError => {
-                    if (tagError.code && 'ER_NO_REFERENCED_ROW_2' == tagError.code) { // Check Add Tag Error for Foreign Key Constraint Error (i.e. Tag Not Found)
+                    if (tagError.parent.code && 'ER_NO_REFERENCED_ROW_2' == tagError.parent.code) { // Check Add Tag Error for Foreign Key Constraint Error (i.e. Tag Not Found)
                         // TODO: Find a way to re-use respondWithResourceNotFound() functions
                         resolve(getOperationResult(false, 404, 'Tag not found'));
                     } else { // Middle of Check Add Tag Error for Foreign Key Constraint Error (i.e. Tag Not Found)

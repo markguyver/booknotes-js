@@ -253,10 +253,17 @@ export const deleteAndRespond = curry((
     return response;
 });
 export const performOperationAndRespond = curry((
-    operationToPerform:             (request: Request) => operationResult,
+    operationToPerform:             (request: Request) => Promise<operationResult>,
     request:                        Request,
     response:                       Response
 ): Response => {
-    const operationOutcome = operationToPerform(request);
-    return response.status(operationOutcome.statusCode).send(operationOutcome.message);
+    operationToPerform(request)
+        .then(operationOutcome => response.status(operationOutcome.statusCode).send(operationOutcome.message))
+        .catch(error => {
+            logger.error({ application: {
+                request: request,
+                error: error,
+            }}, 'performOperationAndRespond() Unexpected Error');
+        });
+    return response;
 });
