@@ -49,7 +49,7 @@ export const validateExtractedTag = (extractedBook: SubmittedTagCandidate): vali
     return validationResponseBaseSuccess();
 };
 export const addTagToResource = curry((
-    resourceToTag: ModelCtor<Author | Book | Note>,
+    resourceToAddTagTo: ModelCtor<Author | Book | Note>,
     resourceName: string,
     resourceIdExtractor: (request: Request) => number,
     request: Request,
@@ -64,7 +64,7 @@ export const addTagToResource = curry((
         // TODO: Find a way to re-use respondWithInvalidResourceID() functions
         resolve(getOperationResult(false, 400, 'Invalid Tag ID'));
     } // End of Validate Extracted Tag ID
-    resourceToTag.findByPk(resourceId).then(resourceResult => {
+    resourceToAddTagTo.findByPk(resourceId).then(resourceResult => {
         if (resourceResult) { // Check Resource Retrieval
             if (resourceResult instanceof Author ||
                 resourceResult instanceof Book ||
@@ -78,7 +78,7 @@ export const addTagToResource = curry((
                         resolve(getOperationResult(false, 404, 'Tag not found'));
                     } else { // Middle of Check Add Tag Error for Foreign Key Constraint Error (i.e. Tag Not Found)
                         logger.error({ application: {
-                            resourceToTag: typeof resourceToTag,
+                            resourceToAddTagTo: typeof resourceToAddTagTo,
                             resourceName: resourceName,
                             resourceId: resourceId,
                             tagId: tagId,
@@ -92,7 +92,7 @@ export const addTagToResource = curry((
                 // This shouldn't happen, because we are only allowing ModelCtor's for Models that have the addTag()
                 // method; but the way Sequelize typings are configured doesn't allow Typescript to deduce this.
                 logger.error({ application: {
-                    resourceToTag: typeof resourceToTag,
+                    resourceToAddTagTo: typeof resourceToAddTagTo,
                     resourceName: resourceName,
                     resourceId: resourceId,
                     tagId: tagId,
@@ -107,13 +107,80 @@ export const addTagToResource = curry((
         } // End of Check Resource Retrieval
     }).catch(resourceError => {
         logger.error({ application: {
-            resourceToTag: typeof resourceToTag,
+            resourceToAddTagTo: typeof resourceToAddTagTo,
             resourceName: resourceName,
             resourceId: resourceId,
             tagId: tagId,
             request: request,
             error: resourceError,
         } }, 'addTagToResource() Find Resource by Primary Key Failure');
+        resolve(getOperationResult(false, 500, 'An unexpected error has occurred'));
+    });
+}));
+export const removeTagFromResource = curry((
+    resourceToRemoveTagFrom: ModelCtor<Author | Book | Note>,
+    resourceName: string,
+    resourceIdExtractor: (request: Request) => number,
+    request: Request,
+): Promise<operationResult> => new Promise(resolve => {
+    const resourceId = resourceIdExtractor(request);
+    if (false === looksLikeAnId(resourceId).boolean) { // Validate Extracted Resource ID
+        // TODO: Find a way to re-use respondWithInvalidResourceID() functions
+        resolve(getOperationResult(false, 400, 'Invalid ' + resourceName + ' ID'));
+    } // End of Validate Extracted Resource ID
+    const tagId = extractTagIdFromRequestData(request);
+    if (false === looksLikeAnId(tagId).boolean) { // Validate Extracted Tag ID
+        // TODO: Find a way to re-use respondWithInvalidResourceID() functions
+        resolve(getOperationResult(false, 400, 'Invalid Tag ID'));
+    } // End of Validate Extracted Tag ID
+    resourceToRemoveTagFrom.findByPk(resourceId).then(resourceResult => {
+        if (resourceResult) { // Check Resource Retrieval
+            if (resourceResult instanceof Author ||
+                resourceResult instanceof Book ||
+                resourceResult instanceof Note
+            ) { // Validate Retrieved Resource (Model) Type (for Typescript)
+                resourceResult.removeTag(tagId).then(() => {
+                    // If the tag does not exist or was not associated with the resource (i.e. author, book, or note),
+                    // then (0 === promiseResponse). If the deletion was successful, then (1 === promiseResponse). We're
+                    // returning true in both instances because the Sequelize return type claims to be void.
+                    resolve(getOperationResult(true, 200, 'Tag removed from ' + resourceName.toLowerCase()));
+                }).catch(tagError => {
+                    logger.error({ application: {
+                        resourceToRemoveTagFrom: typeof resourceToRemoveTagFrom,
+                        resourceName: resourceName,
+                        resourceId: resourceId,
+                        tagId: tagId,
+                        request: request,
+                        error: tagError,
+                    } }, 'removeTagFromResource() Add Tag to Resource (Insert) Failure');
+                    resolve(getOperationResult(false, 500, 'An unexpected error has occurred'));
+                });
+            } else { // Middle of Validate Retrieved Resource (Model) Type (for Typescript)
+                // This shouldn't happen, because we are only allowing ModelCtor's for Models that have the addTag()
+                // method; but the way Sequelize typings are configured doesn't allow Typescript to deduce this.
+                logger.error({ application: {
+                    resourceToRemoveTagFrom: typeof resourceToRemoveTagFrom,
+                    resourceName: resourceName,
+                    resourceId: resourceId,
+                    tagId: tagId,
+                    request: request,
+                    resourceResult: typeof resourceResult,
+                } }, 'removeTagFromResource() Find Resource by Primary Key Succeeded with Unexpected Type');
+                resolve(getOperationResult(false, 500, 'An unexpected error has occurred'));
+            } // End of Validate Retrieved Resource (Model) Type (for Typescript)
+        } else { // Middle of Check Resource Retrieval
+            // TODO: Find a way to re-use respondWithResourceNotFound() functions
+            resolve(getOperationResult(false, 404, resourceName + ' not found'));
+        } // End of Check Resource Retrieval
+    }).catch(resourceError => {
+        logger.error({ application: {
+            resourceToRemoveTagFrom: typeof resourceToRemoveTagFrom,
+            resourceName: resourceName,
+            resourceId: resourceId,
+            tagId: tagId,
+            request: request,
+            error: resourceError,
+        } }, 'removeTagFromResource() Find Resource by Primary Key Failure');
         resolve(getOperationResult(false, 500, 'An unexpected error has occurred'));
     });
 }));
