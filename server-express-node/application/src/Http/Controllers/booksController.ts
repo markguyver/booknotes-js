@@ -2,6 +2,7 @@ import { Request, Router } from 'express';
 import { Sequelize, FindOptions } from 'sequelize';
 import {
     Author,
+    Book,
     BookAuthor,
     ContributionType,
     Note,
@@ -12,7 +13,8 @@ import {
     extractStringParameterValueFromRequestData,
     provideFindOptionsUnmodified,
     provideFindOptionsModified,
-    provideDestroyOptions
+    provideDestroyOptions,
+    performOperationAndRespond
 } from '../helpers';
 import {
     SubmittedBookCandidate,
@@ -24,7 +26,7 @@ import {
 } from '../Models/booksModel';
 import { respondInvalidAuthorId, extractAuthorIdFromRequestData } from '../Models/authorsModel';
 import { createBookAuthorContributionAndRespond } from '../Models/bookAuthorsModel';
-import { respondInvalidTagId, extractTagIdFromRequestData } from '../Models/tagsModel';
+import { respondInvalidTagId, extractTagIdFromRequestData, addTagToResource } from '../Models/tagsModel';
 
 // Prepare Resource-Specific Variables
 const listBooksWithNoteCountQueryOptions: FindOptions = {
@@ -135,6 +137,13 @@ const listBooksByTagIdFromRequestData = fetchAllBooks(
         addWhereTagIdClauseToBookListQueryOptions
     )
 );
+const addTagToBook = performOperationAndRespond(
+    addTagToResource(
+        Book,
+        'Book',
+        extractBookIdFromRequestData
+    )
+);
 
 // Register Resource Routes
 export const booksRoutes = Router();
@@ -147,6 +156,6 @@ export const bookRoutes = Router();
 bookRoutes.get('/:bookId', displayBookById);
 bookRoutes.delete('/:bookId', deleteBookRecordFromRequestData);
 bookRoutes.put('/:bookId/author/:authorId', createBookAuthorContributionAndRespond);
+bookRoutes.post('/:bookId/tag/:tagId', addTagToBook);
 // TODO: Remove Tag From Book Endpoint
-// TODO: Add Tag To Book Endpoint
 // TODO: Remove Author (and ContributionType) From Book Endpoint

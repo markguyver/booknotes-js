@@ -15,7 +15,8 @@ import {
     extractStringParameterValueFromRequestData,
     provideFindOptionsUnmodified,
     provideFindOptionsModified,
-    provideDestroyOptions
+    provideDestroyOptions,
+    performOperationAndRespond
 } from '../helpers';
 import {
     SubmittedAuthorCandidate,
@@ -27,7 +28,7 @@ import {
 } from '../Models/authorsModel';
 import { respondInvalidBookId, extractBookIdFromRequestData } from '../Models/booksModel';
 import { createBookAuthorContributionAndRespond } from '../Models/bookAuthorsModel';
-import { respondInvalidTagId, extractTagIdFromRequestData } from '../Models/tagsModel';
+import { respondInvalidTagId, extractTagIdFromRequestData, addTagToResource } from '../Models/tagsModel';
 
 // Prepare Resource-Specific Variables
 const listAuthorsWithBookCountQueryOptions: FindOptions = {
@@ -162,6 +163,13 @@ const listAuthorsByTagIdFromRequestData = fetchAllAuthors(
         addWhereTagIdClauseToAuthorListQueryOptions
     )
 );
+const addTagToAuthor = performOperationAndRespond(
+    addTagToResource(
+        Author,
+        'Author',
+        extractAuthorIdFromRequestData
+    )
+);
 
 // Register Resource Routes
 export const authorsRoutes = Router();
@@ -174,6 +182,6 @@ export const authorRoutes = Router();
 authorRoutes.get('/:authorId', displayAuthorById);
 authorRoutes.delete('/:authorId', deleteAuthorRecordFromRequestData);
 authorRoutes.put('/:authorId/book/:bookId', createBookAuthorContributionAndRespond);
+authorRoutes.post('/:authorId/tag/:tagId', addTagToAuthor);
 // TODO: Remove Tag From Author Endpoint
-// TODO: Add Tag To Author Endpoint
 // TODO: Remove Book (and ContributionType) From Author Endpoint

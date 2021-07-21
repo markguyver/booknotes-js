@@ -7,9 +7,9 @@ import { logger } from '../logger';
 
 // Data Types
 export interface operationResult {
-    statusCode: number;
-    message: string;
-    boolean: boolean;
+    statusCode: number;     // The HTTP Status Code to Respond With
+    message: string;        // The HTTP Message (i.e. Body) to Respond With
+    boolean: boolean;       // Was the Operation Successful or Not?
 }
 export interface queryOptionsProviderError {
     message: string;
@@ -117,7 +117,7 @@ export const findAllAndRespond = curry((
             error.handler(response);
         } else { // Middle of Check Query Options Provider Error to Handle
             logger.error({ application: {
-                sequelizeModel: sequelizeModel,
+                sequelizeModel: typeof sequelizeModel,
                 queryOptions: queryOptionsProvider(request),
                 request: request,
                 error: error,
@@ -148,7 +148,7 @@ export const findByPKAndRespond = curry((
             } // End of Check for Results
         }).catch(error => {
             logger.error({ application: {
-                sequelizeModel: sequelizeModel,
+                sequelizeModel: typeof sequelizeModel,
                 queryOptions: queryOptions,
                 id: id,
                 request: request,
@@ -205,7 +205,7 @@ export const createAndRespond = curry((
             .then(result => insertSuccessHandler(response, result, 201))
             .catch(error => {
                 logger.error({ application: {
-                    sequelizeModel: sequelizeModel,
+                    sequelizeModel: typeof sequelizeModel,
                     newRecord: newRecord,
                     newRecordValidation: newRecordValidation,
                     request: request,
@@ -239,7 +239,7 @@ export const deleteAndRespond = curry((
             } // End of Check for Results
         }).catch(error => {
             logger.error({ application: {
-                sequelizeModel: sequelizeModel,
+                sequelizeModel: typeof sequelizeModel,
                 queryOptions: destroyOptions,
                 id: id,
                 request: request,
@@ -251,4 +251,12 @@ export const deleteAndRespond = curry((
         invalidIdHandler(response);
     } // End of Validate ID Parameter
     return response;
+});
+export const performOperationAndRespond = curry((
+    operationToPerform:             (request: Request) => operationResult,
+    request:                        Request,
+    response:                       Response
+): Response => {
+    const operationOutcome = operationToPerform(request);
+    return response.status(operationOutcome.statusCode).send(operationOutcome.message);
 });
