@@ -102,7 +102,7 @@ export default {
         removeTagFromBook: function(tagId) {
             this.deleteBookTagById(this.book.id, tagId).then(() => {
                 this.popInfo('The tag has been removed from the book.');
-                this.author.Tags = this.bookTags.filter(currentTag => currentTag.id !== tagId);
+                this.bookTags = this.bookTags.filter(currentTag => currentTag.id !== tagId);
             }).catch(() => this.popError('Failed to remove the tag from the book.', 'Deletion Error'));
         },
         removeNoteFromList: function(noteId) {
