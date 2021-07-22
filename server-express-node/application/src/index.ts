@@ -8,6 +8,7 @@ import { booksRoutes, bookRoutes } from './Http/Controllers/booksController';
 import { contributionTypesRoutes, contributionTypeRoutes } from './Http/Controllers/contributionTypesController';
 import { dashboardRoutes } from './Http/Controllers/dashboardController';
 import { notesRoutes, noteRoutes } from './Http/Controllers/notesController';
+import { searchRoutes } from './Http/Controllers/searchController';
 import { tagsRoutes, tagRoutes } from './Http/Controllers/tagsController';
 
 const expressServerInstance = express();
@@ -43,6 +44,9 @@ expressServerInstance.use('/dashboard', dashboardRoutes);
 // Notes Resource Requests
 expressServerInstance.use('/notes', notesRoutes);
 expressServerInstance.use('/note', noteRoutes);
+
+// Search Resource Requests
+expressServerInstance.use('/search', searchRoutes);
 
 // Tags Resource Requests
 expressServerInstance.use('/tags', tagsRoutes);

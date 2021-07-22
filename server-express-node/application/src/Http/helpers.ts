@@ -37,10 +37,42 @@ const emptyValuesAsStrings = ['', 'NaN', 'null', 'undefined'];
 export const removeEmptyValuesAsStrings = (valueToCheck: any): boolean => -1 == emptyValuesAsStrings.indexOf(String(valueToCheck).toString());
 
 // Prepare Data Handler Methods
-export const extractIntParameterValueFromRequestData = curry((parameterName: string, request: Request): number => parseInt(request.body[parameterName]) || parseInt(request.params[parameterName]) || NaN);
-export const extractStringParameterValueFromRequestData = curry((parameterName: string, request: Request): string => String(request.body[parameterName]).toString() || String(request.params[parameterName]).toString());
+export const extractIntParameterValueFromRequestData = curry((
+    parameterName: string,
+    request: Request
+): number =>
+    parseInt(request.body[parameterName]) ||
+    parseInt(request.params[parameterName]) ||
+    NaN
+);
+export const extractIntQueryValueFromRequestData = curry((
+    parameterName: string,
+    request: Request
+): number =>
+    parseInt(String(request.query[parameterName]).toString()) ||
+    NaN
+);
+export const extractStringParameterValueFromRequestData = curry((
+    parameterName: string,
+    request: Request
+): string =>
+    String(request.params[parameterName]).toString() ||
+    String(request.body[parameterName]).toString()
+);
+export const extractStringQueryValueFromRequestData = curry((
+    parameterName: string,
+    request: Request
+): string =>
+    String(request.query[parameterName]).toString()
+);
 export const provideFindOptionsUnmodified = curry((findOptions: FindOptions, request: Request): FindOptions => findOptions);
-export const provideFindOptionsModified = curry((findOptions: FindOptions, findOptionsModifier: (findOptions: FindOptions, request: Request) => FindOptions, request: Request): FindOptions => findOptionsModifier(findOptions, request));
+export const provideFindOptionsModified = curry((
+    findOptions: FindOptions,
+    findOptionsModifier: (findOptions: FindOptions, request: Request) => FindOptions,
+    request: Request
+): FindOptions =>
+    findOptionsModifier(findOptions, request)
+);
 export const provideDestroyOptions = curry((primaryKeyName: string, usesHardDeletes: boolean, primaryKeyValue: number): deleteModelOptions => {
     const whereClause: WhereOptions = {};
     whereClause[primaryKeyName] = primaryKeyValue;
@@ -57,7 +89,12 @@ export const respondWith404 = (response: Response, message: string = 'Not found'
 export const respondWith500 = (response: Response, message: string = 'Internal Server Error'): Response => response.status(500).send(message);
 
 // Prepare HTTP Resource Response Helpers
-export const respondWithResourceList = curry((resourceName: string, response: Response, resourceData: Array<Model>, statusCode: number = 200): Response => 
+export const respondWithResourceList = curry((
+    resourceName: string,
+    response: Response,
+    resourceData: Array<Model>,
+    statusCode: number = 200
+): Response => 
     response
         .status(statusCode)
         .type('json')

@@ -4,6 +4,7 @@ import {
     Sequelize,
     Model,
     DataTypes,
+    Op,
 
     // Query Options Data Objects
     Includeable,
@@ -67,6 +68,15 @@ export const insertWhereEqualsToQueryOptionsAsFindOptions = (
 ): FindOptions => {
     const whereClause: WhereOptions = {};
     whereClause[columnName] = columnValue;
+    return Object.assign({ where: whereClause }, queryOptions);
+};
+export const insertWhereLikeFuzzyQueryOptionsAsFindOptions = (
+    columnName: string,
+    columnValue: string,
+    queryOptions: FindOptions
+): FindOptions => {
+    const whereClause: WhereOptions = {};
+    whereClause[columnName] = { [Op.like]: '%' + columnValue + '%' };
     return Object.assign({ where: whereClause }, queryOptions);
 };
 
