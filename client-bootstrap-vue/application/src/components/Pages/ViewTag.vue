@@ -56,16 +56,20 @@ export default {
             console.log('Add Authors to Tag Button Pushed');
         },
         removeAuthorFromTag: function(author) {
-            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('Remove Author From Tag, Author:', author);
+            this.deleteAuthorTagById(author.id, this.tag.id).then(() => {
+                this.popInfo('The author has been removed from the tag.');
+                this.tagAuthors = this.tagAuthors.filter(currentAuthor => currentAuthor.id !== author.id);
+            }).catch(() => this.popError('Failed to remove the author from the tag.', 'Deletion Error'));
         },
         addBooksToTag: function() {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
             console.log('Add Books to Tag Button Pushed');
         },
         removeBookFromTag: function(book) {
-            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('Remove Book From Tag, Book:', book);
+            this.deleteBookTagById(book.id, this.tag.id).then(() => {
+                this.popInfo('The book has been removed from the tag.');
+                this.tagBooks = this.tagBooks.filter(currentBook => currentBook.id !== book.id);
+            }).catch(() => this.popError('Failed to remove the book from the tag.', 'Deletion Error'));
         },
     },
 	mixins: [pageHelpers, apiResultsHelpers],
