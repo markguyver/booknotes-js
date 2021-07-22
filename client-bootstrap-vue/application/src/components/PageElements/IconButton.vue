@@ -1,5 +1,5 @@
 <template>
-    <b-icon :icon="iconName" :variant="iconColor" v-b-hover="handleIconHover" @mousedown="handleIconClick"></b-icon>
+    <b-icon :icon="iconName" :variant="iconColor" v-b-hover="handleIconHover" @mousedown.left="handleIconClick('left')" @mousedown.right="handleIconClick('right')"></b-icon>
 </template>
 
 <script>
@@ -13,10 +13,10 @@ export default {
         handleIconHover: function(isHovered) {
             this.iconName = isHovered || this.iconClicked ? this.activeIconName : this.inactiveIconName;
         },
-        handleIconClick: function() {
+        handleIconClick: function(button) {
             this.iconClicked = true;
             this.iconColor = this.activeColorName;
-            this.$emit('button-push');
+            this.$emit('button-push-' + button);
             const changeIconBack = () => {
                 this.iconColor = this.inactiveColorName;
                 this.iconClicked = false;

@@ -3,7 +3,7 @@
         <b-list-group-item>
             <b-badge v-for="tag in tags" variant="tags" v-bind:key="tag.id" v-bind:to="'/tag/' + tag.id" class="ml-1">
                 {{ tag.tag }}
-                <span class="tag-delete-button" href="#"><IconButton href="#" v-on:button-push="deleteTag(tag.id)" activeColorName="warning" activeIconName="x-circle-fill" inactiveColorName="white" inactiveIconName="x" /></span>
+                <span class="tag-delete-button" @click.prevent><IconButton @button-push-left="deleteTag(tag.id)" activeColorName="warning" activeIconName="x-circle-fill" inactiveColorName="white" inactiveIconName="x" /></span>
             </b-badge>
         </b-list-group-item>
     </b-list-group>

@@ -20,12 +20,12 @@
             </b-card-title>
             <b-list-group flush>
                 <b-list-group-item>
-                    <div class="h6">Tags <span class="muted">({{ author.Tags.length }})</span> <IconButton id="add-tag-to-author-button" @button-push="addTagstoAuthor()" class="float-right" /></div>
+                    <div class="h6">Tags <span class="muted">({{ author.Tags.length }})</span> <IconButton id="add-tag-to-author-button" @button-push-left="addTagstoAuthor()" class="float-right" /></div>
                     <b-tooltip target="add-tag-to-author-button" placement="left" variant="secondary">Add Tag(s) to Author</b-tooltip>
                     <TagSubList :tags="author.Tags" @remove-tag="removeTagFromAuthor" />
                 </b-list-group-item>
                 <b-list-group-item>
-                    <div class="h6">Book Contributions <span class="muted">({{ author.BookAuthors.length }})</span> <IconButton id="add-book-to-author-button" @button-push="addBookstoAuthor()" class="float-right" /></div>
+                    <div class="h6">Book Contributions <span class="muted">({{ author.BookAuthors.length }})</span> <IconButton id="add-book-to-author-button" @button-push-left="addBookstoAuthor()" class="float-right" /></div>
                     <b-tooltip target="add-book-to-author-button" placement="left" variant="secondary">Add Book(s) to Author</b-tooltip>
                     <BookSubList :books="convertBookAuthorsToBooksList(author.BookAuthors)" @remove-book="removeBookFromAuthor" />
                 </b-list-group-item>

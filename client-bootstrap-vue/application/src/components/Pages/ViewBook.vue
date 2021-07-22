@@ -16,7 +16,7 @@
             </b-card-title>
             <b-list-group flush>
                 <b-list-group-item id="book-tags">
-                    <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span> <IconButton id="add-tag-to-book-button" @button-push="addTagsToBook()" class="float-right" /></div>
+                    <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span> <IconButton id="add-tag-to-book-button" @button-push-left="addTagsToBook()" class="float-right" /></div>
                     <b-tooltip target="add-tag-to-book-button" placement="left" variant="secondary">Add Tag(s) to Book</b-tooltip>
                     <TagSubList :tags="bookTags" @remove-tag="removeTagFromBook" />
 
@@ -24,7 +24,7 @@
 
                 </b-list-group-item>
                 <b-list-group-item id="book-authors">
-                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <IconButton id="add-author-to-book-button" @button-push="addAuthorsToBook()" class="float-right" /></div>
+                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <IconButton id="add-author-to-book-button" @button-push-left="addAuthorsToBook()" class="float-right" /></div>
                     <b-tooltip target="add-author-to-book-button" placement="left" variant="secondary">Add Author(s) to Book</b-tooltip>
                     <AuthorSubList :authors="convertBookAuthorsToAuthorsList(bookAuthors)" @remove-author="removeAuthorFromBook" />
 
@@ -32,7 +32,7 @@
 
                 </b-list-group-item>
                 <b-list-group-item id="book-notes">
-                    <div class="h6">Notes <span class="muted">({{ bookNotes.length }})</span> <IconButton id="add-note-to-book-button" @button-push="collapseNoteCreateButtonPushed" :activeIconName="collapseNoteCreateActiveButton" :inactiveIconName="collapseNoteCreateInactiveButton" class="float-right" /></div>
+                    <div class="h6">Notes <span class="muted">({{ bookNotes.length }})</span> <IconButton id="add-note-to-book-button" @button-push-left="collapseNoteCreateButtonPushed" :activeIconName="collapseNoteCreateActiveButton" :inactiveIconName="collapseNoteCreateInactiveButton" class="float-right" /></div>
                     <b-tooltip target="add-note-to-book-button" placement="left" variant="secondary">{{ noteCreateButtonTooltipText }}</b-tooltip>
                     <b-collapse v-model="collapseNoteCreateVisible">
                         <CreateNoteElement @noteCreated="fetchBookNotes" :bookId="book.id" ref="createNoteComponent" />

@@ -3,7 +3,7 @@
         <b-list-group-item v-for="author in authors" :key="author.id + (author.ContributionType ? ',' + author.ContributionType.id : 0)" :to="'/author/' + author.id">
             {{ getAuthorFullName(author) }}
             <span class="text-muted" v-if="author.ContributionType">(as {{ author.ContributionType.name }})</span>
-            <span href="#" class="author-delete-button"><IconButton :id="'delete-author-button-' + author.id" href="#" @button-push="deleteAuthor(author)" activeIconName="dash-circle-fill" inactiveIconName="dash-circle" class="float-right" /></span>
+            <span class="author-delete-button" @click.prevent><IconButton :id="'delete-author-button-' + author.id" @button-push-left="deleteAuthor(author)" activeIconName="dash-circle-fill" inactiveIconName="dash-circle" class="float-right" /></span>
             <b-tooltip :target="'delete-author-button-' + author.id" placement="left" variant="secondary">Remove {{ pseudonyms ? 'Pseudonym' : 'Author' }}</b-tooltip>
         </b-list-group-item>
     </b-list-group>

@@ -3,7 +3,7 @@
         <b-list-group-item v-for="book in books" :key="book.id + (book.ContributionType ? ',' + book.ContributionType.id : 0)" :to="'/book/' + book.id">
             {{ book.title }}
             <span class="text-muted" v-if="book.ContributionType">(as {{ book.ContributionType.name }})</span>
-            <span href="#" class="book-delete-button"><IconButton :id="'delete-book-button-' + book.id" href="#" @button-push="deleteBook(book)" activeIconName="dash-circle-fill" inactiveIconName="dash-circle" class="float-right" /></span>
+            <span class="book-delete-button" @click.prevent><IconButton :id="'delete-book-button-' + book.id" @button-push-left="deleteBook(book)" activeIconName="dash-circle-fill" inactiveIconName="dash-circle" class="float-right" /></span>
             <b-tooltip :target="'delete-book-button-' + book.id" placement="left" variant="secondary">Remove Book Contribution</b-tooltip>
         </b-list-group-item>
     </b-list-group>
