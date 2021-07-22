@@ -4,6 +4,7 @@ import { fetchAllAuthors } from '../Models/authorsModel';
 import { fetchAllBooks } from '../Models/booksModel';
 import { fetchAllTags } from '../Models/tagsModel';
 import {
+    searchAuthorsQueryOptionsProvider,
     searchBooksQueryOptionsProvider,
     searchTagsQueryOptionsProvider,
     debugEndpoint
@@ -24,6 +25,7 @@ const searchTagsFindOptions: FindOptions = {
 };
 
 // Define Endpoint Handlers
+const searchAuthorsAndRespond = fetchAllAuthors(searchAuthorsQueryOptionsProvider(searchAuthorsFindOptions));
 const searchBooksAndRespond = fetchAllBooks(searchBooksQueryOptionsProvider(searchBooksFindOptions));
 const searchTagsAndRespond = fetchAllTags(searchTagsQueryOptionsProvider(searchTagsFindOptions));
 // TODO: Instead of using findAllAndRespond(), should make a new helper function more like findByFkAndRespond() that extracts and validates query
@@ -31,6 +33,6 @@ const searchTagsAndRespond = fetchAllTags(searchTagsQueryOptionsProvider(searchT
 // Register Resource Routes
 export const searchRoutes = Router();
 searchRoutes.get('/', debugEndpoint);
-searchRoutes.get('/authors', debugEndpoint);
+searchRoutes.get('/authors', searchAuthorsAndRespond);
 searchRoutes.get('/books', searchBooksAndRespond);
 searchRoutes.get('/tags', searchTagsAndRespond);

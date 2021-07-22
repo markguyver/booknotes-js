@@ -2,12 +2,23 @@ import { Request, Response } from 'express';
 import { curry } from 'ramda';
 import { FindOptions } from 'sequelize';
 import { extractStringQueryValueFromRequestData } from '../helpers';
-import { insertWhereLikeFuzzyQueryOptionsAsFindOptions } from '../../Database/Relational/database-sequelize';
+import {
+    insertWhereLikeFuzzyQueryOptionsAsFindOptions,
+    insertListOfOrWhereLikeFuzzyQueryOptionsAsFindOptions
+} from '../../Database/Relational/database-sequelize';
 
 // Prepare Resource-Specific Response Handler Methods
 
 // Prepare Resource-Specific Data Handler Methods
 const extractSearchQueryFromRequest = extractStringQueryValueFromRequestData('query');
+export const searchAuthorsQueryOptionsProvider = curry((
+    queryOptionsToModify: FindOptions,
+    request: Request
+): FindOptions => insertListOfOrWhereLikeFuzzyQueryOptionsAsFindOptions(
+    ['last_name', 'first_name', 'middle_name'],
+    extractSearchQueryFromRequest(request),
+    queryOptionsToModify
+));
 export const searchBooksQueryOptionsProvider = curry((
     queryOptionsToModify: FindOptions,
     request: Request

@@ -79,6 +79,19 @@ export const insertWhereLikeFuzzyQueryOptionsAsFindOptions = (
     whereClause[columnName] = { [Op.like]: '%' + columnValue + '%' };
     return Object.assign({ where: whereClause }, queryOptions);
 };
+export const insertListOfOrWhereLikeFuzzyQueryOptionsAsFindOptions = (
+    columnNames: string[],
+    columnValue: string,
+    queryOptions: FindOptions
+): FindOptions => {
+    const likeValueClause: WhereAttributeHash = { [Op.like]: '%' + columnValue + '%' };
+    const whereClause: WhereOptions = { [Op.or]: columnNames.map(currentColumnName => {
+        const currentColumnWhereClause: WhereOptions = {};
+        currentColumnWhereClause[currentColumnName] = likeValueClause;
+        return currentColumnWhereClause;
+    }) };
+    return Object.assign({ where: whereClause }, queryOptions);
+};
 
 // Prepare Sequelize Database Connection
 
