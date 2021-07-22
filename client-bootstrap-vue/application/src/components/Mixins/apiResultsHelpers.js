@@ -20,8 +20,8 @@ const getImmutableAuthorResults = getImmutableApiResults('Authors');
 const getImmutableFirstAuthorResult = compose(getFirstResult, getImmutableAuthorResults);
 const getAllAuthors = () => axios.get(getFullApiUrl('/authors')).then(getImmutableAuthorResults);
 const getAuthorById = authorId => axios.get(getFullApiUrl('/author/' + authorId)).then(getImmutableFirstAuthorResult);
-const patchAuthorTagById = (authorId, tagId) => axios.patch(getFullApiUrl('/author/' + authorId + '/tag/' + tagId)).then(getImmutableFirstAuthorResult);
-const deleteAuthorTagById = (authorId, tagId) => axios.delete(getFullApiUrl('/author/' + authorId + '/tag/' + tagId)).then(getImmutableFirstAuthorResult);
+const putAuthorTagById = (authorId, tagId) => axios.put(getFullApiUrl('/author/' + authorId + '/tag/' + tagId)).then(getImmutableFirstAuthorResult);
+const deleteAuthorTagById = (authorId, tagId) => axios.delete(getFullApiUrl('/author/' + authorId + '/tag/' + tagId));
 
 // Books API Helpers
 const getImmutableBookResults = getImmutableApiResults('Books');
@@ -29,8 +29,8 @@ const getImmutableFirstBookResult = compose(getFirstResult, getImmutableBookResu
 const getAllBooks = () => axios.get(getFullApiUrl('/books')).then(getImmutableBookResults);
 const getBookById = bookId => axios.get(getFullApiUrl('/book/' + bookId)).then(getImmutableFirstBookResult);
 const postNewBook = newBookData => axios.post(getFullApiUrl('/books'), newBookData);
-const patchBookTagById = (bookId, tagId) => axios.patch(getFullApiUrl('/book/' + bookId + '/tag/' + tagId)).then(getImmutableFirstBookResult);
-const deleteBookTagById = (bookId, tagId) => axios.delete(getFullApiUrl('/book/' + bookId + '/tag/' + tagId)).then(getImmutableFirstBookResult);
+const putBookTagById = (bookId, tagId) => axios.put(getFullApiUrl('/book/' + bookId + '/tag/' + tagId)).then(getImmutableFirstBookResult);
+const deleteBookTagById = (bookId, tagId) => axios.delete(getFullApiUrl('/book/' + bookId + '/tag/' + tagId));
 
 // Notes API Helpers
 const getImmutableNoteResults = getImmutableApiResults('Notes');
@@ -68,13 +68,13 @@ export default {
 
         getAllAuthors,
         getAuthorById,
-        patchAuthorTagById,
+        putAuthorTagById,
         deleteAuthorTagById,
 
         getAllBooks,
         getBookById,
         postNewBook,
-        patchBookTagById,
+        putBookTagById,
         deleteBookTagById,
 
         getNotesByBookId,
