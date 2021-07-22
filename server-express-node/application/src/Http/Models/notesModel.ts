@@ -12,6 +12,7 @@ import {
     respondWithResourceNotFound,
     respondInvalidResourceId,
     extractIntParameterValueFromRequestData,
+    findAllAndRespond,
     findByPKAndRespond,
     findByFKAndRespond,
     createAndRespond,
@@ -44,6 +45,10 @@ export const validateExtractedNote = (extractedNote: SubmittedNoteCandidate): va
 };
 
 // Prepare Resource-Specific ORM Methods
+export const fetchAllNotes = findAllAndRespond(
+    Note,
+    respondWithNotesPayload
+);
 export const fetchNoteById = findByPKAndRespond(
     Note,
     respondWithNotesPayload,
