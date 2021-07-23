@@ -22,6 +22,9 @@ const routes = [{
     path: '/make/authors',
     component: CreateAuthorPage,
 },{
+    path: '/author',
+    redirect: '/authors',
+},{
     path: '/author/:authorId',
     component: ViewAuthor,
     props: true,
@@ -32,6 +35,9 @@ const routes = [{
     path: '/make/books',
     component: CreateBookPage,
 },{
+    path: '/book',
+    redirect: '/books',
+},{
     path: '/book/:bookId',
     component: ViewBook,
     props: true,
@@ -41,6 +47,9 @@ const routes = [{
 },{
     path: '/make/tags',
     component: CreateTagPage,
+},{
+    path: '/tag',
+    redirect: '/tags',
 },{
     path: '/tag/:tagId',
     component: ViewTag,
