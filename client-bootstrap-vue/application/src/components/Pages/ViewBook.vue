@@ -16,12 +16,12 @@
             </b-card-title>
             <b-list-group flush>
                 <b-list-group-item id="book-tags">
-                    <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span> <IconButton id="add-tag-to-book-button" @button-push-left="addTagsToBook()" class="float-right" /></div>
-                    <b-tooltip target="add-tag-to-book-button" placement="left" variant="secondary">Add Tag(s) to Book</b-tooltip>
+                    <div class="h6">Tags <span class="muted">({{ bookTags.length }})</span> <IconButton id="add-tag-to-book-button" @button-push-left="collapseAddTagButtonPushed()" :activeIconName="collapseAddTagActiveButton" :inactiveIconName="collapseAddTagInactiveButton" class="float-right" /></div>
+                    <b-tooltip target="add-tag-to-book-button" placement="left" variant="secondary">{{ addTagButtonTooltipText }}</b-tooltip>
+                    <b-collapse v-model="collapseAddTagVisible">
+                        <AddTagElement :existingTags="bookTags" @add-tag="addTagToBook" ref="addTagComponent" />
+                    </b-collapse>
                     <TagSubList :tags="bookTags" @remove-tag="removeTagFromBook" />
-
-                    <!-- Adding a Tag to this Book Should be a Page Element Component -->
-
                 </b-list-group-item>
                 <b-list-group-item id="book-authors">
                     <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <IconButton id="add-author-to-book-button" @button-push-left="addAuthorsToBook()" class="float-right" /></div>
@@ -52,6 +52,7 @@ import IconButton from '../PageElements/IconButton.vue';
 import CreateNoteElement from '../PageElements/CreateNoteElement.vue';
 import NotesSubList from '../PageElements/NotesSubList.vue';
 import AuthorSubList from '../PageElements/AuthorSubList.vue';
+import AddTagElement from '../PageElements/AddTagElement.vue';
 import TagSubList from '../PageElements/TagSubList.vue';
 export default {
     name: "ViewBook",
@@ -60,6 +61,7 @@ export default {
         NotesSubList,
         CreateNoteElement,
         AuthorSubList,
+        AddTagElement,
         TagSubList,
     },
     data: function() {return {
@@ -72,6 +74,10 @@ export default {
         collapseNoteCreateActiveButton: '',
         collapseNoteCreateInactiveButton: '',
         noteCreateButtonTooltipText: '',
+        collapseAddTagVisible: false,
+        collapseAddTagActiveButton: '',
+        collapseAddTagInactiveButton: '',
+        addTagButtonTooltipText: '',
     };},
     methods: {
         setNoteListKey: function() {
@@ -87,9 +93,14 @@ export default {
                 this.popError('Could not retrieve notes.');
             });
         },
-        addTagsToBook: function() {
-            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('Add Tags to Book Button Pushed');
+        addTagToBook: function(tagToAdd) {
+            this.putTagToBook(tagToAdd.id, this.book.id)
+                .then(() => {
+                    this.bookTags.push(tagToAdd);
+                    this.$refs.addTagComponent.clearAddTagInput();
+                    this.popInfo('Tag has been added');
+                })
+                .catch(() => this.popError('Failed to add tag to book'));
         },
         addAuthorsToBook: function() {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
@@ -130,6 +141,26 @@ export default {
             this.noteCreateButtonTooltipText = 'Hide Create Note';
             this.collapseNoteCreateVisible = true;
         },
+        collapseAddTagButtonPushed: function() {
+            if (this.collapseAddTagVisible) { // Check Create Note Button State and Toggle
+                this.setAddTagButtonToCollapsedState();
+                this.$refs.addTagComponent.clearAddTagInput();
+            } else { // Middle of Check Create Note Button State and Toggle
+                this.setAddTagButtonToExpandedState();
+            } // End of Check Create Note Button State and Toggle
+        },
+        setAddTagButtonToCollapsedState: function() {
+            this.collapseAddTagInactiveButton = 'plus-circle';
+            this.collapseAddTagActiveButton = 'plus-circle-fill';
+            this.addTagButtonTooltipText = 'Add Tag(s) to Author';
+            this.collapseAddTagVisible = false;
+        },
+        setAddTagButtonToExpandedState: function() {
+            this.collapseAddTagInactiveButton = 'arrow-up-circle';
+            this.collapseAddTagActiveButton = 'arrow-up-circle-fill';
+            this.addTagButtonTooltipText = 'Hide Add Tag(s)';
+            this.collapseAddTagVisible = true;
+        },
     },
 	mixins: [authorHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {
@@ -145,6 +176,7 @@ export default {
                 this.setNoteListKey();
                 this.bookTags = this.book.Tags;
                 this.setCreateNoteButtonToCollapsedState();
+                this.setAddTagButtonToCollapsedState();
                 this.transitionFromLoadingToPage();
 
             }).catch(() => this.transitionFromLoadingToError('Error retrieving book.'));

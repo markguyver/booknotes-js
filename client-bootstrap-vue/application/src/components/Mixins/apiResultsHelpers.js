@@ -46,6 +46,9 @@ const getImmutableFirstTagResult = compose(getFirstResult, getImmutableTagResult
 const getAllTags = () => axios.get(getFullApiUrl('/tags')).then(getImmutableTagResults);
 const getTagById = tagId => axios.get(getFullApiUrl('/tag/' + tagId)).then(getImmutableFirstTagResult);
 const postNewTag = newTagData => axios.post(getFullApiUrl('/tags'), newTagData);
+const searchTags = searchQuery => axios.get(getFullApiUrl('/search/tags?query=' + searchQuery)).then(getImmutableTagResults);
+const putTagToAuthor = (tagId, authorId) => axios.put(getFullApiUrl('/author/' + authorId + '/tag/' + tagId));
+const putTagToBook = (tagId, bookId) => axios.put(getFullApiUrl('/book/' + bookId + '/tag/' + tagId));
 
 // Validation Helpers
 const validateIdValue = idValueToValidate => {
@@ -85,6 +88,9 @@ export default {
         getAllTags,
         getTagById,
         postNewTag,
+        searchTags,
+        putTagToAuthor,
+        putTagToBook,
 
         filterDeleted,
         filterNull,
