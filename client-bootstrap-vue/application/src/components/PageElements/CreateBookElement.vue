@@ -1,5 +1,5 @@
 <template><div id="create-book">
-    <b-card header="Create a Book"><b-form @submit="handleSubmit" @reset="handleReset">
+    <b-card header="Create a Book"><b-form @submit="handleSubmit" @reset="handleReset" autocomplete="off">
         <b-input-group>
             <b-form-input id="book-title-input" v-model="createBookFormData.title" required placeholder="Title (required)" autocomplete="off"></b-form-input>
             <b-input-group-append><b-button size="sm" type="submit" variant="primary" title="Create Book"><b-icon icon="plus"></b-icon></b-button></b-input-group-append>

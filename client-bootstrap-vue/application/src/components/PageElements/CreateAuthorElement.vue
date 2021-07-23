@@ -1,5 +1,5 @@
 <template><div id="author-create">
-    <b-card header="Create an Author"><b-form @submit="handleSubmit" @reset="handleReset">
+    <b-card header="Create an Author"><b-form @submit="handleSubmit" @reset="handleReset" autocomplete="off">
         <b-form-group id="author-first-name-group" label="First Name" label-for="author-first-name-input">
             <b-form-input id="author-first-name-input" v-model="createAuthorFormData.first_name" placeholder="First Name" autocomplete="off"></b-form-input>
         </b-form-group>
@@ -36,15 +36,15 @@ export default {
     methods: {
         populateParentAuthorSelect: function() {
             this.getAllAuthors().then(response => {
-                if (Array.isArray(response.data.Authors) && response.data.Authors.length) {
-                    this.parentAuthorOptions = [{ value: null, text: 'Select an Author' }]
-                        .concat(Array.from(response.data.Authors)
+                if (response && response.size) {
+                    this.parentAuthorOptions = [{ value: null, text: 'Select an Author' }].concat(
+                        response.map(item => item.toJSON()).toArray()
                             .filter(this.filterDeletedAndPseudonymAuthors)
                             .map(currentAuthor => ({
                                 value: currentAuthor.id,
                                 text: this.getAuthorNameLastFirstMiddle(currentAuthor),
                             }))
-                        );
+                    );
                 }
             }).catch(() => {
                 this.popError('Could not retrieve parent author options.');
