@@ -236,13 +236,6 @@ export const createAndRespond = curry((
 ): Response => {
     const newRecord = extractValuesFromRequest(request);
     const newRecordValidation = validateExtractedValues(newRecord);
-
-    logger.debug({ application: {
-        newRecord,
-        newRecordValidation,
-        request,
-    } }, 'Create New Resource Values');
-
     if (newRecordValidation.boolean) { // Validate Extracted Values
         sequelizeModel.create(newRecord)
             .then(result => insertSuccessHandler(response, result, 201))
