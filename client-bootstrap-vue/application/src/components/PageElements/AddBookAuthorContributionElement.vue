@@ -3,17 +3,19 @@
     <!-- Create Book Author Contribution Input Group: Start -->
     <b-input-group size="sm">
 
-        <!-- Add Author to Book: Start -->
+        <!-- Add Author to Book Label & Clear Button: Start -->
         <b-input-group-prepend v-if="addAuthorTextLabelVisible" :is-text="true">Add Author</b-input-group-prepend>
         <b-input-group-prepend v-if="addAuthorInputClearButtonVisible"><b-button @click.left="resetCreateBookAuthorContributionFormInputs()">Clear Author</b-button></b-input-group-prepend>
-        <b-form-input v-if="addAuthorInputVisible" :debounce="updateDelay" v-model="addAuthorInputValue" @update="addAuthorInputValueChanged" :readonly="addAuthorInputValueLocked" />
-        <!-- Add Author to Book: End -->
+        <!-- Add Author to Book Label & Clear Button: End -->
 
-        <!-- Add Book to Author: Start -->
+        <!-- Add Book to Author Label & Clear Button: Start -->
         <b-input-group-prepend v-if="addBookTextLabelVisible" :is-text="true">Add Book</b-input-group-prepend>
         <b-input-group-prepend v-if="addBookInputClearButtonVisible"><b-button @click.left="resetCreateBookAuthorContributionFormInputs()">Clear Book</b-button></b-input-group-prepend>
-        <b-form-input v-if="addBookInputVisible" :debounce="updateDelay" v-model="addBookInputValue" @update="addBookInputValueChanged" :readonly="addBookInputValueLocked" />
-        <!-- Add Book to Author: End -->
+        <!-- Add Book to Author Label & Clear Button: End -->
+
+        <!-- Add Book Author Contribution Form Input: Start -->
+        <b-form-input :debounce="updateDelay" v-model="addResourceInputValue" @update="addResourceInputValueChanged" :readonly="addResourceInputValueLocked" />
+        <!-- Add Book Author Contribution Form Input: End -->
 
         <!-- Choose Contribution Type Dropdown and Submit: Start -->
         <b-input-group-append>
@@ -46,18 +48,10 @@ export default {
     data: function() {return  {
 
         // Add Author Input Variables
-        addAuthorInputValue: '',
-        addAuthorInputValueId: null,
-        addAuthorInputValueLocked: false,
-        addAuthorInputVisible: false,
         addAuthorTextLabelVisible: false,
         addAuthorInputClearButtonVisible: false,
 
         // Add Book Input Variables
-        addBookInputValue: '',
-        addBookInputValueId: null,
-        addBookInputValueLocked: false,
-        addBookInputVisible: false,
         addBookTextLabelVisible: false,
         addBookInputClearButtonVisible: false,
 
@@ -69,6 +63,9 @@ export default {
         addBookButtonDisabled: true,
 
         // Component Universal Variables
+        addResourceInputValue: '',
+        addResourceInputValueId: null,
+        addResourceInputValueLocked: false,
         searchSelection: [],
         searchSelectionVisible: false,
 
@@ -76,85 +73,51 @@ export default {
     methods: {
 
         // Add Author Methods
-        addAuthorInputValueChanged: function(newAuthorSearchValue) {
-            if ('' != newAuthorSearchValue.trim()) { // Check for New Value
-                this.searchAuthors(newAuthorSearchValue).then(results => {
-                    if (results.size > 0) { // Check for Search Results
-                        this.searchSelection = results.map(item => ({
-                            id: item.get('id'),
-                            title: this.getAuthorFullName(item.toJSON()),
-                            disabled: false,
-                        })).toArray();
-                    } else { // Middle of Check for Search Results
-                        this.searchSelection = [{
-                            id: 0,
-                            title: '[no results]',
-                            disabled: true,
-                        }];
-                    } // End of Check for Search Results
-                    this.searchSelectionVisible = true;
-                    this.addAuthorTextLabelVisible = false;
-                    this.addAuthorInputClearButtonVisible = true;
-                }).catch(() => {
-                    this.popError('Failed searching for authors');
-                    this.searchSelection = [];
-                    this.searchSelectionVisible = false;
-                    this.addAuthorTextLabelVisible = true;
-                    this.addAuthorInputClearButtonVisible = false;
-                });
-            } else { // Middle of Check for New Value
-                this.resetCreateBookAuthorContributionFormInputs();
-            } // End of Check for New Value
+        processSearchAuthorsResults: function(authorSearchResults) {
+            if (authorSearchResults.size > 0) { // Check for Search Results
+                this.searchSelection = authorSearchResults.map(item => ({
+                    id: item.get('id'),
+                    title: this.getAuthorFullName(item.toJSON()),
+                    disabled: false,
+                })).toArray();
+            } else { // Middle of Check for Search Results
+                this.searchSelection = [{
+                    id: 0,
+                    title: '[no results]',
+                    disabled: true,
+                }];
+            } // End of Check for Search Results
+            this.addAuthorTextLabelVisible = false;
+            this.addAuthorInputClearButtonVisible = true;
+            this.processSearchResults(); // Call the Search Results Handler for All Resource Types
         },
-        resetAddAuthorInput: function() {
-            this.addAuthorInputValue = '';
-            this.addAuthorInputValueId = null;
-            this.addAuthorInputValueLocked = false;
-            this.addAuthorTextLabelVisible = true;
-            this.addAuthorInputClearButtonVisible = false;
-            this.searchSelection = [];
-            this.searchSelectionVisible = false;
+        processSearchAuthorsError: function() {
+            this.popError('Failed searching for authors');
+            this.processSearchError(); // Call the Search Error Handler for All Resource Types
         },
 
         // Add Book Methods
-        addBookInputValueChanged: function(newBookSearchValue) {
-            if ('' != newBookSearchValue.trim()) { // Check for New Value
-                this.searchBooks(newBookSearchValue).then(results => {
-                    if (results.size > 0) { // Check for Search Results
-                        this.searchSelection = results.map(item => ({
-                            id: item.get('id'),
-                            title: item.get('title'),
-                            disabled: false,
-                        })).toArray();
-                    } else { // Middle of Check for Search Results
-                        this.searchSelection = [{
-                            id: 0,
-                            title: '[no results]',
-                            disabled: true,
-                        }];
-                    } // End of Check for Search Results
-                    this.searchSelectionVisible = true;
-                    this.addBookTextLabelVisible = false;
-                    this.addBookInputClearButtonVisible = true;
-                }).catch(() => {
-                    this.popError('Failed searching for books');
-                    this.searchSelection = [];
-                    this.searchSelectionVisible = false;
-                    this.addBookTextLabelVisible = true;
-                    this.addBookInputClearButtonVisible = false;
-                });
-            } else { // Middle of Check for New Value
-                this.resetCreateBookAuthorContributionFormInputs();
-            } // End of Check for New Value
+        processSearchBooksResults: function(bookSearchResults) {
+            if (bookSearchResults.size > 0) { // Check for Search Results
+                this.searchSelection = bookSearchResults.map(item => ({
+                    id: item.get('id'),
+                    title: item.get('title'),
+                    disabled: false,
+                })).toArray();
+            } else { // Middle of Check for Search Results
+                this.searchSelection = [{
+                    id: 0,
+                    title: '[no results]',
+                    disabled: true,
+                }];
+            } // End of Check for Search Results
+            this.addBookTextLabelVisible = false;
+            this.addBookInputClearButtonVisible = true;
+            this.processSearchResults(); // Call the Search Results Handler for All Resource Types
         },
-        resetAddBookInput: function() {
-            this.addBookInputValue = '';
-            this.addBookInputValueId = null;
-            this.addBookInputValueLocked = false;
-            this.addBookTextLabelVisible = true;
-            this.addBookInputClearButtonVisible = false;
-            this.searchSelection = [];
-            this.searchSelectionVisible = false;
+        processSearchBooksError: function() {
+            this.popError('Failed searching for books');
+            this.processSearchError(); // Call the Search Error Handler for All Resource Types
         },
 
         // Add Contribution Type Methods
@@ -163,7 +126,22 @@ export default {
                 .then(results => this.allContributionTypes = results.map(item => Object.assign(item.toJSON(), { disabled: false })).toArray())
                 .catch(() => this.popError('Failed retrieving available contribution types'));
         },
-        disableContributionTypesByBookIdAndAuthorId: function(bookId, authorId) {
+        disableContributionTypesByBookIdAndAuthorId: function() {
+            let bookId;
+            let authorId;
+            switch (this.context) { // Determine Context to Set ID Variables
+
+                case 'author':
+                    bookId = this.addResourceInputValueId;
+                    authorId = this.contextId;
+                    break;
+                
+                case 'book':
+                    bookId = this.contextId;
+                    authorId = this.addResourceInputValueId;
+                    break;
+
+            } // End of Determine Context to Set ID Variables
             this.allContributionTypes = this.allContributionTypes.map(item => {
                 for (let i = 0; i < this.existingResources.length; i++) { // Loop through Existing Contribution Types
                     if ((this.existingResources[i].AuthorId == authorId) &&
@@ -196,26 +174,62 @@ export default {
         },
 
         // Component Universal Methods
-        searchResultValueSelected: function(selectedSearchResult) {
+        processSearchResults: function() {
+            this.searchSelectionVisible = true;
+        },
+        processSearchError: function() {
+            this.searchSelection = [];
+            this.searchSelectionVisible = false;
+        },
+        addResourceInputValueChanged: function(newResourceValue) {
+            if ('' != newResourceValue.trim()) { // Check for New Value
+                switch (this.context) {
+
+                    case 'author':
+                        this.searchBooks(newResourceValue)
+                            .then(this.processSearchBooksResults)
+                            .catch(this.processSearchBooksError);
+                        break;
+
+                    case 'book':
+                        this.searchAuthors(newResourceValue)
+                            .then(this.processSearchAuthorsResults)
+                            .catch(this.processSearchAuthorsError);
+                        break;
+
+                }
+            } else { // Middle of Check for New Value
+                this.resetCreateBookAuthorContributionFormInputs();
+            } // End of Check for New Value
+        },
+        resetResourceInput: function() {
+            this.addResourceInputValue = '';
+            this.addResourceInputValueId = null;
+            this.addResourceInputValueLocked = false;
+            this.searchSelection = [];
+            this.searchSelectionVisible = false;
             switch (this.context) {
 
                 case 'author':
-                    this.addBookInputValue = selectedSearchResult.title;
-                    this.addBookInputValueId = selectedSearchResult.id;
-                    this.addBookInputValueLocked = true;
-                    this.disableContributionTypesByBookIdAndAuthorId(selectedSearchResult.id, this.contextId);
+                    this.addBookTextLabelVisible = true;
+                    this.addBookInputClearButtonVisible = false;
                     break;
 
                 case 'book':
-                    this.addAuthorInputValue = selectedSearchResult.title;
-                    this.addAuthorInputValueId = selectedSearchResult.id;
-                    this.addAuthorInputValueLocked = true;
-                    this.disableContributionTypesByBookIdAndAuthorId(this.contextId, selectedSearchResult.id);
+                    this.addAuthorTextLabelVisible = true;
+                    this.addAuthorInputClearButtonVisible = false;
                     break;
 
             }
+            
+        },
+        searchResultValueSelected: function(selectedSearchResult) {
+            this.addResourceInputValue = selectedSearchResult.title;
+            this.addResourceInputValueId = selectedSearchResult.id;
+            this.addResourceInputValueLocked = true;
             this.searchSelection = [];
             this.searchSelectionVisible = false;
+            this.disableContributionTypesByBookIdAndAuthorId();
             this.selectContributionDropdownVariant = "primary";
             this.selectContributionDropdownDisabled = false;
         },
@@ -258,17 +272,7 @@ export default {
                 .catch(() => this.popError('Failed to add book-author contribution.'));
         },
         resetCreateBookAuthorContributionFormInputs: function() {
-            switch (this.context) { // Determine Context to Reset Correctly
-
-                case 'author':
-                    this.resetAddBookInput();
-                    break;
-                
-                case 'book':
-                    this.resetAddAuthorInput();
-                    break;
-
-            } // End of Determine Context to Reset Correctly
+            this.resetResourceInput();
             this.resetContributionTypesSelectInput();
         },
 
@@ -280,12 +284,10 @@ export default {
 
             case 'author':
                 this.addBookTextLabelVisible = true;
-                this.addBookInputVisible = true;
                 break;
 
             case 'book':
                 this.addAuthorTextLabelVisible = true;
-                this.addAuthorInputVisible = true;
                 break;
 
         } // End of Determine Which Fields to Display By Context
