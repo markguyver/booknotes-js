@@ -21,7 +21,7 @@ export default {
         handleSubmit: function() {
             this.postNewBook(this.createBookFormData).then(response => {
                 if (201 == response.status) { // Check for Successful Status
-                    this.popInfo('A book has been created: ' + response.data.Books.title); // TODO Add Link to View Book Page
+                    this.popInfo('A book has been created: ' + response.data.Books[0].title); // TODO Add Link to View Book Page
                     this.handleReset();
                 } else { // Middle of Check for Successful Status
                     this.popError('Unexpected error while creating book.');

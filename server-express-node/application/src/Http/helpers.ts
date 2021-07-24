@@ -238,7 +238,7 @@ export const createAndRespond = curry((
     const newRecordValidation = validateExtractedValues(newRecord);
     if (newRecordValidation.boolean) { // Validate Extracted Values
         sequelizeModel.create(newRecord)
-            .then(result => insertSuccessHandler(response, result, 201))
+            .then(result => insertSuccessHandler(response, [result], 201))
             .catch(error => {
                 logger.error({ application: {
                     sequelizeModel: typeof sequelizeModel,

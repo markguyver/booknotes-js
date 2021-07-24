@@ -20,6 +20,7 @@ const getImmutableAuthorResults = getImmutableApiResults('Authors');
 const getImmutableFirstAuthorResult = compose(getFirstResult, getImmutableAuthorResults);
 const getAllAuthors = () => axios.get(getFullApiUrl('/authors')).then(getImmutableAuthorResults);
 const getAuthorById = authorId => axios.get(getFullApiUrl('/author/' + authorId)).then(getImmutableFirstAuthorResult);
+const postNewAuthor = newAuthorData => axios.post(getFullApiUrl('/authors'), newAuthorData);
 const putAuthorTagById = (authorId, tagId) => axios.put(getFullApiUrl('/author/' + authorId + '/tag/' + tagId)).then(getImmutableFirstAuthorResult);
 const deleteAuthorTagById = (authorId, tagId) => axios.delete(getFullApiUrl('/author/' + authorId + '/tag/' + tagId));
 const searchAuthors = searchQuery => axios.get(getFullApiUrl('/search/authors?query=' + searchQuery.trim())).then(getImmutableAuthorResults);
@@ -80,6 +81,7 @@ export default {
 
         getAllAuthors,
         getAuthorById,
+        postNewAuthor,
         putAuthorTagById,
         deleteAuthorTagById,
         searchAuthors,

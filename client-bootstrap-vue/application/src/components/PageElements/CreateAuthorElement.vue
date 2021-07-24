@@ -18,7 +18,6 @@
 </div></template>
 
 <script>
-import axios from 'axios';
 import authorHelpers from '../Mixins/authorHelpers';
 import apiResultsHelpers from '../Mixins/apiResultsHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
@@ -52,15 +51,11 @@ export default {
             });
         },
         handleSubmit: function() {
-            axios.post('/authors', this.createAuthorFormData).then(response => {
-                if (201 == response.status) {
-                    this.popInfo('An author has been created: ' + this.getAuthorFullName(response.data.Authors[0])); // TODO Add Link to AView Author Page
-                    this.handleReset();
-                    this.populateParentAuthorSelect();
-                }
-            }).catch(() => {
-                this.popError('Could not create author.');
-            });
+            this.postNewAuthor(this.createAuthorFormData).then(response => {
+                this.popInfo('An author has been created: ' + this.getAuthorFullName(response.data.Authors[0])); // TODO Add Link to View Author Page
+                this.handleReset();
+                this.populateParentAuthorSelect();
+            }).catch(() => this.popError('Could not create author.'));
         },
         handleReset: function() {
             this.createAuthorFormData.first_name = null;
