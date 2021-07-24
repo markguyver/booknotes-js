@@ -66,20 +66,25 @@ export default {
     },
     data: function() {return {
         book: {},
+
         bookAuthors: [],
+
         bookNotes: [],
-        bookTags: [],
         noteListKey: '',
         collapseNoteCreateVisible: false,
         collapseNoteCreateActiveButton: '',
         collapseNoteCreateInactiveButton: '',
         noteCreateButtonTooltipText: '',
+
+        bookTags: [],
         collapseAddTagVisible: false,
         collapseAddTagActiveButton: '',
         collapseAddTagInactiveButton: '',
         addTagButtonTooltipText: '',
     };},
     methods: {
+
+        // Book Notes Methods
         setNoteListKey: function() {
             this.noteListKey = this.bookNotes.map(currentNote => currentNote.id).join(',');
         },
@@ -92,29 +97,6 @@ export default {
                 this.bookNotes = [];
                 this.popError('Could not retrieve notes.');
             });
-        },
-        addTagToBook: function(tagToAdd) {
-            this.putTagToBook(tagToAdd.id, this.book.id)
-                .then(() => {
-                    this.bookTags.push(tagToAdd);
-                    this.$refs.addTagComponent.clearAddTagInput();
-                    this.popInfo('Tag has been added');
-                })
-                .catch(() => this.popError('Failed to add tag to book'));
-        },
-        addAuthorsToBook: function() {
-            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('Add Authors to Book Button Pushed');
-        },
-        removeAuthorFromBook: function(author) {
-            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('Remove Author From Book, Author:', author);
-        },
-        removeTagFromBook: function(tagId) {
-            this.deleteBookTagById(this.book.id, tagId).then(() => {
-                this.popInfo('The tag has been removed from the book.');
-                this.bookTags = this.bookTags.filter(currentTag => currentTag.id !== tagId);
-            }).catch(() => this.popError('Failed to remove the tag from the book.', 'Deletion Error'));
         },
         removeNoteFromList: function(noteId) {
             // TODO: Update the Note Count Without Forcing a Complete Reload
@@ -141,13 +123,30 @@ export default {
             this.noteCreateButtonTooltipText = 'Hide Create Note';
             this.collapseNoteCreateVisible = true;
         },
+
+        // Book Tags Methods
+        addTagToBook: function(tagToAdd) {
+            this.putTagToBook(tagToAdd.id, this.book.id)
+                .then(() => {
+                    this.bookTags.push(tagToAdd);
+                    this.$refs.addTagComponent.clearAddTagInput();
+                    this.popInfo('Tag has been added');
+                })
+                .catch(() => this.popError('Failed to add tag to book'));
+        },
+        removeTagFromBook: function(tagId) {
+            this.deleteBookTagById(this.book.id, tagId).then(() => {
+                this.popInfo('The tag has been removed from the book.');
+                this.bookTags = this.bookTags.filter(currentTag => currentTag.id !== tagId);
+            }).catch(() => this.popError('Failed to remove the tag from the book.', 'Deletion Error'));
+        },
         collapseAddTagButtonPushed: function() {
-            if (this.collapseAddTagVisible) { // Check Create Note Button State and Toggle
+            if (this.collapseAddTagVisible) { // Check Add Tag Button State and Toggle
                 this.setAddTagButtonToCollapsedState();
                 this.$refs.addTagComponent.clearAddTagInput();
-            } else { // Middle of Check Create Note Button State and Toggle
+            } else { // Middle of Check Add Tag Button State and Toggle
                 this.setAddTagButtonToExpandedState();
-            } // End of Check Create Note Button State and Toggle
+            } // End of Check Add Tag Button State and Toggle
         },
         setAddTagButtonToCollapsedState: function() {
             this.collapseAddTagInactiveButton = 'plus-circle';
@@ -161,6 +160,17 @@ export default {
             this.addTagButtonTooltipText = 'Hide Add Tag(s)';
             this.collapseAddTagVisible = true;
         },
+
+        // Book Authors Methods
+        addAuthorsToBook: function() {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Add Authors to Book Button Pushed');
+        },
+        removeAuthorFromBook: function(author) {
+            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
+            console.log('Remove Author From Book, Author:', author);
+        },
+
     },
 	mixins: [authorHelpers, apiResultsHelpers, pageHelpers],
     mounted: function() {

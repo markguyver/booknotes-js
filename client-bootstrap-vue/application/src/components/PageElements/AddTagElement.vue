@@ -1,6 +1,9 @@
 <template><b-container id="add-tags">
     <b-input-group prepend="Add Tags" size="sm">
         <b-form-input :debounce="updateDelay" v-model="addTagInputValue" @update="addTagInputValueChanged" />
+        <b-input-group-append v-if="tagSelectionVisible">
+            <b-button @click.left="clearAddTagInput()">Clear</b-button>
+        </b-input-group-append>
     </b-input-group>
     <b-collapse v-model="tagSelectionVisible">
         <b-list-group class="position-absolute">
@@ -24,11 +27,19 @@ export default {
         addTagInputValueChanged: function(newValue) {
             if ('' != newValue.trim()) { // Check for New Value
                 this.searchTags(newValue.trim()).then(results => {
-                    this.tagSelection = results.map(item => ({
-                        id: item.get('id'),
-                        tag: item.get('tag'),
-                        disable: -1 !== this.tagsToIgnore.indexOf(item.get('id'))
-                    })).toArray();
+                    if (results.size > 0) { // Check for Search Results
+                        this.tagSelection = results.map(item => ({
+                            id: item.get('id'),
+                            tag: item.get('tag'),
+                            disable: -1 !== this.tagsToIgnore.indexOf(item.get('id'))
+                        })).toArray();
+                    } else { // Middle of Check for Search Results
+                        this.tagSelection = [{
+                            id: 0,
+                            tag: '[no results]',
+                            disable: true,
+                        }];
+                    } // End of Check for Search Results
                     this.tagSelectionVisible = true;
                 }).catch(() => {
                     this.popError('Failed searching for tags'); 
@@ -36,8 +47,7 @@ export default {
                     this.tagSelectionVisible = false;
                 });
             } else { // Middle of Check for New Value
-                this.tagSelection = [];
-                this.tagSelectionVisible = false;
+                this.clearAddTagInput();
             } // End of Check for New Value
         },
         clearAddTagInput: function() {

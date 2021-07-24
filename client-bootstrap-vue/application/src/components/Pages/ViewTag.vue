@@ -51,6 +51,8 @@ export default {
         tagNotes: [],
     };},
     methods: {
+
+        // Tag Authors Methods
         addAuthorsToTag: function() {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
             console.log('Add Authors to Tag Button Pushed');
@@ -61,6 +63,8 @@ export default {
                 this.tagAuthors = this.tagAuthors.filter(currentAuthor => currentAuthor.id !== author.id);
             }).catch(() => this.popError('Failed to remove the author from the tag.', 'Deletion Error'));
         },
+
+        // Tag Books Methods
         addBooksToTag: function() {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
             console.log('Add Books to Tag Button Pushed');
@@ -71,6 +75,7 @@ export default {
                 this.tagBooks = this.tagBooks.filter(currentBook => currentBook.id !== book.id);
             }).catch(() => this.popError('Failed to remove the book from the tag.', 'Deletion Error'));
         },
+
     },
 	mixins: [pageHelpers, apiResultsHelpers],
     mounted: function() {
