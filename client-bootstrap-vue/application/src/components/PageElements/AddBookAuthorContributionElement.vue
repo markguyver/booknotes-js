@@ -244,21 +244,21 @@ export default {
 
                 case 'author':
                     authorId = this.contextId;
-                    bookId = this.addBookInputValueId;
+                    bookId = this.addResourceInputValueId;
                     emitObject.Book = {
-                        id: this.addBookInputValueId,
-                        title: this.addBookInputValue,
+                        id: this.addResourceInputValueId,
+                        title: this.addResourceInputValue,
                     };
                     break;
 
                 case 'book':
-                    authorId = this.addAuthorInputValueId;
+                    authorId = this.addResourceInputValueId;
                     bookId = this.contextId;
                     emitObject.Author = {
-                        id: this.addAuthorInputValueId,
+                        id: this.addResourceInputValueId,
                         first_name: '',
                         middle_name: '',
-                        last_name: this.addAuthorInputValue, // This isn't exactly true but will suffice until a refresh
+                        last_name: this.addResourceInputValue, // This isn't exactly true but will suffice until a refresh
                     };
                     break;
 
