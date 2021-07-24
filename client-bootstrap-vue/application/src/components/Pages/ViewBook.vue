@@ -24,12 +24,12 @@
                     <TagSubList :tags="bookTags" @remove-tag="removeTagFromBook" />
                 </b-list-group-item>
                 <b-list-group-item id="book-authors">
-                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <IconButton id="add-author-to-book-button" @button-push-left="addAuthorsToBook()" class="float-right" /></div>
-                    <b-tooltip target="add-author-to-book-button" placement="left" variant="secondary">Add Author(s) to Book</b-tooltip>
+                    <div class="h6">Authors <span class="muted">({{ bookAuthors.length }})</span> <IconButton id="add-author-to-book-button" @button-push-left="collapseAddAuthorButtonPushed()" :activeIconName="collapseAddAuthorActiveButton" :inactiveIconName="collapseAddAuthorInactiveButton" class="float-right" /></div>
+                    <b-tooltip target="add-author-to-book-button" placement="left" variant="secondary">{{ addAuthorButtonTooltipText }}</b-tooltip>
+                    <b-collapse v-model="collapseAddAuthorVisible">
+                        <AddBookAuthorContributionElement context="book" :contextId="book.id" :existingResources="bookAuthors" @add-book-author-contribution="addAuthorToBook" ref="addBookAuthorContributionComponent" />
+                    </b-collapse>
                     <AuthorSubList :authors="convertBookAuthorsToAuthorsList(bookAuthors)" @remove-author="removeAuthorFromBook" />
-
-                    <!-- Adding an Author to this Book Should Be a Page Element Component -->
-
                 </b-list-group-item>
                 <b-list-group-item id="book-notes">
                     <div class="h6">Notes <span class="muted">({{ bookNotes.length }})</span> <IconButton id="add-note-to-book-button" @button-push-left="collapseNoteCreateButtonPushed" :activeIconName="collapseNoteCreateActiveButton" :inactiveIconName="collapseNoteCreateInactiveButton" class="float-right" /></div>
@@ -51,6 +51,7 @@ import pageHelpers from '../Mixins/pageHelpers';
 import IconButton from '../PageElements/IconButton.vue';
 import CreateNoteElement from '../PageElements/CreateNoteElement.vue';
 import NotesSubList from '../PageElements/NotesSubList.vue';
+import AddBookAuthorContributionElement from '../PageElements/AddBookAuthorContributionElement.vue';
 import AuthorSubList from '../PageElements/AuthorSubList.vue';
 import AddTagElement from '../PageElements/AddTagElement.vue';
 import TagSubList from '../PageElements/TagSubList.vue';
@@ -60,6 +61,7 @@ export default {
         IconButton,
         NotesSubList,
         CreateNoteElement,
+        AddBookAuthorContributionElement,
         AuthorSubList,
         AddTagElement,
         TagSubList,
@@ -68,6 +70,10 @@ export default {
         book: {},
 
         bookAuthors: [],
+        collapseAddAuthorVisible: false,
+        collapseAddAuthorActiveButton: '',
+        collapseAddAuthorInactiveButton: '',
+        addAuthorButtonTooltipText: '',
 
         bookNotes: [],
         noteListKey: '',
@@ -162,13 +168,32 @@ export default {
         },
 
         // Book Authors Methods
-        addAuthorsToBook: function() {
-            /* eslint no-console: ["error", { allow: ["log", "error"] }] */
-            console.log('Add Authors to Book Button Pushed');
+        addAuthorToBook: function(newAuthorValue) {
+            this.bookAuthors.push(newAuthorValue);
         },
         removeAuthorFromBook: function(author) {
             /* eslint no-console: ["error", { allow: ["log", "error"] }] */
             console.log('Remove Author From Book, Author:', author);
+        },
+        collapseAddAuthorButtonPushed: function() {
+            if (this.collapseAddAuthorVisible) { // Check Add Book Button State and Toggle
+                this.setAddAuthorButtonToCollapsedState();
+                this.$refs.addBookAuthorContributionComponent.resetCreateBookAuthorContributionFormInputs();
+            } else { // Middle of Check Add Book Button State and Toggle
+                this.setAddAuthorButtonToExpandedState();
+            } // End of Check Add Book Button State and Toggle
+        },
+        setAddAuthorButtonToCollapsedState: function() {
+            this.collapseAddAuthorInactiveButton = 'plus-circle';
+            this.collapseAddAuthorActiveButton = 'plus-circle-fill';
+            this.addAuthorButtonTooltipText = 'Add Author(s) to Book';
+            this.collapseAddAuthorVisible = false;
+        },
+        setAddAuthorButtonToExpandedState: function() {
+            this.collapseAddAuthorInactiveButton = 'arrow-up-circle';
+            this.collapseAddAuthorActiveButton = 'arrow-up-circle-fill';
+            this.addAuthorButtonTooltipText = 'Hide Add Author(s)';
+            this.collapseAddAuthorVisible = true;
         },
 
     },
@@ -187,6 +212,7 @@ export default {
                 this.bookTags = this.book.Tags;
                 this.setCreateNoteButtonToCollapsedState();
                 this.setAddTagButtonToCollapsedState();
+                this.setAddAuthorButtonToCollapsedState();
                 this.transitionFromLoadingToPage();
 
             }).catch(() => this.transitionFromLoadingToError('Error retrieving book.'));
