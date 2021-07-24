@@ -32,8 +32,8 @@ const isQueryOptionsProviderError = (errorToTest: any): errorToTest is queryOpti
 export const validationResponseBaseFail = (message: string = ''): validationResponse => ({ boolean: false, type: 'failure', message: message });
 export const validationResponseBaseSuccess = (): validationResponse => ({ boolean: true, type: 'success' });
 export const looksLikeAnId = (idSuspect: number): validationResponse => (!isNaN(idSuspect) && idSuspect > 0) ? validationResponseBaseSuccess() : validationResponseBaseFail();
-export const isNonEmptyString = (value: string | undefined): validationResponse => ('string' == typeof value && value.length > 0) ? validationResponseBaseSuccess() : validationResponseBaseFail();
 const emptyValuesAsStrings = ['', 'NaN', 'null', 'undefined'];
+export const isNonEmptyString = (value?: string): validationResponse => ( ('string' == typeof value) && (value.length > 0) && (-1 == emptyValuesAsStrings.indexOf(value)) ) ? validationResponseBaseSuccess() : validationResponseBaseFail();
 export const removeEmptyValuesAsStrings = (valueToCheck: any): boolean => -1 == emptyValuesAsStrings.indexOf(String(valueToCheck).toString());
 
 // Prepare Data Handler Methods
@@ -55,9 +55,8 @@ export const extractIntQueryValueFromRequestData = curry((
 export const extractStringParameterValueFromRequestData = curry((
     parameterName: string,
     request: Request
-): string =>
-    String(request.params[parameterName]).toString() ||
-    String(request.body[parameterName]).toString()
+): string => 
+    String(request.params[parameterName] || request.body[parameterName] || '').toString()
 );
 export const extractStringQueryValueFromRequestData = curry((
     parameterName: string,
@@ -237,6 +236,13 @@ export const createAndRespond = curry((
 ): Response => {
     const newRecord = extractValuesFromRequest(request);
     const newRecordValidation = validateExtractedValues(newRecord);
+
+    logger.debug({ application: {
+        newRecord,
+        newRecordValidation,
+        request,
+    } }, 'Create New Resource Values');
+
     if (newRecordValidation.boolean) { // Validate Extracted Values
         sequelizeModel.create(newRecord)
             .then(result => insertSuccessHandler(response, result, 201))
