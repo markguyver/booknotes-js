@@ -20,7 +20,7 @@ const getImmutableAuthorResults = getImmutableApiResults('Authors');
 const getImmutableFirstAuthorResult = compose(getFirstResult, getImmutableAuthorResults);
 const getAllAuthors = () => axios.get(getFullApiUrl('/authors')).then(getImmutableAuthorResults);
 const getAuthorById = authorId => axios.get(getFullApiUrl('/author/' + authorId)).then(getImmutableFirstAuthorResult);
-const postNewAuthor = newAuthorData => axios.post(getFullApiUrl('/authors'), newAuthorData);
+const postNewAuthor = newAuthorData => axios.post(getFullApiUrl('/authors'), newAuthorData).then(getImmutableFirstAuthorResult);
 const putAuthorTagById = (authorId, tagId) => axios.put(getFullApiUrl('/author/' + authorId + '/tag/' + tagId)).then(getImmutableFirstAuthorResult);
 const deleteAuthorTagById = (authorId, tagId) => axios.delete(getFullApiUrl('/author/' + authorId + '/tag/' + tagId));
 const searchAuthors = searchQuery => axios.get(getFullApiUrl('/search/authors?query=' + searchQuery.trim())).then(getImmutableAuthorResults);
@@ -30,7 +30,7 @@ const getImmutableBookResults = getImmutableApiResults('Books');
 const getImmutableFirstBookResult = compose(getFirstResult, getImmutableBookResults);
 const getAllBooks = () => axios.get(getFullApiUrl('/books')).then(getImmutableBookResults);
 const getBookById = bookId => axios.get(getFullApiUrl('/book/' + bookId)).then(getImmutableFirstBookResult);
-const postNewBook = newBookData => axios.post(getFullApiUrl('/books'), newBookData);
+const postNewBook = newBookData => axios.post(getFullApiUrl('/books'), newBookData).then(getImmutableFirstBookResult);
 const putBookTagById = (bookId, tagId) => axios.put(getFullApiUrl('/book/' + bookId + '/tag/' + tagId)).then(getImmutableFirstBookResult);
 const deleteBookTagById = (bookId, tagId) => axios.delete(getFullApiUrl('/book/' + bookId + '/tag/' + tagId));
 const searchBooks = searchQuery => axios.get(getFullApiUrl('/search/books?query=' + searchQuery.trim())).then(getImmutableBookResults);
@@ -48,14 +48,14 @@ const getImmutableFirstNoteResult = compose(getFirstResult, getImmutableNoteResu
 const getNotesByBookId = bookId => axios.get(getFullApiUrl('/notes/book/' + bookId)).then(getImmutableNoteResults);
 const getNoteById = noteId => axios.get(getFullApiUrl('/note/' + noteId)).then(getImmutableFirstNoteResult);
 const deleteNoteById = noteId => axios.delete(getFullApiUrl('/note/' + noteId));
-const postNewNoteByBookId = (bookId, newNoteData) => axios.post(getFullApiUrl('/notes/book/' + bookId), { note: newNoteData, book_id: bookId });
+const postNewNoteByBookId = (bookId, newNoteData) => axios.post(getFullApiUrl('/notes/book/' + bookId), { note: newNoteData, book_id: bookId }).then(getImmutableFirstNoteResult);
 
 // Tags API Helpers
 const getImmutableTagResults = getImmutableApiResults('Tags');
 const getImmutableFirstTagResult = compose(getFirstResult, getImmutableTagResults);
 const getAllTags = () => axios.get(getFullApiUrl('/tags')).then(getImmutableTagResults);
 const getTagById = tagId => axios.get(getFullApiUrl('/tag/' + tagId)).then(getImmutableFirstTagResult);
-const postNewTag = newTagData => axios.post(getFullApiUrl('/tags'), newTagData);
+const postNewTag = newTagData => axios.post(getFullApiUrl('/tags'), newTagData).then(getImmutableFirstTagResult);
 const searchTags = searchQuery => axios.get(getFullApiUrl('/search/tags?query=' + searchQuery.trim())).then(getImmutableTagResults);
 const putTagToAuthor = (tagId, authorId) => axios.put(getFullApiUrl('/author/' + authorId + '/tag/' + tagId));
 const putTagToBook = (tagId, bookId) => axios.put(getFullApiUrl('/book/' + bookId + '/tag/' + tagId));

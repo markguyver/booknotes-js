@@ -52,7 +52,7 @@ export default {
         },
         handleSubmit: function() {
             this.postNewAuthor(this.createAuthorFormData).then(response => {
-                this.popInfo('An author has been created: ' + this.getAuthorFullName(response.data.Authors[0])); // TODO Add Link to View Author Page
+                this.popInfo('An author has been created: ' + this.getAuthorFullName(response.toJSON())); // TODO Add Link to View Author Page
                 this.handleReset();
                 this.populateParentAuthorSelect();
             }).catch(() => this.popError('Could not create author.'));

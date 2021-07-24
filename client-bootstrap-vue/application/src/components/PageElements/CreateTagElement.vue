@@ -20,10 +20,8 @@ export default {
     methods: {
         handleSubmit: function() {
             this.postNewTag(this.createTagFormData).then(response => {
-                if (201 == response.status) {
-                    this.popInfo('A tag has been created: ' + response.data.Tags[0].tag);
-                    this.handleReset();
-                }
+                this.popInfo('A tag has been created: ' + response.get('tag'));
+                this.handleReset();
             }).catch(() => {
                 this.popError('Could not create tag.');
             });
