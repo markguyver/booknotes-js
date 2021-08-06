@@ -10,6 +10,12 @@ module.exports = {
   },{
     id: 3,
     name: 'Translator',
+  },{
+    id: 4,
+    name: 'Foreword',
+  },{
+    id: 5,
+    name: 'Introduction',
   }]),
 
   down: async (queryInterface, Sequelize) => queryInterface.bulkDelete('contribution_types', null, {}),
