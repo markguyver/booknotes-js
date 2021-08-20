@@ -7,7 +7,7 @@
     "compile": "rm -rf dist && tsc",
     "db:migrate": "cd database && sequelize db:migrate",
     "db:rollback": "cd database && sequelize db:migrate:undo",
-    "develop": "npm run compile && nodemon dist",
+    "develop": "npm run compile && nodemon --inspect=0.0.0.0:9229 dist",
     "documentation": "redoc-cli bundle redoc.json",
     "lint": "npm run compile && eslint dist",
     "minimize": "uglifyjs -c -m -o dist/index.min.js -- $(find /var/node/dist -type f -iname *.js)",
