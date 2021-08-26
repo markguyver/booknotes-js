@@ -10,7 +10,6 @@
     "develop": "npm run compile && nodemon --inspect=0.0.0.0:9229 dist",
     "documentation": "redoc-cli bundle redoc.json",
     "lint": "npm run compile && eslint dist",
-    "minimize": "uglifyjs -c -m -o dist/index.min.js -- $(find /var/node/dist -type f -iname *.js)",
     "start": "node dist/index.js"
   },
   "author": "Mark Chavez <mark.chavez@startmail.com>",
@@ -39,10 +38,10 @@
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
     "eslint": "^6.8.0",
+    "jest": "^27.0.6",
     "nodemon": "^2.0.12",
     "redoc": "^2.0.0-rc.56",
     "sequelize-cli": "^5.5.1",
-    "typescript": "^3.9.10",
-    "uglify-js": "^3.14.1"
+    "typescript": "^3.9.10"
   }
 }
