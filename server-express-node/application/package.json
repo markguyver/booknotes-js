@@ -22,7 +22,7 @@
     "express-pino-logger": "^5.0.0",
     "immutable": "^4.0.0-rc.14",
     "mysql2": "^2.3.0",
-    "pino": "^6.13.0",
+    "pino": "^6.13.1",
     "ramda": "^0.27.1",
     "sequelize": "^5.22.3"
   },
