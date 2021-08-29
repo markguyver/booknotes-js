@@ -108,7 +108,6 @@ This list is not comprehensive but includes the key dependencies.
 * [Pino](https://getpino.io/)
 * [Express Pino](https://github.com/pinojs/express-pino-logger)
 * [Ramda](https://ramdajs.com/)
-* [UglifyJS](http://lisperator.net/uglifyjs/)
 * [ESLint](https://eslint.org/)
 
 ### Database
