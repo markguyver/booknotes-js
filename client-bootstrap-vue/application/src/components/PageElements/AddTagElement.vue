@@ -1,6 +1,6 @@
 <template><b-container id="add-tags">
     <b-input-group prepend="Add Tags" size="sm">
-        <b-form-input :debounce="updateDelay" v-model="addTagInputValue" @update="addTagInputValueChanged" />
+        <b-form-input :debounce="updateDelay" v-model="addTagInputValue" @update="addTagInputValueChanged" ref="addTag" />
         <b-input-group-append v-if="tagSelectionVisible">
             <b-button @click.left="clearAddTagInput()">Clear</b-button>
         </b-input-group-append>
@@ -54,6 +54,7 @@ export default {
             this.addTagInputValue = '';
             this.tagSelection = [];
             this.tagSelectionVisible = false;
+            this.$refs.addTag.focus();
         },
         addSelectedTag: function(selectedTag) {
             this.$emit('add-tag', selectedTag);
