@@ -14,7 +14,7 @@
         <!-- Add Book to Author Label & Clear Button: End -->
 
         <!-- Add Book Author Contribution Form Input: Start -->
-        <b-form-input :debounce="updateDelay" v-model="addResourceInputValue" @update="addResourceInputValueChanged" :readonly="addResourceInputValueLocked" />
+        <b-form-input :debounce="updateDelay" v-model="addResourceInputValue" @update="addResourceInputValueChanged" :readonly="addResourceInputValueLocked" ref="resourceInput" />
         <!-- Add Book Author Contribution Form Input: End -->
 
         <!-- Choose Contribution Type Dropdown and Submit: Start -->
@@ -221,7 +221,7 @@ export default {
                     break;
 
             }
-            
+            this.setFocusToResourceInput();
         },
         searchResultValueSelected: function(selectedSearchResult) {
             this.addResourceInputValue = selectedSearchResult.title;
@@ -275,6 +275,9 @@ export default {
             this.resetResourceInput();
             this.resetContributionTypesSelectInput();
         },
+        setFocusToResourceInput: function() {
+            this.$refs.resourceInput.focus();
+        }
 
     },
     mixins: [apiResultsHelpers, authorHelpers, pageHelpers],

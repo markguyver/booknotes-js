@@ -134,6 +134,7 @@ export default {
                 this.$refs.addBookAuthorContributionComponent.resetCreateBookAuthorContributionFormInputs();
             } else { // Middle of Check Add Book Button State and Toggle
                 this.setAddBookButtonToExpandedState();
+                setTimeout(() => this.$refs.addBookAuthorContributionComponent.setFocusToResourceInput(), 100);
             } // End of Check Add Book Button State and Toggle
         },
         setAddBookButtonToCollapsedState: function() {
