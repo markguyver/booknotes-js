@@ -1,5 +1,5 @@
 <template>
-    <CreateBookElement />
+    <CreateBookElement ref="createBookElement" />
 </template>
 
 <script>
@@ -9,6 +9,7 @@ export default {
     name: 'CreateBookPage',
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getBookBrowseBreadcrumb(), this.getBookCreateBreadcrumb()]);
+        setTimeout(() => this.$refs.createBookElement.setFocusToCreateBook(), 100);
     },
 };
 </script>
