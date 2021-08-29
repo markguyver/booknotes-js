@@ -104,6 +104,7 @@ export default {
                 this.$refs.addTagComponent.clearAddTagInput();
             } else { // Middle of Check Add Tag Button State and Toggle
                 this.setAddTagButtonToExpandedState();
+                setTimeout(() => this.$refs.addTagComponent.setFocusToAddTag(), 100);
             } // End of Check Add Tag Button State and Toggle
         },
         setAddTagButtonToCollapsedState: function() {

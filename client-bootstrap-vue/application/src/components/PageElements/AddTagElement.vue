@@ -54,10 +54,13 @@ export default {
             this.addTagInputValue = '';
             this.tagSelection = [];
             this.tagSelectionVisible = false;
-            this.$refs.addTag.focus();
+            this.setFocusToAddTag();
         },
         addSelectedTag: function(selectedTag) {
             this.$emit('add-tag', selectedTag);
+        },
+        setFocusToAddTag: function() {
+            this.$refs.addTag.focus();
         },
     },
     mixins: [apiResultsHelpers, pageHelpers],
