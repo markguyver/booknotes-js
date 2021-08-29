@@ -1,5 +1,5 @@
 <template>
-    <CreateTagElement />
+    <CreateTagElement ref="createTagElement" />
 </template>
 
 <script>
@@ -9,6 +9,7 @@ export default {
     name: 'CreateTagPage',
     mounted: function() {
         this.$emit('breadcrumbsChange', [this.getHomeBreadcrumb(),this.getTagBrowseBreadcrumb(), this.getTagCreateBreadcrumb()]);
+        setTimeout(() => this.$refs.createTagElement.setFocusToCreateTag(), 100);
     },
 };
 </script>
