@@ -71,6 +71,10 @@ div#notes-list div.note-item div.note-item-container {
     padding: 1rem;
     border-radius: 0.25rem;
 }
+div#notes-list div.note-item div.note-item-container div.note-item-content {
+    max-height: 20em;
+    overflow: hidden;
+}
 div#notes-list div.note-item div.note-item-container div.note-item-content :last-child {
     margin-bottom: 0;
 }
