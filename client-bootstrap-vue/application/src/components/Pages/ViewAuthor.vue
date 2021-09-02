@@ -21,7 +21,7 @@
             <b-list-group flush>
                 <b-list-group-item>
                     <div class="h6">Tags <span class="muted">({{ authorTags.length }})</span> <IconButton id="add-tag-to-author-button" @button-push-left="collapseAddTagButtonPushed()" :activeIconName="collapseAddTagActiveButton" :inactiveIconName="collapseAddTagInactiveButton" class="float-right" /></div>
-                    <b-tooltip target="add-tag-to-author-button" placement="left" variant="secondary">{{ addTagButtonTooltipText }}</b-tooltip>
+                    <b-tooltip target="add-tag-to-author-button" placement="left" variant="secondary" triggers="hover">{{ addTagButtonTooltipText }}</b-tooltip>
                     <b-collapse v-model="collapseAddTagVisible">
                         <AddTagElement :existingTags="authorTags" @add-tag="addTagtoAuthor" ref="addTagComponent" />
                     </b-collapse>
@@ -29,7 +29,7 @@
                 </b-list-group-item>
                 <b-list-group-item>
                     <div class="h6">Book Contributions <span class="muted">({{ author.BookAuthors.length }})</span> <IconButton id="add-book-to-author-button" @button-push-left="collapseAddBookButtonPushed()" :activeIconName="collapseAddBookActiveButton" :inactiveIconName="collapseAddBookInactiveButton" class="float-right" /></div>
-                    <b-tooltip target="add-book-to-author-button" placement="left" variant="secondary">{{ addBookButtonTooltipText }}</b-tooltip>
+                    <b-tooltip target="add-book-to-author-button" placement="left" variant="secondary" triggers="hover">{{ addBookButtonTooltipText }}</b-tooltip>
                     <b-collapse v-model="collapseAddBookVisible">
                         <AddBookAuthorContributionElement context="author" :contextId="author.id" :existingResources="authorBooks" @add-book-author-contribution="addBooktoAuthor" ref="addBookAuthorContributionComponent" />
                     </b-collapse>

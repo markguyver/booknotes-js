@@ -17,12 +17,12 @@
             <b-list-group flush>
                 <b-list-group-item>
                     <div class="h6">Authors <span class="muted">({{ tagAuthors.length }})</span> <IconButton id="add-author-to-tag-button" @button-push-left="addAuthorsToTag" class="float-right" /></div>
-                    <b-tooltip target="add-author-to-tag-button" placement="left" variant="secondary">Add Author(s) to Tag</b-tooltip>
+                    <b-tooltip target="add-author-to-tag-button" placement="left" variant="secondary" triggers="hover">Add Author(s) to Tag</b-tooltip>
                     <AuthorSubList :authors="tagAuthors" @remove-author="removeAuthorFromTag" />
                 </b-list-group-item>
                 <b-list-group-item>
                     <div class="h6">Books <span class="muted">({{ tagBooks.length }})</span> <IconButton id="add-book-to-tag-button" @button-push-left="addBooksToTag" class="float-right" /></div>
-                    <b-tooltip target="add-book-to-tag-button" placement="left" variant="secondary">Add Book(s) to Tag</b-tooltip>
+                    <b-tooltip target="add-book-to-tag-button" placement="left" variant="secondary" triggers="hover">Add Book(s) to Tag</b-tooltip>
                     <BookSubList :books="tagBooks" @remove-book="removeBookFromTag" />
                 </b-list-group-item>
                 <!--
