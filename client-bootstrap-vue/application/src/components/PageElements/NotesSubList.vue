@@ -4,6 +4,9 @@
         <div class="note-item-container">
             <div class="note-item-content" v-html="note.note"></div>
         </div>
+        <div class="note-item-meta mt-2">
+            <span class="label">Last Edited</span> <span class="data">{{ timeAgo(note.updatedAt) }}</span>
+        </div>
         <div class="note-item-buttons">
             <b-button size="sm" variant="secondary" @click="editNotePushed(note.id)">Edit</b-button>
             <b-button size="sm" variant="danger" @click="deleteNotePushed(note.id)">Delete</b-button>
@@ -14,6 +17,7 @@
 
 <script>
 import apiResultsHelpers from '../Mixins/apiResultsHelpers';
+import dateTimeHelpers from '../Mixins/dateTimeHelpers';
 import pageHelpers from '../Mixins/pageHelpers';
 export default {
     data: function() {return {
@@ -46,7 +50,7 @@ export default {
             console.log('Fullscreen Note Clicked, Note ID:', noteId);
         },
     },
-    mixins: [apiResultsHelpers, pageHelpers],
+    mixins: [apiResultsHelpers, dateTimeHelpers, pageHelpers],
     mounted: function() {
         this.notesToDisplay = this.notes;
     },
@@ -65,11 +69,10 @@ div#notes-list div.note-item {
     border-radius: 0.25rem;
     margin-top: 1rem;
 }
-div#notes-list div.note-item div.note-item-container {
-    background-color: #ffffff;
-    border: 1px solid #999999;
-    padding: 1rem;
-    border-radius: 0.25rem;
+div#notes-list div.note-item div.note-item-meta {
+    text-align: right;
+    font-style: italic;
+    color: #787878;
 }
 div#notes-list div.note-item div.note-item-container div.note-item-content {
     max-height: 20em;
@@ -77,6 +80,12 @@ div#notes-list div.note-item div.note-item-container div.note-item-content {
 }
 div#notes-list div.note-item div.note-item-container div.note-item-content :last-child {
     margin-bottom: 0;
+}
+div#notes-list div.note-item div.note-item-container {
+    background-color: #ffffff;
+    border: 1px solid #999999;
+    padding: 1rem;
+    border-radius: 0.25rem;
 }
 div#notes-list div.note-item div.note-item-buttons button {
     margin-top: 0.5rem;
