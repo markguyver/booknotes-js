@@ -8,6 +8,7 @@ import {
     Tag
 } from '../../Database/Relational/database-sequelize';
 import {
+    responseHandler,
     operationResult,
     getOperationResult,
     validationResponse,
@@ -36,9 +37,9 @@ export interface SubmittedTagCandidate {
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithTagsPayload = respondWithResourceList('Tags');
-export const respondWithTagNotFound = respondWithResourceNotFound('Tag');
-export const respondWithTagsNotFound = respondWithResourceNotFound('Tags');
-export const respondInvalidTagId = respondInvalidResourceId('Tag');
+export const respondWithTagNotFound: responseHandler = respondWithResourceNotFound('Tag');
+export const respondWithTagsNotFound: responseHandler = respondWithResourceNotFound('Tags');
+export const respondInvalidTagId: responseHandler = respondInvalidResourceId('Tag');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractTagIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('tag_id', request) || extractIntParameterValueFromRequestData('tagId', request);

@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { ContributionType } from '../../Database/Relational/database-sequelize';
 import {
+    responseHandler,
     validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
@@ -24,8 +25,8 @@ export interface ContributionTypeObject {
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithContributionTypesPayload = respondWithResourceList('ContributionTypes');
-export const respondWithContributionTypeNotFound = respondWithResourceNotFound('Contribution Type');
-export const respondInvalidContributionTypeId = respondInvalidResourceId('Contribution Type');
+export const respondWithContributionTypeNotFound: responseHandler = respondWithResourceNotFound('Contribution Type');
+export const respondInvalidContributionTypeId: responseHandler = respondInvalidResourceId('Contribution Type');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractContributionTypeIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('contribution_type_id', request) || extractIntParameterValueFromRequestData('contributionTypeId', request);

@@ -6,6 +6,7 @@ import { insertWhereEqualsToQueryOptionsAsFindOptions, insertWhereEqualsToQueryO
 import { logger } from '../logger';
 
 // Data Types
+export type responseHandler = (response: Response) => Response;
 export interface operationResult {
     statusCode: number;     // The HTTP Status Code to Respond With
     message: string;        // The HTTP Message (i.e. Body) to Respond With
@@ -13,7 +14,7 @@ export interface operationResult {
 }
 export interface queryOptionsProviderError {
     message: string;
-    handler: (response: Response) => Response;
+    handler: responseHandler;
 }
 export interface validationResponse {
     boolean:    boolean;
@@ -166,8 +167,8 @@ export const findAllAndRespond = curry((
 export const findByPKAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
     queryResultsHandler:            Function,
-    notFoundHandler:                (response: Response) => Response,
-    invalidIdHandler:               (response: Response) => Response,
+    notFoundHandler:                responseHandler,
+    invalidIdHandler:               responseHandler,
     extractedIdValidator:           (extractedId: number) => validationResponse,
     idExtractor:                    (request: Request) => number,
     queryOptions:                   FindOptions,
@@ -200,7 +201,7 @@ export const findByPKAndRespond = curry((
 export const findByFKAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
     queryResultsHandler:            Function,
-    invalidIdHandler:               (response: Response) => Response,
+    invalidIdHandler:               responseHandler,
     foreignKeyName:                 string,
     extractedForeignIdValidator:    (extractedId: number) => validationResponse,
     foreignIdProvider:              (request: Request) => number,
@@ -226,7 +227,7 @@ export const findByFKAndRespond = curry((
 });
 export const createAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
-    validationFailureHandler:       (response: Response, message: string | undefined) => Response,
+    validationFailureHandler:       (response: Response, message?: string) => Response,
     insertFailureHandler:           (response: Response, message: string) => Response,
     insertSuccessHandler:           Function,
     validateExtractedValues:        (extractedObject: object) => validationResponse,
@@ -256,14 +257,14 @@ export const createAndRespond = curry((
 });
 export const deleteAndRespond = curry((
     sequelizeModel:                 ModelCtor<Model<any, any>>,
-    notFoundHandler:                (response: Response) => Response,
-    invalidIdHandler:               (response: Response) => Response,
+    notFoundHandler:                responseHandler,
+    invalidIdHandler:               responseHandler,
     extractedIdValidator:           (extractedId: number) => validationResponse,
     idExtractor:                    (request: Request) => number,
     queryOptionsProvider:           (primaryKeyValue: number) => deleteModelOptions,
     request:                        Request,
     response:                       Response
-) => {
+): Response => {
     const id = idExtractor(request);
     if (extractedIdValidator(id).boolean) { // Validate ID Parameter
         const destroyOptions = queryOptionsProvider(id);

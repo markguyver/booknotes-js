@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { Note } from '../../Database/Relational/database-sequelize';
 import {
+    responseHandler,
     validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
@@ -28,9 +29,9 @@ export interface SubmittedNoteCandidate {
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithNotesPayload = respondWithResourceList('Notes');
-export const respondWithNoteNotFound = respondWithResourceNotFound('Note');
-export const respondWithNotesNotFound = respondWithResourceNotFound('Notes');
-export const respondWithInvalidNoteId = respondInvalidResourceId('Note');
+export const respondWithNoteNotFound: responseHandler = respondWithResourceNotFound('Note');
+export const respondWithNotesNotFound: responseHandler = respondWithResourceNotFound('Notes');
+export const respondWithInvalidNoteId: responseHandler = respondInvalidResourceId('Note');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractNoteIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('note_id', request) || extractIntParameterValueFromRequestData('noteId', request);

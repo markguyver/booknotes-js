@@ -2,6 +2,7 @@ import { Request } from 'express';
 import { Map } from 'immutable';
 import { BookAuthor } from '../../Database/Relational/database-sequelize';
 import {
+    responseHandler,
     validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
@@ -28,8 +29,8 @@ export interface SubmittedBookAuthorContributionCandidate {
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithAuthorsPayload = respondWithResourceList('BookAuthorContributions');
-export const respondWithBookAuthorContributionNotFound = respondWithResourceNotFound('BookAuthorContribution');
-export const respondWithBookAuthorContributionsNotFound = respondWithResourceNotFound('BookAuthorContributions');
+export const respondWithBookAuthorContributionNotFound: responseHandler = respondWithResourceNotFound('BookAuthorContribution');
+export const respondWithBookAuthorContributionsNotFound: responseHandler = respondWithResourceNotFound('BookAuthorContributions');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractBookAuthorContributionFromRequestData = (request: Request): SubmittedBookAuthorContributionCandidate => Map({

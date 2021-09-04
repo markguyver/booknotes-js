@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { Book } from '../../Database/Relational/database-sequelize';
 import {
+    responseHandler,
     validationResponse,
     validationResponseBaseFail,
     validationResponseBaseSuccess,
@@ -26,9 +27,9 @@ export interface SubmittedBookCandidate {
 
 // Prepare Resource-Specific Response Handler Methods
 export const respondWithBooksPayload = respondWithResourceList('Books');
-export const respondWithBookNotFound = respondWithResourceNotFound('Book');
-export const respondWithBooksNotFound = respondWithResourceNotFound('Books');
-export const respondInvalidBookId = respondInvalidResourceId('Book');
+export const respondWithBookNotFound: responseHandler = respondWithResourceNotFound('Book');
+export const respondWithBooksNotFound: responseHandler = respondWithResourceNotFound('Books');
+export const respondInvalidBookId: responseHandler = respondInvalidResourceId('Book');
 
 // Prepare Resource-Specific Data Handler Methods
 export const extractBookIdFromRequestData = (request: Request): number => extractIntParameterValueFromRequestData('book_id', request) || extractIntParameterValueFromRequestData('bookId', request);
